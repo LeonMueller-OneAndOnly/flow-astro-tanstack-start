@@ -5,12 +5,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "astro": "astro",
     "build": "astro build",
-    "preview": "astro preview",
-    "dev:vite": "vite dev --port 3000",
-    "build:vite": "vite build",
-    "serve": "vite preview",
+    "start": "node ./dist/server/entry.mjs",
     "test": "vitest run"
   },
   "dependencies": {
