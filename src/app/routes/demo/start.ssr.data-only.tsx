@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getPunkSongs } from "@/data/demo.punk-songs";
 
+/** Served at `/app/demo/start/ssr/data-only`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/start/ssr/data-only")({
   ssr: "data-only",
   component: RouteComponent,

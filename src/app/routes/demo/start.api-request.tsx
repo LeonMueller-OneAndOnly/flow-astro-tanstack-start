@@ -6,6 +6,7 @@ function getNames() {
   return fetch("/app/demo/api/names").then((res) => res.json());
 }
 
+/** Served at `/app/demo/start/api-request`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/start/api-request")({
   component: Home,
 });

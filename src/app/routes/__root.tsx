@@ -8,6 +8,10 @@ import StoreDevtools from "../lib/demo-store-devtools";
 
 import appCss from "../styles.css?url";
 
+/**
+ * Astro mounts this TanStack Start router under `/app` via `src/pages/app/[...slug].ts`.
+ * Child route paths are served as `/app` plus their TanStack route path.
+ */
 export const Route = createRootRoute({
   head: () => ({
     meta: [

@@ -1,44 +1,24 @@
-# Astro Starter Kit: Basics
+# Astro TanStack Start
 
-```sh
-pnpm create astro@latest -- --template basics
-```
+This repository is a framework starter, not a real application.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The current pages are intentionally small placeholder examples that show how Astro and TanStack Start fit together. They are not product flows, shipped UI, or domain-specific app features.
 
-## 🚀 Project Structure
+## What Is Included
 
-Inside of your Astro project, you'll see the following folders and files:
+- Astro owns the root site entry at `/`.
+- TanStack Start is mounted under `/app`.
+- The TanStack sample app includes lightweight examples for file-based routes, API endpoints, server functions, SSR modes, client state, and dynamic route params.
+- AI/chat/MCP demos are intentionally not included in the active sample app.
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+## Useful Routes
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+- `/` - Astro placeholder landing page.
+- `/app` - TanStack Start placeholder landing page.
+- `/app/demo/start/server-funcs` - Small server function todo example.
+- `/app/demo/start/api-request` - Client request to a TanStack API route.
+- `/app/demo/start/ssr` - SSR mode examples.
+- `/app/demo/store` - TanStack Store example.
+- `/app/example/guitars` - Dynamic route example with placeholder catalog data.
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `pnpm install`         | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm start`.          | Start the built server                           |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Everything under `src/app` belongs to TanStack Start. See the [TanStack Start docs](https://tanstack.com/start/latest) for how that area is structured and used.

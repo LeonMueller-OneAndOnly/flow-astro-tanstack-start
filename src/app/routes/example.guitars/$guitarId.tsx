@@ -1,6 +1,10 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import guitars from "../../data/example-guitars";
 
+/**
+ * Served at `/app/example/guitars/:guitarId`.
+ * TanStack's `$guitarId` segment is the dynamic URL part after Astro's `/app` mount.
+ */
 export const Route = createFileRoute("/example/guitars/$guitarId")({
   component: RouteComponent,
   loader: async ({ params }) => {

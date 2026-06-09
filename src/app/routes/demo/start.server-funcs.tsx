@@ -45,6 +45,7 @@ const addTodo = createServerFn({ method: "POST" })
     return todos;
   });
 
+/** Served at `/app/demo/start/server-funcs`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/start/server-funcs")({
   component: Home,
   loader: async () => await getTodos(),

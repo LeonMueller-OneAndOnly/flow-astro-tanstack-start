@@ -3,6 +3,7 @@ import { useStore } from "@tanstack/react-store";
 
 import { fullName, store } from "@/lib/demo-store";
 
+/** Served at `/app/demo/store`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/store")({
   component: DemoStore,
 });
