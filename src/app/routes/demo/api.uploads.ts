@@ -3,6 +3,7 @@ import { json } from "@tanstack/react-start";
 
 import {
   createDemoUploadKey,
+  DEMO_UPLOAD_PREFIX,
   demoUploadDisk,
   getDemoUploadsRoot,
   isDemoUploadKey,
@@ -61,7 +62,7 @@ export const Route = createFileRoute("/demo/api/uploads")({
 });
 
 async function listUploads() {
-  const listing = await demoUploadDisk.listAll("demo-uploads", { recursive: true });
+  const listing = await demoUploadDisk.listAll(DEMO_UPLOAD_PREFIX, { recursive: true });
   const files = await Promise.all(
     Array.from(listing.objects)
       .filter((object) => object.isFile)
