@@ -1,61 +1,29 @@
-import { sql } from "drizzle-orm";
-import { integer, numeric, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const sidequestMigrations = sqliteTable("sidequest_migrations", {
-  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
-  name: text("name", { length: 255 }),
-  batch: integer("batch"),
-  migrationTime: numeric("migration_time"),
-});
-
-export const sidequestMigrationsLock = sqliteTable("sidequest_migrations_lock", {
-  index: integer("index").primaryKey({ autoIncrement: true }).notNull(),
-  isLocked: integer("is_locked"),
-});
-
-export const sidequestQueues = sqliteTable(
-  "sidequest_queues",
+export const jobQueueJobs = sqliteTable(
+  "job_queue_jobs",
   {
     id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
     name: text("name", { length: 255 }).notNull(),
-    state: text("state", { length: 255 }).notNull(),
-    concurrency: integer("concurrency").notNull(),
-    priority: integer("priority").notNull(),
-  },
-  (table) => [uniqueIndex("sidequest_queues_name_unique").on(table.name)],
-);
-
-export const sidequestJobs = sqliteTable(
-  "sidequest_jobs",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
-    queue: text("queue", { length: 255 }).notNull(),
-    class: text("class", { length: 255 }).notNull(),
-    script: text("script", { length: 255 }).notNull(),
-    args: text("args").notNull(),
-    constructorArgs: text("constructor_args").notNull(),
+    payload: text("payload").notNull(),
+    status: text("status", { length: 32 }).notNull().default("pending"),
+    priority: integer("priority").notNull().default(0),
+    attempt: integer("attempt").notNull().default(0),
+    maxAttempts: integer("max_attempts").notNull().default(3),
+    availableAt: integer("available_at").notNull(),
+    lockedAt: integer("locked_at"),
+    lockedBy: text("locked_by", { length: 255 }),
+    startedAt: integer("started_at"),
+    completedAt: integer("completed_at"),
+    failedAt: integer("failed_at"),
     result: text("result"),
-    errors: text("errors"),
-    state: text("state", { length: 255 }).notNull(),
-    availableAt: numeric("available_at"),
-    insertedAt: numeric("inserted_at").notNull(),
-    attemptedAt: numeric("attempted_at"),
-    completedAt: numeric("completed_at"),
-    failedAt: numeric("failed_at"),
-    canceledAt: numeric("canceled_at"),
-    claimedAt: numeric("claimed_at"),
-    claimedBy: text("claimed_by", { length: 255 }),
-    attempt: integer("attempt").notNull(),
-    maxAttempts: integer("max_attempts").notNull(),
-    timeout: integer("timeout"),
-    uniqueDigest: text("unique_digest", { length: 255 }),
-    uniquenessConfig: text("uniqueness_config"),
-    retryDelay: integer("retry_delay"),
-    backoffStrategy: text("backoff_strategy").default("exponential").notNull(),
+    lastError: text("last_error"),
+    createdAt: integer("created_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
   },
   (table) => [
-    uniqueIndex("sidequest_jobs_unique_digest_active_idx")
-      .on(table.uniqueDigest)
-      .where(sql`${table.uniqueDigest} is not null`),
+    index("job_queue_jobs_claim_idx").on(table.status, table.availableAt, table.priority),
+    index("job_queue_jobs_locked_idx").on(table.status, table.lockedAt),
+    index("job_queue_jobs_name_idx").on(table.name),
   ],
 );

@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "83bb4679-f3ad-4472-8fdb-4e51c222e8dd",
+  "id": "3b7e083b-f7bb-4a3a-8d1d-756c97ac4a2c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "sidequest_jobs": {
-      "name": "sidequest_jobs",
+    "job_queue_jobs": {
+      "name": "job_queue_jobs",
       "columns": {
         "id": {
           "name": "id",
@@ -14,39 +14,92 @@
           "notNull": true,
           "autoincrement": true
         },
-        "queue": {
-          "name": "queue",
+        "name": {
+          "name": "name",
           "type": "text(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "class": {
-          "name": "class",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "script": {
-          "name": "script",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "args": {
-          "name": "args",
+        "payload": {
+          "name": "payload",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "constructor_args": {
-          "name": "constructor_args",
-          "type": "text",
+        "status": {
+          "name": "status",
+          "type": "text(32)",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "priority": {
+          "name": "priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "attempt": {
+          "name": "attempt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "max_attempts": {
+          "name": "max_attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 3
+        },
+        "available_at": {
+          "name": "available_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "locked_at": {
+          "name": "locked_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "locked_by": {
+          "name": "locked_by",
+          "type": "text(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "failed_at": {
+          "name": "failed_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "result": {
@@ -56,235 +109,22 @@
           "notNull": false,
           "autoincrement": false
         },
-        "errors": {
-          "name": "errors",
+        "last_error": {
+          "name": "last_error",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "state": {
-          "name": "state",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "available_at": {
-          "name": "available_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "inserted_at": {
-          "name": "inserted_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "attempted_at": {
-          "name": "attempted_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "failed_at": {
-          "name": "failed_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "canceled_at": {
-          "name": "canceled_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "claimed_at": {
-          "name": "claimed_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "claimed_by": {
-          "name": "claimed_by",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "attempt": {
-          "name": "attempt",
+        "created_at": {
+          "name": "created_at",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "max_attempts": {
-          "name": "max_attempts",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "timeout": {
-          "name": "timeout",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "unique_digest": {
-          "name": "unique_digest",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "uniqueness_config": {
-          "name": "uniqueness_config",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "retry_delay": {
-          "name": "retry_delay",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "backoff_strategy": {
-          "name": "backoff_strategy",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'exponential'"
-        }
-      },
-      "indexes": {
-        "sidequest_jobs_unique_digest_active_idx": {
-          "name": "sidequest_jobs_unique_digest_active_idx",
-          "columns": ["unique_digest"],
-          "isUnique": true,
-          "where": "\"sidequest_jobs\".\"unique_digest\" is not null"
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "sidequest_migrations": {
-      "name": "sidequest_migrations",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "batch": {
-          "name": "batch",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "migration_time": {
-          "name": "migration_time",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "sidequest_migrations_lock": {
-      "name": "sidequest_migrations_lock",
-      "columns": {
-        "index": {
-          "name": "index",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "is_locked": {
-          "name": "is_locked",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "sidequest_queues": {
-      "name": "sidequest_queues",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "state": {
-          "name": "state",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "concurrency": {
-          "name": "concurrency",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "priority": {
-          "name": "priority",
+        "updated_at": {
+          "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -292,10 +132,20 @@
         }
       },
       "indexes": {
-        "sidequest_queues_name_unique": {
-          "name": "sidequest_queues_name_unique",
+        "job_queue_jobs_claim_idx": {
+          "name": "job_queue_jobs_claim_idx",
+          "columns": ["status", "available_at", "priority"],
+          "isUnique": false
+        },
+        "job_queue_jobs_locked_idx": {
+          "name": "job_queue_jobs_locked_idx",
+          "columns": ["status", "locked_at"],
+          "isUnique": false
+        },
+        "job_queue_jobs_name_idx": {
+          "name": "job_queue_jobs_name_idx",
           "columns": ["name"],
-          "isUnique": true
+          "isUnique": false
         }
       },
       "foreignKeys": {},
