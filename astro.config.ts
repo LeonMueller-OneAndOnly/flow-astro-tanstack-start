@@ -1,5 +1,6 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
+import node from "@astrojs/node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 
 import viteTsConfigPaths from "vite-tsconfig-paths";
@@ -11,9 +12,16 @@ import { astroGrab } from "astro-grab";
 
 const isProduction = process.env.APP_ENV === "production";
 
+const port = process.env.PORT ? Number(process.env.PORT) : undefined;
+
 // https://astro.build/config
 export default defineConfig({
   output: "server",
+  adapter: node({
+    mode: "standalone",
+  }),
+
+  server: { port },
 
   vite: {
     plugins: [
@@ -34,4 +42,15 @@ export default defineConfig({
     typesafeRoutes(),
     astroGrab({ key: "c", holdDuration: 500 }),
   ],
+
+  env: {
+    schema: {
+      APP_ENV: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+        default: "local",
+      }),
+    },
+  },
 });
