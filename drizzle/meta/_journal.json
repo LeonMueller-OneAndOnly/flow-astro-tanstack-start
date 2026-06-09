@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "turso",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1781003857143,
+      "tag": "0000_powerful_blue_marvel",
+      "breakpoints": true
+    }
+  ]
+}

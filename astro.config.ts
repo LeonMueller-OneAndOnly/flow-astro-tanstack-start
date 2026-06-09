@@ -43,12 +43,12 @@ export default defineConfig({
       APP_ENV: envField.string({
         context: "server",
         access: "public",
-        optional: true,
         default: "local",
       }),
       DATABASE_URL: envField.string({
         context: "server",
         access: "secret",
+        optional: false,
       }),
     },
   },
