@@ -6,7 +6,7 @@ import Header from "../components/Header";
 
 import StoreDevtools from "../lib/demo-store-devtools";
 
-import appCss from "../styles.css?url";
+import appCss from "../../styles/globals.css?url";
 
 /**
  * Astro mounts this TanStack Start router under `/app` via `src/pages/app/[...slug].ts`.
