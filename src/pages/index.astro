@@ -2,6 +2,21 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 export const prerender = false;
+
+let tanstackNames: Array<string> = [];
+let tanstackApiError = "";
+
+try {
+  const response = await fetch(new URL("/app/demo/api/names", Astro.url));
+
+  if (!response.ok) {
+    throw new Error(`TanStack API returned ${response.status}`);
+  }
+
+  tanstackNames = await response.json();
+} catch (error) {
+  tanstackApiError = error instanceof Error ? error.message : "Unable to load TanStack API data";
+}
 ---
 
 <BaseLayout>
@@ -20,6 +35,25 @@ export const prerender = false;
           TanStack Start docs
         </a>
       </div>
+
+      <section class="api-card" aria-labelledby="tanstack-api-title">
+        <div>
+          <p class="api-label">Fetched by Astro SSR</p>
+          <h2 id="tanstack-api-title">TanStack API route response</h2>
+          <p>
+            This card is rendered by <code>src/pages/index.astro</code>, but its data comes from
+            <code>/app/demo/api/names</code> inside the mounted TanStack Start app.
+          </p>
+        </div>
+
+        {tanstackApiError ? (
+          <p class="api-error">{tanstackApiError}</p>
+        ) : (
+          <ul class="name-list" aria-label="Names returned by the TanStack API route">
+            {tanstackNames.map((name) => <li>{name}</li>)}
+          </ul>
+        )}
+      </section>
     </section>
   </main>
 </BaseLayout>
@@ -97,5 +131,79 @@ export const prerender = false;
     border-color: transparent;
     background: #67e8f9;
     font-weight: 700;
+  }
+
+  .api-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px;
+    align-items: center;
+    margin-top: 32px;
+    padding: 20px;
+    border: 1px solid rgba(103, 232, 249, 0.28);
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(8, 47, 73, 0.82), rgba(15, 23, 42, 0.72));
+  }
+
+  .api-label {
+    margin: 0 0 8px;
+    color: #86efac;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    letter-spacing: -0.04em;
+  }
+
+  .api-card p:not(.api-label):not(.api-error) {
+    margin: 10px 0 0;
+    color: #b6c4d7;
+    line-height: 1.6;
+  }
+
+  code {
+    color: #67e8f9;
+  }
+
+  .name-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    max-width: 260px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .name-list li {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    padding: 8px 11px;
+    color: #ecfeff;
+    background: rgba(255, 255, 255, 0.08);
+    font-weight: 700;
+  }
+
+  .api-error {
+    margin: 0;
+    color: #fecaca;
+    font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .api-card {
+      grid-template-columns: 1fr;
+    }
+
+    .name-list {
+      justify-content: flex-start;
+      max-width: none;
+    }
   }
 </style>

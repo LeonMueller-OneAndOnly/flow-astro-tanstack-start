@@ -15,7 +15,8 @@ const loggedServerFunction = createServerFn({ method: "GET" }).middleware([
 ]);
 */
 
-const TODOS_FILE = "todos.json";
+const TODOS_DIR = ".tanstack/tmp";
+const TODOS_FILE = `${TODOS_DIR}/todos.json`;
 
 async function readTodos() {
   return JSON.parse(
@@ -41,6 +42,7 @@ const addTodo = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const todos = await readTodos();
     todos.push({ id: todos.length + 1, name: data });
+    await fs.promises.mkdir(TODOS_DIR, { recursive: true });
     await fs.promises.writeFile(TODOS_FILE, JSON.stringify(todos, null, 2));
     return todos;
   });
