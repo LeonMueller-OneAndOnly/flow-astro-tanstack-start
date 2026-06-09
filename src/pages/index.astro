@@ -17,31 +17,60 @@ try {
 } catch (error) {
   tanstackApiError = error instanceof Error ? error.message : "Unable to load TanStack API data";
 }
+
+const primaryRamp = ["400", "500", "600", "700"];
+const secondaryRamp = ["400", "500", "600", "700"];
 ---
 
 <BaseLayout>
   <main class="page-shell">
+    <div class="glow glow-a" aria-hidden="true"></div>
+    <div class="glow glow-b" aria-hidden="true"></div>
+
     <section class="hero-card">
       <p class="eyebrow">Framework starter</p>
-      <h1>Astro shell with a TanStack Start app</h1>
+      <h1>Astro shell with a <span class="grad">TanStack Start</span> app</h1>
       <p class="lede">
-        This is placeholder scaffolding only. Use it to verify routing, rendering, API routes,
-        and server functions before replacing the sample content with a real app.
+        Placeholder scaffolding for verifying routing, rendering, API routes, and server
+        functions. Two brand colors are wired through the design tokens in
+        <code>src/styles/globals.css</code> — swap them to make the kit your own.
       </p>
+
       <div class="actions">
-        <a class="primary" href="/app">Open TanStack app</a>
-        <a href="https://docs.astro.build" target="_blank" rel="noreferrer">Astro docs</a>
-        <a href="https://tanstack.com/start/latest" target="_blank" rel="noreferrer">
+        <a class="btn btn-primary" href="/app">Open TanStack app</a>
+        <a class="btn btn-secondary" href="https://tanstack.com/start/latest" target="_blank" rel="noreferrer">
           TanStack Start docs
         </a>
+        <a class="btn btn-ghost" href="https://docs.astro.build" target="_blank" rel="noreferrer">
+          Astro docs
+        </a>
+      </div>
+
+      <div class="palette" role="img" aria-label="Brand color palette: primary blue and secondary violet">
+        <div class="swatch-group">
+          <span class="swatch-label">Brand · primary</span>
+          <div class="swatches">
+            {primaryRamp.map((step) => (
+              <span class="swatch" style={`background: var(--brand-${step})`} title={`brand-${step}`}></span>
+            ))}
+          </div>
+        </div>
+        <div class="swatch-group">
+          <span class="swatch-label">Brand · secondary</span>
+          <div class="swatches">
+            {secondaryRamp.map((step) => (
+              <span class="swatch" style={`background: var(--brand-secondary-${step})`} title={`brand-secondary-${step}`}></span>
+            ))}
+          </div>
+        </div>
       </div>
 
       <section class="api-card" aria-labelledby="tanstack-api-title">
         <div>
           <p class="api-label">Fetched by Astro SSR</p>
           <h2 id="tanstack-api-title">TanStack API route response</h2>
-          <p>
-            This card is rendered by <code>src/pages/index.astro</code>, but its data comes from
+          <p class="api-copy">
+            Rendered by <code>src/pages/index.astro</code>, with data fetched from
             <code>/app/demo/api/names</code> inside the mounted TanStack Start app.
           </p>
         </div>
@@ -60,49 +89,81 @@ try {
 
 <style>
   .page-shell {
+    position: relative;
     min-height: 100vh;
     display: grid;
     place-items: center;
     padding: 24px;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.22), transparent 30%),
-      radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.2), transparent 30%),
-      #0f172a;
-    color: #e5eefb;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    overflow: hidden;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  /* Brand-tinted ambient glows, blue + violet, behind the card. */
+  .glow {
+    position: absolute;
+    width: 48rem;
+    height: 48rem;
+    border-radius: 999px;
+    filter: blur(90px);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .glow-a {
+    top: -16rem;
+    left: -10rem;
+    background: radial-gradient(circle, color-mix(in oklch, var(--brand-500) 55%, transparent), transparent 60%);
+  }
+
+  .glow-b {
+    bottom: -18rem;
+    right: -12rem;
+    background: radial-gradient(circle, color-mix(in oklch, var(--brand-secondary-500) 50%, transparent), transparent 60%);
   }
 
   .hero-card {
-    width: min(760px, 100%);
+    position: relative;
+    z-index: 1;
+    width: min(820px, 100%);
     padding: clamp(28px, 6vw, 64px);
-    border: 1px solid rgba(148, 163, 184, 0.24);
+    border: 1px solid var(--border);
     border-radius: 28px;
-    background: rgba(15, 23, 42, 0.74);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+    background: color-mix(in oklch, var(--card) 86%, transparent);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 24px 80px color-mix(in oklch, var(--brand-900) 22%, transparent);
   }
 
   .eyebrow {
-    margin: 0 0 12px;
-    color: #67e8f9;
+    margin: 0 0 14px;
+    color: var(--brand-600);
     font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   h1 {
     margin: 0;
-    max-width: 680px;
-    font-size: clamp(2.4rem, 8vw, 5rem);
-    line-height: 0.95;
-    letter-spacing: -0.07em;
+    max-width: 720px;
+    font-size: clamp(2.3rem, 7vw, 4.4rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    font-weight: 800;
+  }
+
+  .grad {
+    background: linear-gradient(110deg, var(--brand-500), var(--brand-secondary-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .lede {
-    max-width: 620px;
-    margin: 24px 0 0;
-    color: #b6c4d7;
-    font-size: clamp(1rem, 2vw, 1.2rem);
+    max-width: 640px;
+    margin: 22px 0 0;
+    color: var(--muted-foreground);
+    font-size: clamp(1rem, 2vw, 1.18rem);
     line-height: 1.7;
   }
 
@@ -113,24 +174,77 @@ try {
     margin-top: 32px;
   }
 
-  a {
-    color: #e5eefb;
+  .btn {
+    display: inline-flex;
+    align-items: center;
     text-decoration: none;
-    border: 1px solid rgba(148, 163, 184, 0.28);
     border-radius: 999px;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid transparent;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
   }
 
-  a:hover {
-    border-color: rgba(103, 232, 249, 0.7);
+  .btn:hover {
+    transform: translateY(-1px);
   }
 
-  a.primary {
-    color: #082f49;
-    border-color: transparent;
-    background: #67e8f9;
+  .btn-primary {
+    color: var(--primary-foreground);
+    background: linear-gradient(110deg, var(--brand-600), var(--brand-secondary-600));
+    box-shadow: 0 8px 24px color-mix(in oklch, var(--brand-600) 35%, transparent);
+  }
+
+  .btn-secondary {
+    color: var(--brand-secondary-700);
+    background: color-mix(in oklch, var(--brand-secondary-500) 16%, transparent);
+    border-color: color-mix(in oklch, var(--brand-secondary-500) 35%, transparent);
+  }
+
+  .btn-secondary:hover {
+    background: color-mix(in oklch, var(--brand-secondary-500) 24%, transparent);
+  }
+
+  .btn-ghost {
+    color: var(--foreground);
+    border-color: var(--border);
+    background: transparent;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--brand-400);
+  }
+
+  .palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .swatch-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.7rem;
     font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  .swatches {
+    display: flex;
+    gap: 8px;
+  }
+
+  .swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--foreground) 8%, transparent);
   }
 
   .api-card {
@@ -139,16 +253,20 @@ try {
     gap: 24px;
     align-items: center;
     margin-top: 32px;
-    padding: 20px;
-    border: 1px solid rgba(103, 232, 249, 0.28);
+    padding: 22px;
+    border: 1px solid color-mix(in oklch, var(--brand-secondary-500) 22%, transparent);
     border-radius: 22px;
-    background: linear-gradient(135deg, rgba(8, 47, 73, 0.82), rgba(15, 23, 42, 0.72));
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--brand-500) 9%, transparent),
+      color-mix(in oklch, var(--brand-secondary-500) 9%, transparent)
+    );
   }
 
   .api-label {
     margin: 0 0 8px;
-    color: #86efac;
-    font-size: 0.75rem;
+    color: var(--brand-secondary-600);
+    font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -156,18 +274,22 @@ try {
 
   h2 {
     margin: 0;
-    font-size: clamp(1.3rem, 3vw, 1.9rem);
-    letter-spacing: -0.04em;
+    font-size: clamp(1.25rem, 3vw, 1.8rem);
+    letter-spacing: -0.03em;
   }
 
-  .api-card p:not(.api-label):not(.api-error) {
+  .api-copy {
     margin: 10px 0 0;
-    color: #b6c4d7;
+    color: var(--muted-foreground);
     line-height: 1.6;
   }
 
   code {
-    color: #67e8f9;
+    color: var(--brand-700);
+    background: color-mix(in oklch, var(--brand-500) 10%, transparent);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
   }
 
   .name-list {
@@ -182,17 +304,18 @@ try {
   }
 
   .name-list li {
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1px solid var(--border);
     border-radius: 999px;
-    padding: 8px 11px;
-    color: #ecfeff;
-    background: rgba(255, 255, 255, 0.08);
-    font-weight: 700;
+    padding: 8px 12px;
+    color: var(--foreground);
+    background: var(--muted);
+    font-weight: 600;
+    font-size: 0.9rem;
   }
 
   .api-error {
     margin: 0;
-    color: #fecaca;
+    color: var(--destructive);
     font-weight: 700;
   }
 

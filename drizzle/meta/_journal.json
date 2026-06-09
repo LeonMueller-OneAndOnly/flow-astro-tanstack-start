@@ -8,6 +8,13 @@
       "when": 1781009029452,
       "tag": "0000_swift_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1781020351817,
+      "tag": "0001_absent_sway",
+      "breakpoints": true
     }
   ]
 }

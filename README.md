@@ -20,5 +20,12 @@ The current pages are intentionally small placeholder examples that show how Ast
 - `/app/demo/start/ssr` - SSR mode examples.
 - `/app/demo/store` - TanStack Store example.
 - `/app/example/guitars` - Dynamic route example with placeholder catalog data.
+- `/app/api/auth/*` - Better Auth API mounted inside the TanStack Start app.
 
 Everything under `src/app` belongs to TanStack Start. See the [TanStack Start docs](https://tanstack.com/start/latest) for how that area is structured and used.
+
+## Auth
+
+Better Auth is configured in `src/app/lib/auth.ts` with Drizzle, username/password auth, and magic links through the existing `sendMail` integration.
+
+Set `BETTER_AUTH_SECRET` in production. Set `BETTER_AUTH_URL` to the public origin, for example `https://example.com`, so magic links use the correct host.
