@@ -9,6 +9,7 @@ The current pages are intentionally small placeholder examples that show how Ast
 - Astro owns the root site entry at `/`.
 - TanStack Start is mounted under `/app`.
 - The TanStack sample app includes lightweight examples for file-based routes, API endpoints, server functions, SSR modes, client state, and dynamic route params.
+- The file upload flow is included as reference code only. It shows local Flydrive storage and the shape of a later S3/R2 migration, not a finished product feature.
 - AI/chat/MCP demos are intentionally not included in the active sample app.
 
 ## Useful Routes
@@ -17,6 +18,7 @@ The current pages are intentionally small placeholder examples that show how Ast
 - `/app` - TanStack Start placeholder landing page.
 - `/app/demo/start/server-funcs` - Small server function todo example.
 - `/app/demo/start/api-request` - Client request to a TanStack API route.
+- `/app/demo/start/uploads` - Reference Flydrive file upload example.
 - `/app/demo/start/ssr` - SSR mode examples.
 - `/app/demo/store` - TanStack Store example.
 - `/app/example/guitars` - Dynamic route example with placeholder catalog data.
@@ -29,3 +31,11 @@ Everything under `src/app` belongs to TanStack Start. See the [TanStack Start do
 Better Auth is configured in `src/app/lib/auth.ts` with Drizzle, username/password auth, and magic links through the existing `sendMail` integration.
 
 Set `BETTER_AUTH_SECRET` in production. Set `BETTER_AUTH_URL` to the public origin, for example `https://example.com`, so magic links use the correct host.
+
+## Reference File Uploads
+
+The upload example uses [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver in `src/app/lib/demo-file-storage.ts`.
+
+Set `UPLOADS_DIR` to control where local example uploads are stored. The default is `.uploads`, relative to the project root. `UPLOADS_DIR` is defined in the Astro env schema in `astro.config.ts`.
+
+For production, store file metadata in the database and persist stable storage keys, not generated URLs or local paths. To migrate to S3, R2, or another S3-compatible provider, swap the Flydrive driver and keep the rest of the app code using storage keys.

@@ -60,6 +60,13 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
+      // Example file upload storage root for the Flydrive local filesystem driver.
+      // Use an absolute path or a path relative to the project root.
+      UPLOADS_DIR: envField.string({
+        context: "server",
+        access: "secret",
+        default: ".uploads",
+      }),
     },
   },
 });

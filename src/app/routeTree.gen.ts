@@ -13,8 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
 import { Route as ExampleGuitarsGuitarIdRouteImport } from './routes/example.guitars/$guitarId'
+import { Route as DemoStartUploadsRouteImport } from './routes/demo/start.uploads'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
+import { Route as DemoApiUploadsRouteImport } from './routes/demo/api.uploads'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
@@ -42,6 +44,11 @@ const ExampleGuitarsGuitarIdRoute = ExampleGuitarsGuitarIdRouteImport.update({
   path: '/example/guitars/$guitarId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoStartUploadsRoute = DemoStartUploadsRouteImport.update({
+  id: '/demo/start/uploads',
+  path: '/demo/start/uploads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
   path: '/demo/start/server-funcs',
@@ -50,6 +57,11 @@ const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
 const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
   id: '/demo/start/api-request',
   path: '/demo/start/api-request',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoApiUploadsRoute = DemoApiUploadsRouteImport.update({
+  id: '/demo/api/uploads',
+  path: '/demo/api/uploads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
@@ -88,8 +100,10 @@ export interface FileRoutesByFullPath {
   '/demo/store': typeof DemoStoreRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
+  '/demo/api/uploads': typeof DemoApiUploadsRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/demo/start/uploads': typeof DemoStartUploadsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
   '/example/guitars': typeof ExampleGuitarsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -102,8 +116,10 @@ export interface FileRoutesByTo {
   '/demo/store': typeof DemoStoreRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
+  '/demo/api/uploads': typeof DemoApiUploadsRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/demo/start/uploads': typeof DemoStartUploadsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
   '/example/guitars': typeof ExampleGuitarsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -117,8 +133,10 @@ export interface FileRoutesById {
   '/demo/store': typeof DemoStoreRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
+  '/demo/api/uploads': typeof DemoApiUploadsRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/demo/start/uploads': typeof DemoStartUploadsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
   '/example/guitars/': typeof ExampleGuitarsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -133,8 +151,10 @@ export interface FileRouteTypes {
     | '/demo/store'
     | '/api/auth/$'
     | '/demo/api/names'
+    | '/demo/api/uploads'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/demo/start/uploads'
     | '/example/guitars/$guitarId'
     | '/example/guitars'
     | '/demo/start/ssr/data-only'
@@ -147,8 +167,10 @@ export interface FileRouteTypes {
     | '/demo/store'
     | '/api/auth/$'
     | '/demo/api/names'
+    | '/demo/api/uploads'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/demo/start/uploads'
     | '/example/guitars/$guitarId'
     | '/example/guitars'
     | '/demo/start/ssr/data-only'
@@ -161,8 +183,10 @@ export interface FileRouteTypes {
     | '/demo/store'
     | '/api/auth/$'
     | '/demo/api/names'
+    | '/demo/api/uploads'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/demo/start/uploads'
     | '/example/guitars/$guitarId'
     | '/example/guitars/'
     | '/demo/start/ssr/data-only'
@@ -176,8 +200,10 @@ export interface RootRouteChildren {
   DemoStoreRoute: typeof DemoStoreRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
+  DemoApiUploadsRoute: typeof DemoApiUploadsRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  DemoStartUploadsRoute: typeof DemoStartUploadsRoute
   ExampleGuitarsGuitarIdRoute: typeof ExampleGuitarsGuitarIdRoute
   ExampleGuitarsIndexRoute: typeof ExampleGuitarsIndexRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
@@ -216,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExampleGuitarsGuitarIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/start/uploads': {
+      id: '/demo/start/uploads'
+      path: '/demo/start/uploads'
+      fullPath: '/demo/start/uploads'
+      preLoaderRoute: typeof DemoStartUploadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
       path: '/demo/start/server-funcs'
@@ -228,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/start/api-request'
       fullPath: '/demo/start/api-request'
       preLoaderRoute: typeof DemoStartApiRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/api/uploads': {
+      id: '/demo/api/uploads'
+      path: '/demo/api/uploads'
+      fullPath: '/demo/api/uploads'
+      preLoaderRoute: typeof DemoApiUploadsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/api/names': {
@@ -280,8 +320,10 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStoreRoute: DemoStoreRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
+  DemoApiUploadsRoute: DemoApiUploadsRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  DemoStartUploadsRoute: DemoStartUploadsRoute,
   ExampleGuitarsGuitarIdRoute: ExampleGuitarsGuitarIdRoute,
   ExampleGuitarsIndexRoute: ExampleGuitarsIndexRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,

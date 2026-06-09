@@ -1,5 +1,13 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Boxes, Database, FileText, Route as RouteIcon, Server, ShoppingBag } from "lucide-react";
+import {
+  Boxes,
+  CloudUpload,
+  Database,
+  FileText,
+  Route as RouteIcon,
+  Server,
+  ShoppingBag,
+} from "lucide-react";
 
 /** Served at `/app`; child routes append their TanStack path after `/app`. */
 export const Route = createFileRoute("/")({
@@ -32,6 +40,13 @@ function App() {
       title: "Client Store",
       description: "A compact TanStack Store example with derived state.",
       to: "/demo/store",
+    },
+    {
+      icon: <CloudUpload className="w-9 h-9 text-cyan-300" />,
+      title: "File Uploads",
+      description:
+        "Reference upload flow using Flydrive with local storage and an S3 migration path.",
+      to: "/demo/start/uploads",
     },
     {
       icon: <ShoppingBag className="w-9 h-9 text-cyan-300" />,
