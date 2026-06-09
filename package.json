@@ -1,13 +1,17 @@
 {
   "name": "omnis-astro-tanstack-start",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "start": "node ./dist/server/entry.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "format": "oxfmt . --write",
+    "format:check": "oxfmt . --check",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.1",
@@ -52,6 +56,8 @@
     "astro-grab": "^0.3.0",
     "astro-typesafe-routes": "^5.1.0",
     "jsdom": "^27.0.0",
+    "oxfmt": "^0.47.0",
+    "oxlint": "^1.62.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
     "vitest": "^3.0.5",

@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react", "jsx-a11y", "vitest", "import"],
+  "categories": {
+    "correctness": "error"
+  },
+  "jsPlugins": ["./oxlint-rules/astro-pages.js"],
+  "ignorePatterns": [".claude", ".agents"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "typescript/no-unused-vars": "off",
+    "typescript/triple-slash-reference": "off",
+    "flowoffice/require-prerender-export": "error"
+  },
+  "env": {
+    "builtin": true
+  }
+}

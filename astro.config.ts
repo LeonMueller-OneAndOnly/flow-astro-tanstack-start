@@ -36,12 +36,7 @@ export default defineConfig({
     ],
   },
 
-  integrations: [
-    react(),
-    sitemap(),
-    typesafeRoutes(),
-    astroGrab({ key: "c", holdDuration: 500 }),
-  ],
+  integrations: [react(), sitemap(), typesafeRoutes(), astroGrab({ key: "c", holdDuration: 500 })],
 
   env: {
     schema: {
