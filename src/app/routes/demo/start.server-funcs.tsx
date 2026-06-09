@@ -1,7 +1,10 @@
-import fs from "node:fs";
 import { useState } from "react";
+import { asc } from "drizzle-orm";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+
+import { db } from "../../db/client";
+import { demoTodos } from "../../db/schema";
 
 /*
 const loggingMiddleware = createMiddleware().server(
@@ -15,22 +18,31 @@ const loggedServerFunction = createServerFn({ method: "GET" }).middleware([
 ]);
 */
 
-const TODOS_DIR = ".tanstack/tmp";
-const TODOS_FILE = `${TODOS_DIR}/todos.json`;
+type Todo = {
+  id: number;
+  name: string;
+};
 
-async function readTodos() {
-  return JSON.parse(
-    await fs.promises.readFile(TODOS_FILE, "utf-8").catch(() =>
-      JSON.stringify(
-        [
-          { id: 1, name: "Get groceries" },
-          { id: 2, name: "Buy a new phone" },
-        ],
-        null,
-        2,
-      ),
-    ),
-  );
+async function readTodos(): Promise<Array<Todo>> {
+  const todos = await listTodos();
+
+  if (todos.length > 0) {
+    return todos;
+  }
+
+  await db.insert(demoTodos).values([
+    { name: "Get groceries", createdAt: new Date() },
+    { name: "Buy a new phone", createdAt: new Date() },
+  ]);
+
+  return await listTodos();
+}
+
+async function listTodos(): Promise<Array<Todo>> {
+  return await db
+    .select({ id: demoTodos.id, name: demoTodos.name })
+    .from(demoTodos)
+    .orderBy(asc(demoTodos.id));
 }
 
 const getTodos = createServerFn({
@@ -38,13 +50,16 @@ const getTodos = createServerFn({
 }).handler(async () => await readTodos());
 
 const addTodo = createServerFn({ method: "POST" })
-  .inputValidator((d: string) => d)
+  .inputValidator((d: string) => d.trim())
   .handler(async ({ data }) => {
-    const todos = await readTodos();
-    todos.push({ id: todos.length + 1, name: data });
-    await fs.promises.mkdir(TODOS_DIR, { recursive: true });
-    await fs.promises.writeFile(TODOS_FILE, JSON.stringify(todos, null, 2));
-    return todos;
+    if (data.length === 0) {
+      return await readTodos();
+    }
+
+    await readTodos();
+    await db.insert(demoTodos).values({ name: data, createdAt: new Date() });
+
+    return await listTodos();
   });
 
 /** Served at `/app/demo/start/server-funcs`; TanStack route paths are mounted under Astro's `/app` catch-all. */

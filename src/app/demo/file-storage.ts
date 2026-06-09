@@ -1,11 +1,12 @@
-import path from "node:path";
 import { randomUUID } from "node:crypto";
+import path from "node:path";
 
 import { UPLOADS_DIR } from "astro:env/server";
 import { Disk } from "flydrive";
 import { FSDriver } from "flydrive/drivers/fs";
 
 export const DEMO_UPLOAD_PREFIX = "demo-uploads";
+export const DEMO_UPLOAD_DISK = "local";
 export const MAX_DEMO_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 export const demoUploadDisk = new Disk(

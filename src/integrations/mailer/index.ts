@@ -2,7 +2,7 @@ import { createRequire } from "node:module";
 
 import { z } from "zod";
 
-import { createJobQueueWorker, defineJob } from "../job-queue";
+import { createJobQueueWorker, createJobRegistry } from "../job-queue";
 
 const require = createRequire(import.meta.url);
 
@@ -69,21 +69,22 @@ const ZSendMailJobPayload = z.object({
   outgoingMailer: ZMailOutgoingMailer.default({ type: "internal" }),
 });
 
-export const sendMailJob = defineJob({
+export const mailJobRegistry = createJobRegistry();
+
+export const sendMailJob = mailJobRegistry.defineJob({
   name: "send-mail",
   schema: ZSendMailJobPayload,
+  async handler({ mail, reason, outgoingMailer }) {
+    await handleJob_sendMail(mail, reason, outgoingMailer);
+
+    return { to: mail.to, reason };
+  },
 });
 
-const mailJobQueueWorker = createJobQueueWorker(
-  [
-    sendMailJob.handle(async ({ mail, reason, outgoingMailer }) => {
-      await handleJob_sendMail(mail, reason, outgoingMailer);
-
-      return { to: mail.to, reason };
-    }),
-  ],
-  { concurrency: 1, retryDelayMs: 30_000 },
-);
+const mailJobQueueWorker = createJobQueueWorker(mailJobRegistry, {
+  concurrency: 1,
+  retryDelayMs: 30_000,
+});
 
 export function startMailJobQueue() {
   mailJobQueueWorker.start();

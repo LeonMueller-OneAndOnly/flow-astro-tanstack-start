@@ -3,11 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CloudUpload, FileDown, RefreshCw } from "lucide-react";
 
 type DemoUpload = {
+  id: string;
   key: string;
   name: string;
   contentType: string;
   size: number;
-  lastModified: string;
+  disk: string;
+  createdAt: string;
   url: string;
 };
 
@@ -64,7 +66,7 @@ function UploadsDemo() {
     }
 
     setSelectedFile(null);
-    setMessage("Uploaded. The app stored a Flydrive key, not a filesystem path.");
+    setMessage("Uploaded. The app stored metadata in demo_user_uploads and the file in Flydrive.");
     await refreshFiles();
     setIsPending(false);
   };
@@ -80,9 +82,9 @@ function UploadsDemo() {
             File uploads with local Flydrive storage
           </h1>
           <p className="max-w-3xl text-lg leading-8 text-stone-300">
-            This demo stores uploads under the configured local upload directory and reads them back
-            through an API route. Treat it as starter-kit reference code, not a finished product
-            flow.
+            This demo stores upload metadata in the demo_user_uploads table, stores bytes through
+            Flydrive, and reads everything back through a TanStack API route. Treat it as
+            starter-kit reference code, not a finished product flow.
           </p>
         </div>
 
@@ -126,7 +128,7 @@ function UploadsDemo() {
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold">Stored files</h2>
-                <p className="text-sm text-stone-400">Listed from Flydrive using storage keys.</p>
+                <p className="text-sm text-stone-400">Listed from the demo_user_uploads table.</p>
               </div>
               <button
                 type="button"
@@ -146,15 +148,15 @@ function UploadsDemo() {
               <div className="space-y-3">
                 {files.map((file) => (
                   <a
-                    key={file.key}
+                    key={file.id}
                     href={file.url}
                     className="flex items-center justify-between gap-4 rounded-xl border border-stone-800 bg-stone-950 p-4 transition-colors hover:border-amber-300/70"
                   >
                     <div className="min-w-0">
                       <p className="truncate font-medium text-stone-100">{file.name}</p>
                       <p className="mt-1 text-xs text-stone-500">
-                        {formatBytes(file.size)} · {file.contentType} ·{" "}
-                        {formatDate(file.lastModified)}
+                        {formatBytes(file.size)} · {file.contentType} · {file.disk} ·{" "}
+                        {formatDate(file.createdAt)}
                       </p>
                     </div>
                     <FileDown className="h-5 w-5 shrink-0 text-amber-300" />
@@ -168,9 +170,9 @@ function UploadsDemo() {
         <section className="mt-6 rounded-2xl border border-stone-800 bg-stone-900/70 p-6 text-sm leading-7 text-stone-300">
           <h2 className="mb-2 text-lg font-semibold text-white">Migration note</h2>
           <p>
-            This example uses Flydrive's local filesystem driver. To migrate to S3 or R2, swap the
-            driver in <code className="text-amber-200">src/app/lib/demo-file-storage.ts</code> and
-            keep storing database records by stable object key rather than by local path.
+            This example uses a local filesystem driver. To migrate to S3 or R2, swap the driver in{" "}
+            <code className="text-amber-200">src/app/demo/file-storage.ts</code> and keep storing
+            database records by stable object key rather than by local path.
           </p>
         </section>
       </div>

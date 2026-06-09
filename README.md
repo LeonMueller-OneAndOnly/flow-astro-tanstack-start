@@ -34,8 +34,8 @@ Set `BETTER_AUTH_SECRET` in production. Set `BETTER_AUTH_URL` to the public orig
 
 ## Reference File Uploads
 
-The upload example uses [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver in `src/app/lib/demo-file-storage.ts`.
+The upload example uses [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver in `src/app/demo/file-storage.ts`.
 
 Set `UPLOADS_DIR` to control where local example uploads are stored. The default is `.uploads`, relative to the project root. `UPLOADS_DIR` is defined in the Astro env schema in `astro.config.ts`.
 
-For production, store file metadata in the database and persist stable storage keys, not generated URLs or local paths. To migrate to S3, R2, or another S3-compatible provider, swap the Flydrive driver and keep the rest of the app code using storage keys.
+The demo stores metadata in the `demo_user_uploads` table via the `demoUserUploads` schema export. For production, attach ownership/authorization and persist stable storage keys, not generated URLs or local paths. To migrate to S3, R2, or another S3-compatible provider, swap the Flydrive driver and keep the rest of the app code using storage keys.

@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -60,6 +60,31 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }),
 });
 
+export const demoUserUploads = sqliteTable(
+  "demo_user_uploads",
+  {
+    id: text("id").primaryKey(),
+    storageKey: text("storage_key").notNull().unique(),
+    originalName: text("original_name").notNull(),
+    contentType: text("content_type").notNull(),
+    size: integer("size").notNull(),
+    disk: text("disk", { length: 32 }).notNull().default("local"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("demo_user_uploads_created_at_idx").on(table.createdAt)],
+);
+
+/** Framework starter demo data for the todo example. Remove this table when deleting demo routes. */
+export const demoTodos = sqliteTable(
+  "demo_todos",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
+    name: text("name").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("demo_todos_created_at_idx").on(table.createdAt)],
+);
+
 export const jobQueueJobs = sqliteTable(
   "job_queue_jobs",
   {
@@ -94,6 +119,7 @@ export const jobQueueCronSchedules = sqliteTable(
   "job_queue_cron_schedules",
   {
     id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
+    key: text("key", { length: 255 }),
     name: text("name", { length: 255 }).notNull(),
     payload: text("payload").notNull(),
     cron: text("cron", { length: 255 }).notNull(),
@@ -108,6 +134,7 @@ export const jobQueueCronSchedules = sqliteTable(
   },
   (table) => [
     index("job_queue_cron_schedules_due_idx").on(table.status, table.nextRunAt),
+    uniqueIndex("job_queue_cron_schedules_key_idx").on(table.key),
     index("job_queue_cron_schedules_name_idx").on(table.name),
   ],
 );

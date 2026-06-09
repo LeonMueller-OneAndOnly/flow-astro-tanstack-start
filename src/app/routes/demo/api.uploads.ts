@@ -1,18 +1,24 @@
+import { randomUUID } from "node:crypto";
+
+import { desc, eq } from "drizzle-orm";
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 
+import { db } from "../../db/client";
+import { demoUserUploads } from "../../db/schema";
 import {
   createDemoUploadKey,
+  DEMO_UPLOAD_DISK,
   DEMO_UPLOAD_PREFIX,
   demoUploadDisk,
   getDemoUploadsRoot,
   isDemoUploadKey,
   MAX_DEMO_UPLOAD_BYTES,
-} from "../../lib/demo-file-storage";
+} from "../../demo/file-storage";
 
 /**
  * Reference-only upload API served at `/app/demo/api/uploads`.
- * Real apps should persist Flydrive file snapshots or storage keys in the database.
+ * Real apps should attach ownership/authorization and use S3/R2 signed URLs for larger files.
  */
 export const Route = createFileRoute("/demo/api/uploads")({
   server: {
@@ -46,61 +52,78 @@ export const Route = createFileRoute("/demo/api/uploads")({
           return json({ error: "This example accepts files up to 5 MB." }, { status: 400 });
         }
 
-        const key = createDemoUploadKey(file.name);
+        const contentType = file.type || "application/octet-stream";
+        const originalName = file.name || "upload.bin";
+        const key = createDemoUploadKey(originalName);
         const bytes = new Uint8Array(await file.arrayBuffer());
 
         await demoUploadDisk.put(key, bytes, {
           contentLength: file.size,
-          contentType: file.type || "application/octet-stream",
+          contentType,
           visibility: "private",
         });
 
-        return json({ file: await describeUpload(key) }, { status: 201 });
+        const [upload] = await db
+          .insert(demoUserUploads)
+          .values({
+            id: randomUUID(),
+            storageKey: key,
+            originalName,
+            contentType,
+            size: file.size,
+            disk: DEMO_UPLOAD_DISK,
+            createdAt: new Date(),
+          })
+          .returning();
+
+        return json({ file: serializeUpload(upload) }, { status: 201 });
       },
     },
   },
 });
 
 async function listUploads() {
-  const listing = await demoUploadDisk.listAll(DEMO_UPLOAD_PREFIX, { recursive: true });
-  const files = await Promise.all(
-    Array.from(listing.objects)
-      .filter((object) => object.isFile)
-      .map((file) => describeUpload(file.key)),
-  );
+  const uploads = await db.select().from(demoUserUploads).orderBy(desc(demoUserUploads.createdAt));
 
-  return files.sort((a, b) => b.lastModified.localeCompare(a.lastModified));
+  return uploads.map(serializeUpload);
 }
 
-async function describeUpload(key: string) {
-  const metadata = await demoUploadDisk.getMetaData(key);
-
+function serializeUpload(upload: typeof demoUserUploads.$inferSelect) {
   return {
-    key,
-    name: key.split("/").at(-1) ?? key,
-    contentType: metadata.contentType ?? "application/octet-stream",
-    size: metadata.contentLength,
-    lastModified: metadata.lastModified.toISOString(),
-    url: `/app/demo/api/uploads?key=${encodeURIComponent(key)}`,
+    id: upload.id,
+    key: upload.storageKey,
+    name: upload.originalName,
+    contentType: upload.contentType,
+    size: upload.size,
+    disk: upload.disk,
+    createdAt: upload.createdAt.toISOString(),
+    url: `/app/demo/api/uploads?key=${encodeURIComponent(upload.storageKey)}`,
   };
 }
 
 async function downloadUpload(key: string) {
-  if (!isDemoUploadKey(key) || !(await demoUploadDisk.exists(key))) {
+  const [upload] = await db
+    .select()
+    .from(demoUserUploads)
+    .where(eq(demoUserUploads.storageKey, key))
+    .limit(1);
+
+  if (!upload || !isDemoUploadKey(key) || !(await demoUploadDisk.exists(key))) {
     return json({ error: "File not found." }, { status: 404 });
   }
 
-  const [metadata, bytes] = await Promise.all([
-    demoUploadDisk.getMetaData(key),
-    demoUploadDisk.getBytes(key),
-  ]);
-  const name = (key.split("/").at(-1) ?? "download").replaceAll('"', "");
+  const bytes = await demoUploadDisk.getBytes(key);
+  const name = upload.originalName.replaceAll('"', "");
+  const body = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
 
-  return new Response(bytes, {
+  return new Response(body, {
     headers: {
       "Content-Disposition": `attachment; filename="${name}"`,
-      "Content-Length": String(metadata.contentLength),
-      "Content-Type": metadata.contentType ?? "application/octet-stream",
+      "Content-Length": String(upload.size),
+      "Content-Type": upload.contentType,
     },
   });
 }

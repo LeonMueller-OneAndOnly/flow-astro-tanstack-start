@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7a48c27f-f648-4557-8f04-7e27391f71b0",
-  "prevId": "79d2cff0-3f51-4820-938b-c55452cd8dd0",
+  "id": "14b477ec-5c8d-4763-b596-133bea21f743",
+  "prevId": "3d29a3e4-f994-46ea-bcf0-8007e80b5534",
   "tables": {
     "account": {
       "name": "account",
@@ -121,6 +121,77 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "demo_user_uploads": {
+      "name": "demo_user_uploads",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "storage_key": {
+          "name": "storage_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "original_name": {
+          "name": "original_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "size": {
+          "name": "size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "disk": {
+          "name": "disk",
+          "type": "text(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'local'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "demo_user_uploads_storage_key_unique": {
+          "name": "demo_user_uploads_storage_key_unique",
+          "columns": ["storage_key"],
+          "isUnique": true
+        },
+        "demo_user_uploads_created_at_idx": {
+          "name": "demo_user_uploads_created_at_idx",
+          "columns": ["created_at"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "job_queue_cron_schedules": {
       "name": "job_queue_cron_schedules",
       "columns": {
@@ -130,6 +201,13 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "name": {
           "name": "name",
@@ -217,6 +295,11 @@
           "name": "job_queue_cron_schedules_due_idx",
           "columns": ["status", "next_run_at"],
           "isUnique": false
+        },
+        "job_queue_cron_schedules_key_idx": {
+          "name": "job_queue_cron_schedules_key_idx",
+          "columns": ["key"],
+          "isUnique": true
         },
         "job_queue_cron_schedules_name_idx": {
           "name": "job_queue_cron_schedules_name_idx",

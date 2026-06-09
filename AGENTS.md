@@ -4,6 +4,9 @@ Be concise. Challenge weak assumptions. Ask when vague. No friendly filler.
 
 Dont start the dev server, ask the user to do that - if you want to access it and it is not already running.
 
+Prefer hardcoded defaults. Add env variables only for secrets or deployment-specific configuration.
+Document every env variable in `astro.config.ts`.
+
 # Framework
 
 This project uses Astro plus TanStack Start. TanStack Start is mounted under `/app`.
