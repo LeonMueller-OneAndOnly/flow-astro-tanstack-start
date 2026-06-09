@@ -51,7 +51,7 @@ const secondaryRamp = ["400", "500", "600", "700"];
           <span class="swatch-label">Brand · primary</span>
           <div class="swatches">
             {primaryRamp.map((step) => (
-              <span class="swatch" style={`background: var(--brand-${step})`} title={`brand-${step}`}></span>
+              <span class="swatch" style={`background: var(--brand-primary-${step})`} title={`brand-primary-${step}`}></span>
             ))}
           </div>
         </div>
@@ -113,7 +113,7 @@ const secondaryRamp = ["400", "500", "600", "700"];
   .glow-a {
     top: -16rem;
     left: -10rem;
-    background: radial-gradient(circle, color-mix(in oklch, var(--brand-500) 55%, transparent), transparent 60%);
+    background: radial-gradient(circle, color-mix(in oklch, var(--brand-primary-500) 55%, transparent), transparent 60%);
   }
 
   .glow-b {
@@ -131,12 +131,12 @@ const secondaryRamp = ["400", "500", "600", "700"];
     border-radius: 28px;
     background: color-mix(in oklch, var(--card) 86%, transparent);
     backdrop-filter: blur(12px);
-    box-shadow: 0 24px 80px color-mix(in oklch, var(--brand-900) 22%, transparent);
+    box-shadow: 0 24px 80px color-mix(in oklch, var(--brand-primary-900) 22%, transparent);
   }
 
   .eyebrow {
     margin: 0 0 14px;
-    color: var(--brand-600);
+    color: var(--brand-primary-600);
     font-size: 0.82rem;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -153,7 +153,7 @@ const secondaryRamp = ["400", "500", "600", "700"];
   }
 
   .grad {
-    background: linear-gradient(110deg, var(--brand-500), var(--brand-secondary-500));
+    background: linear-gradient(110deg, var(--brand-primary-500), var(--brand-secondary-500));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -192,8 +192,8 @@ const secondaryRamp = ["400", "500", "600", "700"];
 
   .btn-primary {
     color: var(--primary-foreground);
-    background: linear-gradient(110deg, var(--brand-600), var(--brand-secondary-600));
-    box-shadow: 0 8px 24px color-mix(in oklch, var(--brand-600) 35%, transparent);
+    background: linear-gradient(110deg, var(--brand-primary-600), var(--brand-secondary-600));
+    box-shadow: 0 8px 24px color-mix(in oklch, var(--brand-primary-600) 35%, transparent);
   }
 
   .btn-secondary {
@@ -213,7 +213,7 @@ const secondaryRamp = ["400", "500", "600", "700"];
   }
 
   .btn-ghost:hover {
-    border-color: var(--brand-400);
+    border-color: var(--brand-primary-400);
   }
 
   .palette {
@@ -258,7 +258,7 @@ const secondaryRamp = ["400", "500", "600", "700"];
     border-radius: 22px;
     background: linear-gradient(
       135deg,
-      color-mix(in oklch, var(--brand-500) 9%, transparent),
+      color-mix(in oklch, var(--brand-primary-500) 9%, transparent),
       color-mix(in oklch, var(--brand-secondary-500) 9%, transparent)
     );
   }
@@ -285,8 +285,8 @@ const secondaryRamp = ["400", "500", "600", "700"];
   }
 
   code {
-    color: var(--brand-700);
-    background: color-mix(in oklch, var(--brand-500) 10%, transparent);
+    color: var(--brand-primary-700);
+    background: color-mix(in oklch, var(--brand-primary-500) 10%, transparent);
     padding: 1px 6px;
     border-radius: 6px;
     font-size: 0.9em;
