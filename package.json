@@ -16,7 +16,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.1",
     "@ai-sdk/react": "^2.0.8",
-    "@astrojs/react": "^4.4.0",
+    "@astrojs/react": "^5.0.7",
     "@modelcontextprotocol/sdk": "^1.8.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/nitro-v2-vite-plugin": "^1.132.31",
@@ -29,7 +29,7 @@
     "@tanstack/router-plugin": "^1.132.0",
     "@tanstack/store": "^0.7.0",
     "ai": "^5.0.8",
-    "astro": "^5.14.4",
+    "astro": "^6.4.4",
     "highlight.js": "^11.11.1",
     "lucide-react": "^0.544.0",
     "react": "^19.2.0",
@@ -44,17 +44,25 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@tanstack/devtools-event-client": "^0.3.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
-    "@vitejs/plugin-react": "^5.0.4",
+    "@vitejs/plugin-react": "^5.2.0",
+    "astro-grab": "^0.3.0",
+    "astro-typesafe-routes": "^5.1.0",
     "jsdom": "^27.0.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
     "vitest": "^3.0.5",
     "web-vitals": "^5.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "^7.3.2"
+    }
   }
 }
