@@ -1,19 +1,27 @@
 import { hostname } from "node:os";
 
+import { Cron } from "croner";
 import { eq, sql } from "drizzle-orm";
 import PQueue from "p-queue";
 import { z } from "zod";
 
 import { db } from "../../app/db/client";
-import { jobQueueJobs } from "../../app/db/schema";
+import { jobQueueCronSchedules, jobQueueJobs } from "../../app/db/schema";
 
 export type JobQueueStatus = "pending" | "running" | "completed" | "failed";
 
 export type EnqueueJobOptions = {
   availableAt?: Date;
+  cronScheduleId?: number;
   delayMs?: number;
   maxAttempts?: number;
   priority?: number;
+};
+
+export type ScheduleJobOptions = {
+  maxAttempts?: number;
+  priority?: number;
+  timezone?: string;
 };
 
 export type JobQueueContext<TPayload> = {
@@ -36,6 +44,11 @@ export type DefinedJob<TName extends string, TSchema extends z.ZodTypeAny> = {
     payload: z.input<TSchema>,
     options?: EnqueueJobOptions,
   ) => Promise<typeof jobQueueJobs.$inferSelect>;
+  schedule: (
+    cron: string,
+    payload: z.input<TSchema>,
+    options?: ScheduleJobOptions,
+  ) => Promise<typeof jobQueueCronSchedules.$inferSelect>;
   handle: (handler: JobHandler<z.output<TSchema>>) => RegisteredJob<TName, TSchema>;
 };
 
@@ -69,6 +82,8 @@ export function defineJob<TName extends string, TSchema extends z.ZodTypeAny>(op
     ...options,
     enqueue: (payload, enqueueOptions) =>
       enqueueJob(options.name, options.schema, payload, enqueueOptions),
+    schedule: (cron, payload, scheduleOptions) =>
+      scheduleJob(options.name, options.schema, cron, payload, scheduleOptions),
     handle: (handler) => ({ ...options, handler }),
   };
 }
@@ -96,6 +111,7 @@ export function createJobQueueWorker(jobs: RegisteredJob[], options: JobQueueWor
 
     try {
       await releaseStaleJobs(lockTimeoutMs);
+      await enqueueDueCronSchedules();
       const claimedJobs = await claimJobs(Math.min(openSlots, claimBatchSize), workerId);
 
       for (const job of claimedJobs) {
@@ -139,6 +155,7 @@ async function enqueueJob<TSchema extends z.ZodTypeAny>(
       name,
       payload: JSON.stringify(parsedPayload),
       status: "pending",
+      cronScheduleId: options.cronScheduleId,
       priority: options.priority ?? 0,
       maxAttempts: options.maxAttempts ?? 3,
       availableAt,
@@ -148,6 +165,80 @@ async function enqueueJob<TSchema extends z.ZodTypeAny>(
     .returning();
 
   return job;
+}
+
+async function scheduleJob<TSchema extends z.ZodTypeAny>(
+  name: string,
+  schema: TSchema,
+  cron: string,
+  payload: z.input<TSchema>,
+  options: ScheduleJobOptions = {},
+) {
+  const now = Date.now();
+  const parsedPayload = schema.parse(payload);
+  const nextRunAt = getNextCronRunAt(cron, options.timezone, new Date(now));
+
+  const [schedule] = await db
+    .insert(jobQueueCronSchedules)
+    .values({
+      name,
+      payload: JSON.stringify(parsedPayload),
+      cron,
+      timezone: options.timezone,
+      status: "active",
+      priority: options.priority ?? 0,
+      maxAttempts: options.maxAttempts ?? 3,
+      nextRunAt,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning();
+
+  return schedule;
+}
+
+async function enqueueDueCronSchedules() {
+  const now = Date.now();
+
+  const dueSchedules = await db.all<typeof jobQueueCronSchedules.$inferSelect>(sql`
+    update ${jobQueueCronSchedules}
+    set
+      last_enqueued_at = ${now},
+      updated_at = ${now}
+    where id in (
+      select id
+      from ${jobQueueCronSchedules}
+      where status = 'active'
+        and next_run_at <= ${now}
+      order by next_run_at asc, id asc
+      limit 25
+    )
+    returning *
+  `);
+
+  for (const schedule of dueSchedules) {
+    const nextRunAt = getNextCronRunAt(schedule.cron, schedule.timezone, new Date(now + 1));
+
+    await db
+      .insert(jobQueueJobs)
+      .values({
+        name: schedule.name,
+        payload: schedule.payload,
+        status: "pending",
+        cronScheduleId: schedule.id,
+        priority: schedule.priority,
+        maxAttempts: schedule.maxAttempts,
+        availableAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    await db
+      .update(jobQueueCronSchedules)
+      .set({ nextRunAt, updatedAt: now })
+      .where(eq(jobQueueCronSchedules.id, schedule.id));
+  }
 }
 
 async function claimJobs(limit: number, workerId: string): Promise<ClaimedJobRow[]> {
@@ -291,4 +382,12 @@ function serializeError(error: unknown) {
   }
 
   return JSON.stringify({ message: String(error) });
+}
+
+function getNextCronRunAt(cron: string, timezone: string | null | undefined, from: Date) {
+  const nextRun = new Cron(cron, { paused: true, timezone: timezone ?? undefined }).nextRun(from);
+
+  if (!nextRun) throw new Error(`Cron expression has no next run: ${cron}`);
+
+  return nextRun.getTime();
 }
