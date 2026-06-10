@@ -1,5 +1,6 @@
 ---
 import guitars from "../app/lib/demo/data/example-guitars";
+import { $appPath } from "../app/lib/typesafe-paths";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 export const prerender = false;
@@ -8,70 +9,73 @@ const featuredGuitars = guitars.slice(0, 3);
 const heroGuitar = guitars[2] ?? guitars[0];
 const lowestPrice = Math.min(...guitars.map((guitar) => guitar.price));
 const highestPrice = Math.max(...guitars.map((guitar) => guitar.price));
+const guitarCatalogHref = $appPath({ to: "/demo/example/guitars" });
+const guitarHref = (guitarId: string | number) =>
+  $appPath({ to: "/demo/example/guitars/$guitarId", params: { guitarId: String(guitarId) } });
 const demoLinks = [
   {
     title: "TanStack demo hub",
-    href: "/app",
+    href: $appPath({ to: "/" }),
     label: "Index",
     description: "The mounted TanStack Start landing page that collects the app demos.",
   },
   {
     title: "Todo server functions",
-    href: "/app/demo/start/server-funcs",
+    href: $appPath({ to: "/demo/start/server-funcs" }),
     label: "Server fn",
     description: "A todo flow using loaders, server functions, mutations, and database writes.",
   },
   {
     title: "API request",
-    href: "/app/demo/start/api-request",
+    href: $appPath({ to: "/demo/start/api-request" }),
     label: "API route",
     description: "A client page that fetches data from a colocated TanStack API handler.",
   },
   {
     title: "SSR mode hub",
-    href: "/app/demo/start/ssr",
+    href: $appPath({ to: "/demo/start/ssr" }),
     label: "SSR",
     description: "Navigation for the rendering-mode examples in the starter.",
   },
   {
     title: "SPA mode",
-    href: "/app/demo/start/ssr/spa-mode",
+    href: $appPath({ to: "/demo/start/ssr/spa-mode" }),
     label: "Client",
     description: "A no-SSR route that loads its punk-song data in the browser.",
   },
   {
     title: "Full SSR",
-    href: "/app/demo/start/ssr/full-ssr",
+    href: $appPath({ to: "/demo/start/ssr/full-ssr" }),
     label: "Server",
     description: "A loader-rendered page that sends complete HTML from the server.",
   },
   {
     title: "Data-only SSR",
-    href: "/app/demo/start/ssr/data-only",
+    href: $appPath({ to: "/demo/start/ssr/data-only" }),
     label: "Data",
     description: "A route using TanStack Start's data-only SSR mode.",
   },
   {
     title: "Client store",
-    href: "/app/demo/store",
+    href: $appPath({ to: "/demo/store" }),
     label: "Store",
     description: "A compact TanStack Store example with derived full-name state.",
   },
   {
     title: "Upload tester",
-    href: "/app/demo/start/uploads",
+    href: $appPath({ to: "/demo/start/uploads" }),
     label: "Files",
     description: "A Flydrive-backed upload, list, and download reference flow.",
   },
   {
     title: "Mail worker tester",
-    href: "/app/demo/start/mail-worker",
+    href: $appPath({ to: "/demo/start/mail-worker" }),
     label: "Worker",
     description: "A form that queues a preview email job for the background worker.",
   },
   {
     title: "Guitar catalog",
-    href: "/app/example/guitars",
+    href: guitarCatalogHref,
     label: "Routes",
     description: "A list/detail catalog demo using TanStack dynamic route params.",
   },
@@ -93,8 +97,8 @@ const demoLinks = [
         </p>
 
         <div class="actions" aria-label="Primary actions">
-          <a class="btn btn-primary" href="/app/example/guitars">Browse guitar demo</a>
-          <a class="btn btn-secondary" href={`/app/example/guitars/${heroGuitar.id}`}>Open featured guitar</a>
+          <a class="btn btn-primary" href={guitarCatalogHref}>Browse guitar demo</a>
+          <a class="btn btn-secondary" href={guitarHref(heroGuitar.id)}>Open featured guitar</a>
         </div>
 
         <dl class="stats" aria-label="Catalog stats">
@@ -107,13 +111,13 @@ const demoLinks = [
             <dd>sample range</dd>
           </div>
           <div>
-            <dt>/app/example</dt>
+            <dt>/app/demo/example</dt>
             <dd>mounted route</dd>
           </div>
         </dl>
       </div>
 
-      <a class="hero-showcase" href={`/app/example/guitars/${heroGuitar.id}`} aria-label={`Open ${heroGuitar.name}`}>
+      <a class="hero-showcase" href={guitarHref(heroGuitar.id)} aria-label={`Open ${heroGuitar.name}`}>
         <div class="pick-card">dynamic route demo</div>
         <img src={heroGuitar.image} alt={heroGuitar.name} />
         <div class="showcase-caption">
@@ -137,7 +141,7 @@ const demoLinks = [
 
     <section class="guitar-grid" aria-label="Featured guitars">
       {featuredGuitars.map((guitar) => (
-        <a class="guitar-card" href={`/app/example/guitars/${guitar.id}`}>
+        <a class="guitar-card" href={guitarHref(guitar.id)}>
           <img src={guitar.image} alt={guitar.name} loading="lazy" />
           <div>
             <span>${guitar.price}</span>
@@ -179,7 +183,7 @@ const demoLinks = [
       <div>
         <span>03</span>
         <h3>App routes when useful</h3>
-        <p>TanStack Start stays focused on interactive examples under <code>/app/example/guitars</code>.</p>
+        <p>TanStack Start stays focused on interactive examples under <code>/app/demo/example/guitars</code>.</p>
       </div>
     </section>
   </main>
