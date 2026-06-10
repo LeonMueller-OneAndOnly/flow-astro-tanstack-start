@@ -3,9 +3,9 @@ import { betterAuth } from "better-auth";
 import { magicLink, username } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
-import { sendMail } from "../../integrations/mailer";
-import { db } from "../../db/client";
-import * as schema from "../../db/schema";
+import { sendMail } from "../../../integrations/mailer";
+import { db } from "../../../db/client";
+import * as schema from "../../../db/schema";
 import { authBasePath } from "./auth-config";
 
 export const auth = betterAuth({

@@ -1,170 +1,169 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import guitars from "../app/data/example-guitars";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
 export const prerender = false;
 
-let tanstackNames: Array<string> = [];
-let tanstackApiError = "";
-
-try {
-  const response = await fetch(new URL("/app/demo/api/names", Astro.url));
-
-  if (!response.ok) {
-    throw new Error(`TanStack API returned ${response.status}`);
-  }
-
-  tanstackNames = await response.json();
-} catch (error) {
-  tanstackApiError = error instanceof Error ? error.message : "Unable to load TanStack API data";
-}
-
-const primaryRamp = ["400", "500", "600", "700"];
-const secondaryRamp = ["400", "500", "600", "700"];
+const featuredGuitars = guitars.slice(0, 3);
+const heroGuitar = guitars[2] ?? guitars[0];
+const lowestPrice = Math.min(...guitars.map((guitar) => guitar.price));
+const highestPrice = Math.max(...guitars.map((guitar) => guitar.price));
 ---
 
-<BaseLayout>
+<BaseLayout
+  title="Astro TanStack Guitar Starter"
+  description="A sharper Astro and TanStack Start starter kit built around a guitar catalog demo."
+>
   <main class="page-shell">
-    <div class="glow glow-a" aria-hidden="true"></div>
-    <div class="glow glow-b" aria-hidden="true"></div>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Astro + TanStack Start</p>
+        <h1>Starter kit, tuned like a boutique guitar shop.</h1>
+        <p class="lede">
+          Static Astro pages handle the polished front door. The mounted TanStack Start demo
+          shows an app-like catalog with dynamic guitar routes when you need richer client behavior.
+        </p>
 
-    <section class="hero-card">
-      <p class="eyebrow">Framework starter</p>
-      <h1>Astro shell with a <span class="grad">TanStack Start</span> app</h1>
-      <p class="lede">
-        Placeholder scaffolding for verifying routing, rendering, API routes, and server
-        functions. Two brand colors are wired through the design tokens in
-        <code>src/styles/globals.css</code> — swap them to make the kit your own.
+        <div class="actions" aria-label="Primary actions">
+          <a class="btn btn-primary" href="/app/example/guitars">Browse guitar demo</a>
+          <a class="btn btn-secondary" href={`/app/example/guitars/${heroGuitar.id}`}>Open featured guitar</a>
+        </div>
+
+        <dl class="stats" aria-label="Catalog stats">
+          <div>
+            <dt>{guitars.length}</dt>
+            <dd>demo guitars</dd>
+          </div>
+          <div>
+            <dt>${lowestPrice}-${highestPrice}</dt>
+            <dd>sample range</dd>
+          </div>
+          <div>
+            <dt>/app/example</dt>
+            <dd>mounted route</dd>
+          </div>
+        </dl>
+      </div>
+
+      <a class="hero-showcase" href={`/app/example/guitars/${heroGuitar.id}`} aria-label={`Open ${heroGuitar.name}`}>
+        <div class="pick-card">dynamic route demo</div>
+        <img src={heroGuitar.image} alt={heroGuitar.name} />
+        <div class="showcase-caption">
+          <span>{heroGuitar.name}</span>
+          <strong>${heroGuitar.price}</strong>
+        </div>
+      </a>
+    </section>
+
+    <section class="section intro" aria-labelledby="starter-title">
+      <div>
+        <p class="eyebrow">What this proves</p>
+        <h2 id="starter-title">A starter that points at a real-feeling demo, not a framework lobby.</h2>
+      </div>
+      <p>
+        Use Astro for marketing, docs, content, and lightweight SSR. Send users straight into the
+        guitar catalog when they need the TanStack Start example for nested routing, params, and
+        app-style UI under the mounted <code>/app</code> boundary.
       </p>
+    </section>
 
-      <div class="actions">
-        <a class="btn btn-primary" href="/app">Open TanStack app</a>
-        <a class="btn btn-secondary" href="/app/demo/start/uploads">Try upload demo</a>
-        <a class="btn btn-secondary" href="https://tanstack.com/start/latest" target="_blank" rel="noreferrer">
-          TanStack Start docs
-        </a>
-        <a class="btn btn-ghost" href="https://docs.astro.build" target="_blank" rel="noreferrer">
-          Astro docs
-        </a>
-      </div>
-
-      <div class="palette" role="img" aria-label="Brand color palette: primary blue and secondary violet">
-        <div class="swatch-group">
-          <span class="swatch-label">Brand · primary</span>
-          <div class="swatches">
-            {primaryRamp.map((step) => (
-              <span class="swatch" style={`background: var(--brand-primary-${step})`} title={`brand-primary-${step}`}></span>
-            ))}
+    <section class="guitar-grid" aria-label="Featured guitars">
+      {featuredGuitars.map((guitar) => (
+        <a class="guitar-card" href={`/app/example/guitars/${guitar.id}`}>
+          <img src={guitar.image} alt={guitar.name} loading="lazy" />
+          <div>
+            <span>${guitar.price}</span>
+            <h3>{guitar.name}</h3>
+            <p>{guitar.shortDescription}</p>
           </div>
-        </div>
-        <div class="swatch-group">
-          <span class="swatch-label">Brand · secondary</span>
-          <div class="swatches">
-            {secondaryRamp.map((step) => (
-              <span class="swatch" style={`background: var(--brand-secondary-${step})`} title={`brand-secondary-${step}`}></span>
-            ))}
-          </div>
-        </div>
+        </a>
+      ))}
+    </section>
+
+    <section class="section feature-strip" aria-label="Starter capabilities">
+      <div>
+        <span>01</span>
+        <h3>Astro-first shell</h3>
+        <p>Keep simple public pages fast, static-friendly, and easy to replace.</p>
       </div>
-
-      <section class="api-card" aria-labelledby="tanstack-api-title">
-        <div>
-          <p class="api-label">Fetched by Astro SSR</p>
-          <h2 id="tanstack-api-title">TanStack API route response</h2>
-          <p class="api-copy">
-            Rendered by <code>src/pages/index.astro</code>, with data fetched from
-            <code>/app/demo/api/names</code> inside the mounted TanStack Start app.
-          </p>
-        </div>
-
-        {tanstackApiError ? (
-          <p class="api-error">{tanstackApiError}</p>
-        ) : (
-          <ul class="name-list" aria-label="Names returned by the TanStack API route">
-            {tanstackNames.map((name) => <li>{name}</li>)}
-          </ul>
-        )}
-      </section>
+      <div>
+        <span>02</span>
+        <h3>Direct demo entry</h3>
+        <p>The main call to action goes to the guitar catalog instead of the generic app root.</p>
+      </div>
+      <div>
+        <span>03</span>
+        <h3>App routes when useful</h3>
+        <p>TanStack Start stays focused on interactive examples under <code>/app/example/guitars</code>.</p>
+      </div>
     </section>
   </main>
 </BaseLayout>
 
 <style>
   .page-shell {
-    position: relative;
     min-height: 100vh;
-    display: grid;
-    place-items: center;
-    padding: 24px;
     overflow: hidden;
-    background: var(--background);
+    padding: clamp(18px, 3vw, 40px);
+    background:
+      radial-gradient(circle at 12% 10%, color-mix(in oklch, var(--brand-primary-400) 26%, transparent), transparent 32rem),
+      radial-gradient(circle at 85% 18%, color-mix(in oklch, var(--brand-secondary-500) 22%, transparent), transparent 30rem),
+      linear-gradient(135deg, oklch(0.985 0.02 86), oklch(0.96 0.025 68) 42%, var(--background));
     color: var(--foreground);
   }
 
-  /* Brand-tinted ambient glows, blue + violet, behind the card. */
-  .glow {
-    position: absolute;
-    width: 48rem;
-    height: 48rem;
-    border-radius: 999px;
-    filter: blur(90px);
-    opacity: 0.6;
-    pointer-events: none;
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 460px);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: center;
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: clamp(34px, 7vw, 92px) 0 clamp(34px, 6vw, 72px);
   }
 
-  .glow-a {
-    top: -16rem;
-    left: -10rem;
-    background: radial-gradient(circle, color-mix(in oklch, var(--brand-primary-500) 55%, transparent), transparent 60%);
-  }
-
-  .glow-b {
-    bottom: -18rem;
-    right: -12rem;
-    background: radial-gradient(circle, color-mix(in oklch, var(--brand-secondary-500) 50%, transparent), transparent 60%);
-  }
-
-  .hero-card {
+  .hero-copy {
     position: relative;
-    z-index: 1;
-    width: min(820px, 100%);
-    padding: clamp(28px, 6vw, 64px);
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    background: color-mix(in oklch, var(--card) 86%, transparent);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 24px 80px color-mix(in oklch, var(--brand-primary-900) 22%, transparent);
   }
 
   .eyebrow {
     margin: 0 0 14px;
-    color: var(--brand-primary-600);
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
+    color: var(--brand-secondary-700);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
   }
 
-  h1 {
-    margin: 0;
-    max-width: 720px;
-    font-size: clamp(2.3rem, 7vw, 4.4rem);
-    line-height: 1;
-    letter-spacing: -0.045em;
-    font-weight: 800;
+  h1,
+  h2,
+  h3,
+  p {
+    margin-top: 0;
   }
 
-  .grad {
-    background: linear-gradient(110deg, var(--brand-primary-500), var(--brand-secondary-500));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  h1 {
+    max-width: 760px;
+    margin-bottom: 24px;
+    font-size: clamp(3.2rem, 9vw, 7.4rem);
+    font-weight: 950;
+    line-height: 0.9;
+    letter-spacing: -0.075em;
+  }
+
+  h2 {
+    max-width: 720px;
+    margin-bottom: 0;
+    font-size: clamp(2rem, 4.8vw, 4.2rem);
+    line-height: 0.98;
+    letter-spacing: -0.06em;
   }
 
   .lede {
-    max-width: 640px;
-    margin: 22px 0 0;
-    color: var(--muted-foreground);
-    font-size: clamp(1rem, 2vw, 1.18rem);
+    max-width: 650px;
+    margin-bottom: 0;
+    color: color-mix(in oklch, var(--foreground) 68%, transparent);
+    font-size: clamp(1.08rem, 2vw, 1.35rem);
     line-height: 1.7;
   }
 
@@ -172,162 +171,308 @@ const secondaryRamp = ["400", "500", "600", "700"];
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: 32px;
+    margin-top: 34px;
   }
 
   .btn {
     display: inline-flex;
     align-items: center;
-    text-decoration: none;
-    border-radius: 999px;
-    padding: 12px 20px;
-    font-weight: 600;
-    font-size: 0.95rem;
+    justify-content: center;
+    min-height: 48px;
     border: 1px solid transparent;
-    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    border-radius: 999px;
+    padding: 0 20px;
+    font-weight: 850;
+    text-decoration: none;
+    transition: transform 160ms ease, box-shadow 180ms ease, border-color 180ms ease;
   }
 
   .btn:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
   }
 
   .btn-primary {
-    color: var(--primary-foreground);
-    background: linear-gradient(110deg, var(--brand-primary-600), var(--brand-secondary-600));
-    box-shadow: 0 8px 24px color-mix(in oklch, var(--brand-primary-600) 35%, transparent);
+    background: var(--foreground);
+    color: var(--background);
+    box-shadow: 0 18px 36px color-mix(in oklch, var(--foreground) 18%, transparent);
   }
 
   .btn-secondary {
-    color: var(--brand-secondary-700);
-    background: color-mix(in oklch, var(--brand-secondary-500) 16%, transparent);
-    border-color: color-mix(in oklch, var(--brand-secondary-500) 35%, transparent);
+    border-color: color-mix(in oklch, var(--foreground) 20%, transparent);
+    background: color-mix(in oklch, var(--card) 72%, transparent);
+    color: var(--foreground);
   }
 
   .btn-secondary:hover {
-    background: color-mix(in oklch, var(--brand-secondary-500) 24%, transparent);
+    border-color: color-mix(in oklch, var(--brand-secondary-600) 55%, transparent);
   }
 
-  .btn-ghost {
-    color: var(--foreground);
-    border-color: var(--border);
-    background: transparent;
-  }
-
-  .btn-ghost:hover {
-    border-color: var(--brand-primary-400);
-  }
-
-  .palette {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    margin-top: 36px;
-    padding-top: 28px;
-    border-top: 1px solid var(--border);
-  }
-
-  .swatch-label {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted-foreground);
-  }
-
-  .swatches {
-    display: flex;
-    gap: 8px;
-  }
-
-  .swatch {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--foreground) 8%, transparent);
-  }
-
-  .api-card {
+  .stats {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 24px;
-    align-items: center;
-    margin-top: 32px;
-    padding: 22px;
-    border: 1px solid color-mix(in oklch, var(--brand-secondary-500) 22%, transparent);
-    border-radius: 22px;
-    background: linear-gradient(
-      135deg,
-      color-mix(in oklch, var(--brand-primary-500) 9%, transparent),
-      color-mix(in oklch, var(--brand-secondary-500) 9%, transparent)
-    );
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 680px;
+    margin: 44px 0 0;
   }
 
-  .api-label {
-    margin: 0 0 8px;
-    color: var(--brand-secondary-600);
-    font-size: 0.72rem;
-    font-weight: 800;
+  .stats div {
+    border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+    border-radius: 24px;
+    padding: 18px;
+    background: color-mix(in oklch, var(--card) 58%, transparent);
+    backdrop-filter: blur(16px);
+  }
+
+  .stats dt {
+    margin-bottom: 4px;
+    font-size: clamp(1.25rem, 2.3vw, 1.8rem);
+    font-weight: 950;
+    letter-spacing: -0.04em;
+  }
+
+  .stats dd {
+    margin: 0;
+    color: color-mix(in oklch, var(--foreground) 58%, transparent);
+    font-size: 0.86rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-showcase {
+    position: relative;
+    display: block;
+    min-height: 590px;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklch, var(--foreground) 16%, transparent);
+    border-radius: 42px;
+    background: oklch(0.18 0.035 65);
+    box-shadow: 0 34px 90px color-mix(in oklch, var(--foreground) 18%, transparent);
+    color: white;
+    isolation: isolate;
+    text-decoration: none;
+  }
+
+  .hero-showcase::before {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    content: "";
+    background:
+      linear-gradient(180deg, rgb(0 0 0 / 0%) 34%, rgb(0 0 0 / 78%)),
+      radial-gradient(circle at 50% 20%, rgb(255 255 255 / 28%), transparent 20rem);
+  }
+
+  .hero-showcase img {
+    width: 100%;
+    height: 100%;
+    min-height: 590px;
+    object-fit: cover;
+    transform: scale(1.02);
+    transition: transform 500ms ease;
+  }
+
+  .hero-showcase:hover img {
+    transform: scale(1.07);
+  }
+
+  .pick-card,
+  .showcase-caption {
+    position: absolute;
+    z-index: 2;
+  }
+
+  .pick-card {
+    top: 22px;
+    left: 22px;
+    border: 1px solid rgb(255 255 255 / 28%);
+    border-radius: 999px;
+    padding: 10px 14px;
+    background: rgb(0 0 0 / 32%);
+    backdrop-filter: blur(14px);
+    font-size: 0.74rem;
+    font-weight: 900;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
-  h2 {
-    margin: 0;
-    font-size: clamp(1.25rem, 3vw, 1.8rem);
-    letter-spacing: -0.03em;
+  .showcase-caption {
+    right: 24px;
+    bottom: 24px;
+    left: 24px;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
   }
 
-  .api-copy {
-    margin: 10px 0 0;
-    color: var(--muted-foreground);
-    line-height: 1.6;
+  .showcase-caption span {
+    max-width: 290px;
+    font-size: clamp(1.5rem, 4vw, 2.8rem);
+    font-weight: 950;
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+  }
+
+  .showcase-caption strong {
+    border-radius: 999px;
+    padding: 12px 15px;
+    background: white;
+    color: black;
+    font-size: 1rem;
+  }
+
+  .section,
+  .guitar-grid {
+    width: min(1180px, 100%);
+    margin-inline: auto;
+  }
+
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    gap: clamp(24px, 5vw, 64px);
+    align-items: end;
+    padding: clamp(34px, 6vw, 74px) 0;
+  }
+
+  .intro > p {
+    margin-bottom: 0;
+    color: color-mix(in oklch, var(--foreground) 66%, transparent);
+    font-size: 1.05rem;
+    line-height: 1.75;
   }
 
   code {
-    color: var(--brand-primary-700);
-    background: color-mix(in oklch, var(--brand-primary-500) 10%, transparent);
-    padding: 1px 6px;
-    border-radius: 6px;
+    border-radius: 8px;
+    padding: 2px 7px;
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+    color: var(--brand-secondary-700);
     font-size: 0.9em;
+    font-weight: 750;
   }
 
-  .name-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px;
-    max-width: 260px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  .guitar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
   }
 
-  .name-list li {
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 8px 12px;
+  .guitar-card {
+    overflow: hidden;
+    border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+    border-radius: 30px;
+    background: color-mix(in oklch, var(--card) 74%, transparent);
     color: var(--foreground);
-    background: var(--muted);
-    font-weight: 600;
-    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 20px 54px color-mix(in oklch, var(--foreground) 7%, transparent);
+    transition: transform 180ms ease, border-color 180ms ease;
   }
 
-  .api-error {
-    margin: 0;
-    color: var(--destructive);
-    font-weight: 700;
+  .guitar-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklch, var(--brand-primary-500) 38%, transparent);
   }
 
-  @media (max-width: 720px) {
-    .api-card {
+  .guitar-card img {
+    width: 100%;
+    aspect-ratio: 1.15;
+    object-fit: cover;
+  }
+
+  .guitar-card div {
+    padding: 20px;
+  }
+
+  .guitar-card span {
+    display: inline-flex;
+    margin-bottom: 12px;
+    border-radius: 999px;
+    padding: 7px 10px;
+    background: color-mix(in oklch, var(--brand-primary-500) 12%, transparent);
+    color: var(--brand-primary-800);
+    font-weight: 900;
+  }
+
+  .guitar-card h3 {
+    margin-bottom: 10px;
+    font-size: 1.35rem;
+    letter-spacing: -0.035em;
+  }
+
+  .guitar-card p {
+    margin-bottom: 0;
+    color: color-mix(in oklch, var(--foreground) 58%, transparent);
+    line-height: 1.6;
+  }
+
+  .feature-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    margin-top: 18px;
+    margin-bottom: clamp(24px, 5vw, 64px);
+    border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+    border-radius: 30px;
+    background: color-mix(in oklch, var(--foreground) 12%, transparent);
+  }
+
+  .feature-strip div {
+    padding: clamp(22px, 4vw, 34px);
+    background: color-mix(in oklch, var(--card) 76%, transparent);
+  }
+
+  .feature-strip span {
+    display: block;
+    margin-bottom: 42px;
+    color: var(--brand-secondary-700);
+    font-weight: 950;
+  }
+
+  .feature-strip h3 {
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    letter-spacing: -0.035em;
+  }
+
+  .feature-strip p {
+    margin-bottom: 0;
+    color: color-mix(in oklch, var(--foreground) 60%, transparent);
+    line-height: 1.65;
+  }
+
+  @media (max-width: 900px) {
+    .hero,
+    .intro,
+    .guitar-grid,
+    .feature-strip {
       grid-template-columns: 1fr;
     }
 
-    .name-list {
-      justify-content: flex-start;
-      max-width: none;
+    .hero-showcase,
+    .hero-showcase img {
+      min-height: 460px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .page-shell {
+      padding: 16px;
+    }
+
+    .actions,
+    .stats {
+      grid-template-columns: 1fr;
+    }
+
+    .btn {
+      width: 100%;
+    }
+
+    .showcase-caption {
+      align-items: start;
+      flex-direction: column;
     }
   }
 </style>

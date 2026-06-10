@@ -14,7 +14,7 @@ import {
   getDemoUploadsRoot,
   isDemoUploadKey,
   MAX_DEMO_UPLOAD_BYTES,
-} from "../../demo/file-storage";
+} from "../../lib/demo-file-storage";
 
 /**
  * Reference-only upload API served at `/app/demo/api/uploads`.
