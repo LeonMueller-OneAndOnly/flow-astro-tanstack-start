@@ -9,7 +9,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 
-import { demoPageBackground } from "../../lib/demo/demo-theme";
+import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 
 /** Served at `/app/demo`; lists every starter demo. Delete `src/app/routes/demo` to drop them all. */
 export const Route = createFileRoute("/demo/")({
@@ -65,7 +65,7 @@ function DemoIndex() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-background text-foreground" style={demoPageBackground}>
+    <div className="min-h-screen bg-background text-foreground" style={brandPageBackground}>
       <section className="relative overflow-hidden px-6 py-20 text-center">
         <div className="relative max-w-5xl mx-auto">
           <p className="mb-5 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
@@ -87,7 +87,7 @@ function DemoIndex() {
               href="https://tanstack.com/start"
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full bg-foreground px-7 py-3 font-bold text-background shadow-[0_18px_36px_color-mix(in_oklch,var(--foreground)_18%,transparent)] transition-transform hover:-translate-y-0.5"
+              className={`rounded-full px-7 py-3 ${brandPrimaryButtonClass}`}
             >
               TanStack Start docs
             </a>

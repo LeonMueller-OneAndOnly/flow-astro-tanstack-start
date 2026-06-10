@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { demoPageBackground } from "@/lib/demo/demo-theme";
+import { brandPageBackground, brandPrimaryButtonClass } from "@/lib/brand-theme";
 import { Result } from "@/lib/result";
 
 const ZMailWorkerInput = z.object({
@@ -86,7 +86,7 @@ function MailWorkerTestPage() {
   return (
     <main
       className="min-h-screen bg-background px-6 py-16 text-foreground"
-      style={demoPageBackground}
+      style={brandPageBackground}
     >
       <div className="mx-auto max-w-3xl">
         <div className="mb-8">
@@ -140,7 +140,7 @@ function MailWorkerTestPage() {
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className={brandPrimaryButtonClass}>
                   {isSubmitting ? "Queueing..." : "Queue mail job"}
                 </Button>
                 {status?.success ? (

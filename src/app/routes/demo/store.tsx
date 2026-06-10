@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useStore } from "@tanstack/react-store";
 
-import { demoPageBackground } from "@/lib/demo/demo-theme";
+import { brandPageBackground } from "@/lib/brand-theme";
 import { fullName, store } from "@/lib/demo/demo-store";
 
 const fieldClass =
@@ -51,7 +51,7 @@ function DemoStore() {
   return (
     <div
       className="flex h-full min-h-[calc(100vh-32px)] w-full items-center justify-center bg-background p-8 text-foreground"
-      style={demoPageBackground}
+      style={brandPageBackground}
     >
       <div className="flex min-w-1/2 flex-col gap-4 rounded-2xl border border-foreground/10 bg-card/80 p-8 text-3xl shadow-xl backdrop-blur-sm">
         <h1 className="mb-5 text-4xl font-bold tracking-tight">Store example</h1>

@@ -10,6 +10,12 @@ import sitemap from "@astrojs/sitemap";
 import typesafeRoutes from "astro-typesafe-routes";
 import { astroGrab } from "astro-grab";
 import { loadConfigEnv } from "./src/app/lib/config-env";
+import {
+  APP_SITEMAP_OUTPUT_PATH,
+  getAppSitemapPages,
+  getAppSitemapUrl,
+  shouldIncludeInSitemap,
+} from "./src/app/lib/sitemap";
 
 const configEnv = loadConfigEnv();
 const appEnv = process.env.APP_ENV ?? configEnv.APP_ENV;
@@ -19,6 +25,7 @@ const configuredPort = process.env.PORT ?? configEnv.PORT;
 const port = configuredPort ? Number(configuredPort) : undefined;
 
 const isProduction = appEnv === "production";
+const appSitemapPages = appOrigin ? await getAppSitemapPages() : [];
 
 // https://astro.build/config
 export default defineConfig({
@@ -40,13 +47,28 @@ export default defineConfig({
         router: {
           basepath: "app",
         },
+        pages: appSitemapPages,
+        sitemap: appOrigin
+          ? {
+              host: appOrigin,
+              outputPath: APP_SITEMAP_OUTPUT_PATH,
+            }
+          : undefined,
       }),
       viteTsConfigPaths(),
       tailwindcss(),
     ],
   },
 
-  integrations: [react(), sitemap(), typesafeRoutes(), astroGrab({ key: "c", holdDuration: 500 })],
+  integrations: [
+    react(),
+    sitemap({
+      customSitemaps: appOrigin ? [getAppSitemapUrl(appOrigin)] : [],
+      filter: shouldIncludeInSitemap,
+    }),
+    typesafeRoutes(),
+    astroGrab({ key: "c", holdDuration: 500 }),
+  ],
 
   env: {
     // Hyphenated dev-only mailer flags are read with bracket access in code and

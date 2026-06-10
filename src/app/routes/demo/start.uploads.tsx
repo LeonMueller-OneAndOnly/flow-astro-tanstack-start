@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CloudUpload, FileDown, RefreshCw } from "lucide-react";
 
-import { demoPageBackground } from "../../lib/demo/demo-theme";
+import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 import { $appPath } from "../../lib/typesafe-paths";
 
 type DemoUpload = {
@@ -79,7 +79,7 @@ function UploadsDemo() {
   return (
     <div
       className="min-h-screen bg-background px-6 py-12 text-foreground"
-      style={demoPageBackground}
+      style={brandPageBackground}
     >
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 rounded-3xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
@@ -110,14 +110,14 @@ function UploadsDemo() {
               aria-label="File to upload"
               type="file"
               onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-              className="mb-4 block w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-brand-primary-600 file:px-4 file:py-2 file:font-semibold file:text-white"
+              className="mb-4 block w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-foreground file:px-4 file:py-2 file:font-semibold file:text-background"
             />
 
             <button
               type="button"
               onClick={uploadFile}
               disabled={isPending}
-              className="inline-flex w-full items-center justify-center rounded-xl bg-brand-primary-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-brand-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className={`inline-flex w-full items-center justify-center rounded-xl px-5 py-3 ${brandPrimaryButtonClass}`}
             >
               {isPending ? "Uploading" : "Upload file"}
             </button>

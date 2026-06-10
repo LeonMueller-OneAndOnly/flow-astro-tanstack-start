@@ -5,7 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { db } from "../../../db/client";
 import { demoTodos } from "../../../db/schema";
-import { demoPageBackground } from "../../lib/demo/demo-theme";
+import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 
 /*
 const loggingMiddleware = createMiddleware().server(
@@ -84,7 +84,7 @@ function Home() {
   return (
     <div
       className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
-      style={demoPageBackground}
+      style={brandPageBackground}
     >
       <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
         <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
@@ -118,7 +118,7 @@ function Home() {
           <button
             disabled={todo.trim().length === 0}
             onClick={submitTodo}
-            className="rounded-lg bg-brand-primary-600 px-4 py-3 font-bold text-white transition-colors hover:bg-brand-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className={`rounded-lg px-4 py-3 ${brandPrimaryButtonClass}`}
           >
             Add todo
           </button>

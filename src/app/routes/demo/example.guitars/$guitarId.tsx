@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import guitars from "../../../lib/demo/data/example-guitars";
-import { demoPageBackground } from "../../../lib/demo/demo-theme";
+import { brandPageBackground, brandPrimaryButtonClass } from "../../../lib/brand-theme";
 
 /**
  * Served at `/app/example/guitars/:guitarId`.
@@ -23,7 +23,7 @@ function RouteComponent() {
   return (
     <div
       className="relative flex min-h-screen items-center bg-background p-5 text-foreground"
-      style={demoPageBackground}
+      style={brandPageBackground}
     >
       <div className="relative z-10 w-[60%] rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-md">
         <Link
@@ -36,9 +36,7 @@ function RouteComponent() {
         <p className="mb-6 text-muted-foreground">{guitar.description}</p>
         <div className="flex items-center justify-between">
           <div className="text-2xl font-bold text-brand-primary-600">${guitar.price}</div>
-          <button className="rounded-lg bg-brand-primary-600 px-6 py-2 text-white transition-colors hover:bg-brand-primary-700">
-            Add to Cart
-          </button>
+          <button className={`rounded-lg px-6 py-2 ${brandPrimaryButtonClass}`}>Add to Cart</button>
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { demoPageBackground } from "../../lib/demo/demo-theme";
+import { brandPageBackground } from "../../lib/brand-theme";
 import { $appPath } from "../../lib/typesafe-paths";
 
 async function getNames() {
@@ -24,7 +24,7 @@ function Home() {
   return (
     <div
       className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
-      style={demoPageBackground}
+      style={brandPageBackground}
     >
       <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
         <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">

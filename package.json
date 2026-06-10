@@ -57,6 +57,7 @@
   "devDependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "@tanstack/devtools-event-client": "^0.3.2",
+    "@tanstack/router-generator": "^1.132.51",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.10.2",
