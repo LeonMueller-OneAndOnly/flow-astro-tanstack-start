@@ -8,6 +8,26 @@ const shouldIncludeInSitemap = createSitemapFilter({
   excludePathPrefixes: ["/_", "/app/api", "/app/demo/api"],
 });
 
+export async function getUnifiedSitemapOptions(origin: string) {
+  const appPages = await getAppSitemapPages(shouldIncludeInSitemap);
+
+  return {
+    astro: {
+      customSitemaps: getAppSitemapUrl(origin),
+      filter: shouldIncludeInSitemap,
+    },
+    tanstackStart: {
+      pages: appPages,
+      sitemap: {
+        host: origin,
+        outputPath: APP_SITEMAP_OUTPUT_PATH,
+      },
+    },
+  };
+}
+
+// ---
+
 type SitemapRules = {
   excludePathPrefixes: ReadonlyArray<`/${string}`>;
 };
@@ -34,24 +54,6 @@ type AppSitemapPage = {
   path: `/${string}`;
   sitemap?: SitemapOptions;
 };
-
-export async function getUnifiedSitemapOptions(origin: string) {
-  const appPages = await getAppSitemapPages(shouldIncludeInSitemap);
-
-  return {
-    astro: {
-      customSitemaps: getAppSitemapUrl(origin),
-      filter: shouldIncludeInSitemap,
-    },
-    tanstackStart: {
-      pages: appPages,
-      sitemap: {
-        host: origin,
-        outputPath: APP_SITEMAP_OUTPUT_PATH,
-      },
-    },
-  };
-}
 
 function createSitemapFilter(rules: SitemapRules): SitemapFilter {
   return (urlOrPath) => {
