@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { handleJob_sendMail, ZMail, ZMailOutgoingMailer } from "../core";
+import { handleJob_sendMail, ZMail, ZMailOutgoingMailer } from "../integrations/mailer/core";
 import { jobs } from "./registry";
 
 const ZSendMailJobPayload = z.object({

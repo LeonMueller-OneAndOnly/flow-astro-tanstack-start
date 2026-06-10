@@ -1,4 +1,4 @@
-import { sendMailJob } from "./jobs/send-mail";
+import { sendMailJob } from "../../jobs/send-mail";
 import {
   isTestEnv,
   previewEmail_inBrowser,

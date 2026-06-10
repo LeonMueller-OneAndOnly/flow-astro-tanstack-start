@@ -10,7 +10,9 @@ const nodemailer = require("nodemailer") as {
   createTransport(config: unknown): NodeMailerTransporter;
 };
 const htmlToText = require("nodemailer-html-to-text").htmlToText as () => unknown;
-const previewEmail_inBrowser = require("preview-email") as (message: TMail) => Promise<string>;
+export const previewEmail_inBrowser = require("preview-email") as (
+  message: TMail,
+) => Promise<string>;
 
 type NodeMailerTransporter = {
   sendMail(mail: unknown, callback: (err: Error | null, info: unknown) => void): void;
