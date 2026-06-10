@@ -30,7 +30,7 @@ Everything under `src/app` belongs to TanStack Start. See the [TanStack Start do
 
 Better Auth is configured in `src/app/lib/auth.ts` with Drizzle, username/password auth, and magic links through the existing `sendMail` integration.
 
-Set `BETTER_AUTH_SECRET` in production. Set `BETTER_AUTH_URL` to the public origin, for example `https://example.com`, so magic links use the correct host.
+Set `SESSION_SECRET_KEY` in production. It is the shared server-side secret used for signing/encrypting session and auth data. Set `APP_ORIGIN` to the public origin, for example `https://example.com`, so Astro canonical URLs and Better Auth magic links use the correct host.
 
 ## Reference File Uploads
 

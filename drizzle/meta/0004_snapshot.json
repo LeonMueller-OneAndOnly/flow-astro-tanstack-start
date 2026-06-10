@@ -102,9 +102,7 @@
       "indexes": {
         "account_user_id_idx": {
           "name": "account_user_id_idx",
-          "columns": [
-            "user_id"
-          ],
+          "columns": ["user_id"],
           "isUnique": false
         }
       },
@@ -113,12 +111,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -155,9 +149,7 @@
       "indexes": {
         "demo_todos_created_at_idx": {
           "name": "demo_todos_created_at_idx",
-          "columns": [
-            "created_at"
-          ],
+          "columns": ["created_at"],
           "isUnique": false
         }
       },
@@ -223,16 +215,12 @@
       "indexes": {
         "demo_user_uploads_storage_key_unique": {
           "name": "demo_user_uploads_storage_key_unique",
-          "columns": [
-            "storage_key"
-          ],
+          "columns": ["storage_key"],
           "isUnique": true
         },
         "demo_user_uploads_created_at_idx": {
           "name": "demo_user_uploads_created_at_idx",
-          "columns": [
-            "created_at"
-          ],
+          "columns": ["created_at"],
           "isUnique": false
         }
       },
@@ -342,24 +330,17 @@
       "indexes": {
         "job_queue_cron_schedules_due_idx": {
           "name": "job_queue_cron_schedules_due_idx",
-          "columns": [
-            "status",
-            "next_run_at"
-          ],
+          "columns": ["status", "next_run_at"],
           "isUnique": false
         },
         "job_queue_cron_schedules_key_idx": {
           "name": "job_queue_cron_schedules_key_idx",
-          "columns": [
-            "key"
-          ],
+          "columns": ["key"],
           "isUnique": true
         },
         "job_queue_cron_schedules_name_idx": {
           "name": "job_queue_cron_schedules_name_idx",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": false
         }
       },
@@ -505,33 +486,22 @@
       "indexes": {
         "job_queue_jobs_claim_idx": {
           "name": "job_queue_jobs_claim_idx",
-          "columns": [
-            "status",
-            "available_at",
-            "priority"
-          ],
+          "columns": ["status", "available_at", "priority"],
           "isUnique": false
         },
         "job_queue_jobs_cron_schedule_idx": {
           "name": "job_queue_jobs_cron_schedule_idx",
-          "columns": [
-            "cron_schedule_id"
-          ],
+          "columns": ["cron_schedule_id"],
           "isUnique": false
         },
         "job_queue_jobs_locked_idx": {
           "name": "job_queue_jobs_locked_idx",
-          "columns": [
-            "status",
-            "locked_at"
-          ],
+          "columns": ["status", "locked_at"],
           "isUnique": false
         },
         "job_queue_jobs_name_idx": {
           "name": "job_queue_jobs_name_idx",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": false
         }
       },
@@ -603,16 +573,12 @@
       "indexes": {
         "session_token_unique": {
           "name": "session_token_unique",
-          "columns": [
-            "token"
-          ],
+          "columns": ["token"],
           "isUnique": true
         },
         "session_user_id_idx": {
           "name": "session_user_id_idx",
-          "columns": [
-            "user_id"
-          ],
+          "columns": ["user_id"],
           "isUnique": false
         }
       },
@@ -621,12 +587,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -706,16 +668,12 @@
       "indexes": {
         "user_email_unique": {
           "name": "user_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         },
         "user_username_unique": {
           "name": "user_username_unique",
-          "columns": [
-            "username"
-          ],
+          "columns": ["username"],
           "isUnique": true
         }
       },

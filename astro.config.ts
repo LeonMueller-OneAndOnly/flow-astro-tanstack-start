@@ -2,6 +2,9 @@
 import { defineConfig, envField } from "astro/config";
 import node from "@astrojs/node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { parse } from "dotenv";
 
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
@@ -10,12 +13,57 @@ import sitemap from "@astrojs/sitemap";
 import typesafeRoutes from "astro-typesafe-routes";
 import { astroGrab } from "astro-grab";
 
-const isProduction = process.env.APP_ENV === "production";
+type ConfigMode = "local" | "test" | "production";
 
-const port = process.env.PORT ? Number(process.env.PORT) : undefined;
+const loadConfigEnv = (mode: ConfigMode) => {
+  const envFiles = [".env", ".env.local", `.env.${mode}`, `.env.${mode}.local`];
+
+  return envFiles.reduce<Record<string, string>>((env, envFile) => {
+    const path = join(process.cwd(), envFile);
+
+    if (!existsSync(path)) {
+      return env;
+    }
+
+    return { ...env, ...parse(readFileSync(path)) };
+  }, {});
+};
+
+const getConfigMode = () => {
+  const modeFlag = process.argv.find((arg) => arg.startsWith("--mode="));
+
+  if (modeFlag) {
+    return modeFlag.slice("--mode=".length);
+  }
+
+  const modeFlagIndex = process.argv.indexOf("--mode");
+
+  if (modeFlagIndex !== -1) {
+    return process.argv[modeFlagIndex + 1] ?? "development";
+  }
+
+  if (process.argv.includes("build") || process.argv.includes("preview")) {
+    return "production";
+  }
+
+  return "development";
+};
+
+const toConfigMode = (mode: string): ConfigMode => {
+  if (mode === "test" || mode === "production") return mode;
+
+  return "local";
+};
+
+const configEnv = loadConfigEnv(toConfigMode(getConfigMode()));
+const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN;
+
+const configuredPort = process.env.PORT ?? configEnv.PORT;
+const port = configuredPort ? Number(configuredPort) : undefined;
 
 // https://astro.build/config
 export default defineConfig({
+  site: appOrigin,
   output: "server",
   adapter: node({
     mode: "standalone",
@@ -39,23 +87,35 @@ export default defineConfig({
   integrations: [react(), sitemap(), typesafeRoutes(), astroGrab({ key: "c", holdDuration: 500 })],
 
   env: {
+    // Hyphenated dev-only mailer flags are read with bracket access in code and
+    // are not declared here because Astro env keys must be named exports.
     schema: {
+      // Runtime environment name. Use "production" for deployed production builds.
       APP_ENV: envField.string({
         context: "server",
         access: "public",
         default: "local",
       }),
+      // Public canonical origin for Astro URLs and Better Auth-generated links.
+      APP_ORIGIN: envField.string({
+        context: "server",
+        access: "public",
+        optional: false,
+      }),
+      // Optional dev server port override.
+      PORT: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+      // SQLite/libSQL database connection URL.
       DATABASE_URL: envField.string({
         context: "server",
         access: "secret",
         optional: false,
       }),
-      BETTER_AUTH_SECRET: envField.string({
-        context: "server",
-        access: "secret",
-        optional: true,
-      }),
-      BETTER_AUTH_URL: envField.string({
+      // Shared server-side secret for signing/encrypting session/auth data. Required in production.
+      SESSION_SECRET_KEY: envField.string({
         context: "server",
         access: "secret",
         optional: true,
@@ -66,6 +126,30 @@ export default defineConfig({
         context: "server",
         access: "secret",
         default: ".uploads",
+      }),
+      // SMTP configuration used when production mail is sent directly.
+      SMTP_HOST: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
+      // SMTP username, also used as the outgoing sender address.
+      SMTP_USERNAME: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
+      // SMTP password for the configured username.
+      SMTP_PASSWORD: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
+      // Allows local production-like runs to avoid the real production S3 bucket.
+      S3_USE_DEVELOPMENT_BUCKET: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
       }),
     },
   },

@@ -3,8 +3,8 @@ import { asc } from "drizzle-orm";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
-import { db } from "../../db/client";
-import { demoTodos } from "../../db/schema";
+import { db } from "../../../db/client";
+import { demoTodos } from "../../../db/schema";
 
 /*
 const loggingMiddleware = createMiddleware().server(

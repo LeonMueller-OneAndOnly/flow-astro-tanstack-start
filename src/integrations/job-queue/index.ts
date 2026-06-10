@@ -6,9 +6,9 @@ import { eq, sql } from "drizzle-orm";
 import PQueue from "p-queue";
 import { z } from "zod";
 
-import { db } from "../../app/db/client";
+import { db } from "../../db/client";
 import { Result } from "../../app/lib/result";
-import { jobQueueCronSchedules, jobQueueJobs } from "../../app/db/schema";
+import { jobQueueCronSchedules, jobQueueJobs } from "../../db/schema";
 
 export type JobQueueStatus = "pending" | "running" | "completed" | "failed";
 
@@ -143,12 +143,6 @@ export function createJobRegistry(): JobRegistry {
   };
 }
 
-export function defineJob<TName extends string, TSchema extends z.ZodTypeAny>(
-  options: DefineJobOptions<TName, TSchema>,
-): DefinedJob<TName, TSchema> {
-  return createDefinedJob(options);
-}
-
 export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWorkerOptions = {}) {
   const concurrency = options.concurrency ?? 1;
   const pollIntervalMs = options.pollIntervalMs ?? 1_000;
@@ -220,7 +214,7 @@ function toWorkerJob<TName extends string, TSchema extends z.ZodTypeAny>(
 
 function createDefinedJob<TName extends string, TSchema extends z.ZodTypeAny>(
   options: DefineJobOptions<TName, TSchema>,
-  registerCron?: (cron: RegisteredCron<TName, TSchema>) => void,
+  registerCron: (cron: RegisteredCron<TName, TSchema>) => void,
 ): DefinedJob<TName, TSchema> {
   return {
     ...options,
@@ -241,7 +235,7 @@ function createDefinedJob<TName extends string, TSchema extends z.ZodTypeAny>(
         },
       } satisfies RegisteredCron<TName, TSchema>;
 
-      registerCron?.(cron);
+      registerCron(cron);
 
       return cron;
     },

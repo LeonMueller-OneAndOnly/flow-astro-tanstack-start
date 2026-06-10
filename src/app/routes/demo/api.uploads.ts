@@ -4,8 +4,8 @@ import { desc, eq } from "drizzle-orm";
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 
-import { db } from "../../db/client";
-import { demoUserUploads } from "../../db/schema";
+import { db } from "../../../db/client";
+import { demoUserUploads } from "../../../db/schema";
 import {
   createDemoUploadKey,
   DEMO_UPLOAD_DISK,
