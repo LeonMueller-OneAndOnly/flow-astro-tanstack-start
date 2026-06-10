@@ -12,12 +12,13 @@ import { astroGrab } from "astro-grab";
 import { loadConfigEnv } from "./src/app/lib/config-env";
 
 const configEnv = loadConfigEnv();
+const appEnv = process.env.APP_ENV ?? configEnv.APP_ENV;
 const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN;
 
 const configuredPort = process.env.PORT ?? configEnv.PORT;
 const port = configuredPort ? Number(configuredPort) : undefined;
 
-const isProduction = (process.env.APP_ENV ?? configEnv.APP_ENV) === "production";
+const isProduction = appEnv === "production";
 
 // https://astro.build/config
 export default defineConfig({
@@ -30,6 +31,9 @@ export default defineConfig({
   server: { port },
 
   vite: {
+    define: {
+      "import.meta.env.APP_ENV": JSON.stringify(appEnv),
+    },
     plugins: [
       tanstackStart({
         srcDirectory: "./src/app",
