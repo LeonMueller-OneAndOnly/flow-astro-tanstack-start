@@ -46,7 +46,6 @@ const queueMail = createServerFn({ method: "POST" })
             html: `<p>${escapeHtml(parsedInput.data.message).replaceAll("\n", "<br>")}</p>`,
           },
           reason: "manual mail worker test",
-          outgoingMailer: { type: "internal" },
           transport: "preview-in-browser",
         },
         { maxAttempts: 1 },
