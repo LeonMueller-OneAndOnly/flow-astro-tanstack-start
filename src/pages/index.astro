@@ -8,7 +8,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 export const prerender = false;
 
 const demoHubHref = $appPath({ to: "/demo" });
-const omnisImageSrc = "/images/demo/robot-standing-3.png";
+const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
 ---
 
 <BaseLayout
@@ -17,36 +17,38 @@ const omnisImageSrc = "/images/demo/robot-standing-3.png";
 >
   <main class="page-shell" style={`background:${brandPageBackground.background}`}>
     <section class="hero">
-      <p class="eyebrow">Astro + TanStack Start</p>
-      <h1>A starter kit, not a real app yet.</h1>
-      <p class="lede">
-        Astro serves the static front door. TanStack Start, mounted under <code>/app</code>, handles
-        the interactive, app-like routes. The bundled examples live behind one link so you can
-        explore them — then delete them in one move.
-      </p>
+      <div class="hero-copy">
+        <p class="eyebrow">Astro + TanStack Start</p>
+        <h1>A starter kit, not a real app yet.</h1>
+        <p class="lede">
+          Astro serves the static front door. TanStack Start, mounted under <code>/app</code>,
+          handles the interactive, app-like routes. The bundled examples live behind one link so you
+          can explore them — then delete them in one move.
+        </p>
 
-      <div class="actions" aria-label="Primary actions">
-        <a class="btn btn-primary" href={demoHubHref}>Browse the demos</a>
-        <a
-          class="btn btn-secondary"
-          href="https://docs.astro.build"
-          target="_blank"
-          rel="noopener noreferrer">Astro docs</a
-        >
-        <a
-          class="btn btn-secondary"
-          href="https://tanstack.com/start"
-          target="_blank"
-          rel="noopener noreferrer">TanStack Start docs</a
-        >
+        <div class="actions" aria-label="Primary actions">
+          <a class="btn btn-primary" href={demoHubHref}>Browse the demos</a>
+          <a
+            class="btn btn-secondary"
+            href="https://docs.astro.build"
+            target="_blank"
+            rel="noopener noreferrer">Astro docs</a
+          >
+          <a
+            class="btn btn-secondary"
+            href="https://tanstack.com/start"
+            target="_blank"
+            rel="noopener noreferrer">TanStack Start docs</a
+          >
+        </div>
       </div>
 
       <figure class="omnis-visual" aria-label="Omnis robot preview">
         <Image
           src={omnisImageSrc}
-          width={1112}
-          height={834}
-          alt="Omnis robot standing under green lights"
+          width={1024}
+          height={1024}
+          alt="Omnis robot standing"
           class="omnis-image"
           loading="eager"
         />
@@ -72,9 +74,9 @@ const omnisImageSrc = "/images/demo/robot-standing-3.png";
       </article>
       <article>
         <span>Demos</span>
-        <h2>All under <code>/demo</code></h2>
+        <h2>All under <code>/app/demo</code></h2>
         <p>
-          Every example sits beneath the <code>/demo</code> route segment. Drop <code
+          Every example sits beneath the <code>/app/demo</code> route segment. Drop <code
             >src/app/routes/demo</code
           > and <code>src/app/lib/demo</code> to remove them all.
         </p>
@@ -93,9 +95,24 @@ const omnisImageSrc = "/images/demo/robot-standing-3.png";
   }
 
   .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(36px, 6vw, 72px);
+    align-items: center;
     width: min(1100px, 100%);
     margin: 0 auto;
     padding: clamp(48px, 10vw, 120px) 0 clamp(28px, 5vw, 56px);
+  }
+
+  /* Two columns when there is room: copy left, robot to the right of the title. */
+  @media (min-width: 960px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    }
+  }
+
+  .hero-copy {
+    min-width: 0;
   }
 
   .eyebrow {
@@ -133,8 +150,9 @@ const omnisImageSrc = "/images/demo/robot-standing-3.png";
 
   .omnis-visual {
     overflow: hidden;
-    max-width: 820px;
-    margin: clamp(36px, 7vw, 72px) 0 0;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
     border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
     border-radius: 32px;
     background: color-mix(in oklch, var(--card) 70%, transparent);
