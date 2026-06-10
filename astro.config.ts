@@ -9,7 +9,7 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import typesafeRoutes from "astro-typesafe-routes";
 import { astroGrab } from "astro-grab";
-import { loadConfigEnv } from "@/lib/config-env";
+import { loadConfigEnv } from "./src/app/lib/config-env";
 
 const configEnv = loadConfigEnv();
 const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN;
@@ -99,12 +99,6 @@ export default defineConfig({
       }),
       // SMTP password for the configured username.
       SMTP_PASSWORD: envField.string({
-        context: "server",
-        access: "secret",
-        optional: true,
-      }),
-      // Allows local production-like runs to avoid the real production S3 bucket.
-      S3_USE_DEVELOPMENT_BUCKET: envField.string({
         context: "server",
         access: "secret",
         optional: true,

@@ -14,8 +14,8 @@ import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
 import { Route as ExampleGuitarsGuitarIdRouteImport } from './routes/example.guitars/$guitarId'
 import { Route as DemoStartUploadsRouteImport } from './routes/demo/start.uploads'
-import { Route as DemoStartMailWorkerRouteImport } from './routes/demo/start.mail-worker'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
+import { Route as DemoStartMailWorkerRouteImport } from './routes/demo/start.mail-worker'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiUploadsRouteImport } from './routes/demo/api.uploads'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
@@ -50,14 +50,14 @@ const DemoStartUploadsRoute = DemoStartUploadsRouteImport.update({
   path: '/demo/start/uploads',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoStartMailWorkerRoute = DemoStartMailWorkerRouteImport.update({
-  id: '/demo/start/mail-worker',
-  path: '/demo/start/mail-worker',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
   path: '/demo/start/server-funcs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoStartMailWorkerRoute = DemoStartMailWorkerRouteImport.update({
+  id: '/demo/start/mail-worker',
+  path: '/demo/start/mail-worker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
@@ -262,18 +262,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartUploadsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/start/mail-worker': {
-      id: '/demo/start/mail-worker'
-      path: '/demo/start/mail-worker'
-      fullPath: '/demo/start/mail-worker'
-      preLoaderRoute: typeof DemoStartMailWorkerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
       path: '/demo/start/server-funcs'
       fullPath: '/demo/start/server-funcs'
       preLoaderRoute: typeof DemoStartServerFuncsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/start/mail-worker': {
+      id: '/demo/start/mail-worker'
+      path: '/demo/start/mail-worker'
+      fullPath: '/demo/start/mail-worker'
+      preLoaderRoute: typeof DemoStartMailWorkerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/api-request': {
