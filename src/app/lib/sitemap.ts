@@ -1,7 +1,7 @@
 import path from "node:path";
 import { getConfig, physicalGetRouteNodes } from "@tanstack/router-generator";
 
-export const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
+const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
 const APP_BASE_PATH = "/app";
 
 const shouldIncludeInSitemap = createSitemapFilter({
@@ -40,17 +40,15 @@ export async function getUnifiedSitemapOptions(origin: string) {
 
   return {
     astro: {
-      customSitemaps: origin ? [getAppSitemapUrl(origin)] : [],
+      customSitemaps: getAppSitemapUrl(origin),
       filter: shouldIncludeInSitemap,
     },
     tanstackStart: {
       pages: appPages,
-      sitemap: origin
-        ? {
-            host: origin,
-            outputPath: APP_SITEMAP_OUTPUT_PATH,
-          }
-        : undefined,
+      sitemap: {
+        host: origin,
+        outputPath: APP_SITEMAP_OUTPUT_PATH,
+      },
     },
   };
 }
