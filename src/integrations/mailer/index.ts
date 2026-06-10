@@ -24,6 +24,42 @@ export type TMailTransport = z.infer<typeof ZMailTransport>;
 
 export const isTestEnv = [process.env.APP_ENV, process.env.NODE_ENV].includes("test");
 
+export async function sendMail(input: {
+  mail: TMail;
+  /** specify mailer type via free form string */
+  reason: string;
+}) {
+  const mail = ZMail.parse(input.mail);
+
+  const transport = getMailTransport();
+
+  if (
+    process.env["send-out-mail-without-job-queue-usage_DEV_ONLY"] &&
+    process.env.APP_ENV !== "production"
+  ) {
+    return handleJob_sendMail({ mail, reason: input.reason, transport });
+  }
+
+  if (isTestEnv) return;
+
+  const { sendMailJob } = await import("../../jobs/send-mail");
+  await sendMailJob.enqueue({ mail, reason: input.reason, transport }, { maxAttempts: 3 });
+}
+
+export async function handleJob_sendMail(input: {
+  mail: TMail;
+  reason: string;
+  transport: TMailTransport;
+}) {
+  if (input.transport === "send-via-smtp") {
+    await sendMailViaSmtp(input.mail, input.reason);
+  }
+
+  if (input.transport === "preview-in-browser") {
+    await previewEmail_inBrowser(input.mail);
+  }
+}
+
 function getMailTransport(): TMailTransport {
   if (process.env["open-preview-for-all-mails_DEV_ONLY"] && process.env.APP_ENV !== "production") {
     return "preview-in-browser";
@@ -43,38 +79,7 @@ function getMailTransport(): TMailTransport {
   return "preview-in-browser";
 }
 
-export async function handleJob_sendMail(
-  mail: TMail,
-  reason: string,
-  outgoingMailer: TMailOutgoingMailer,
-  transport: TMailTransport,
-) {
-  if (transport === "send-via-smtp") {
-    await sendMailViaOutgoingMailer(mail, reason, outgoingMailer);
-  }
-
-  if (transport === "preview-in-browser") {
-    await previewEmail_inBrowser(mail);
-  }
-}
-
-export async function sendMailViaOutgoingMailer(
-  mail: TMail,
-  reason: string,
-  outgoingMailer: TMailOutgoingMailer,
-) {
-  if (outgoingMailer.type === "internal") {
-    await sendMailViaSmtp(mail, reason);
-    return;
-  }
-
-  throw new Error(`Unsupported outgoing mailer: ${outgoingMailer.type}`);
-}
-
-/**
- * @deprecated Use sendMail so mails run through the job queue instead of API request lifecycles.
- */
-export async function sendMailViaSmtp(mail: TMail, reason: string) {
+async function sendMailViaSmtp(mail: TMail, reason: string) {
   const transporter = getDefaultMailTransporter();
   const result = await Result.fromAsync(
     () =>
@@ -150,7 +155,6 @@ let defaultMailTransporter: NodeMailerTransporter | undefined;
 
 function getDefaultMailTransporter() {
   defaultMailTransporter ??= createNodeMailerTransporter();
-
   return defaultMailTransporter;
 }
 
@@ -189,26 +193,4 @@ function createNodeMailerTransporter(): NodeMailerTransporter {
   globalWithTransporter[key_globalThis] = transporter;
 
   return transporter;
-}
-
-export async function sendMail(
-  theMail: TMail,
-  reason: string,
-  options?: { outgoingMailer?: TMailOutgoingMailer },
-) {
-  const mail = ZMail.parse(theMail);
-  const outgoingMailer = ZMailOutgoingMailer.parse(options?.outgoingMailer ?? { type: "internal" });
-  const transport = getMailTransport();
-
-  if (
-    process.env["send-out-mail-without-job-queue-usage_DEV_ONLY"] &&
-    process.env.APP_ENV !== "production"
-  ) {
-    return handleJob_sendMail(mail, reason, outgoingMailer, transport);
-  }
-
-  if (isTestEnv) return;
-
-  const { sendMailJob } = await import("../../jobs/send-mail");
-  await sendMailJob.enqueue({ mail, reason, outgoingMailer, transport }, { maxAttempts: 3 });
 }

@@ -23,18 +23,21 @@ export const auth = betterAuth({
   plugins: [
     username(),
     magicLink({
-      sendMagicLink: async ({ email, url }) => {
-        await sendMail(
-          {
-            to: email,
-            subject: "Sign in to Astro TanStack Start",
-            text: `Open this link to sign in: ${url}`,
-            html: `<p>Open this link to sign in:</p><p><a href="${url}">${url}</a></p>`,
-          },
-          "better-auth-magic-link",
-        );
-      },
+      sendMagicLink: sendMagicLink,
+      expiresIn: 30 * 60, // seconds
     }),
     tanstackStartCookies(),
   ],
 });
+
+async function sendMagicLink(input: { email: string; url: string }) {
+  await sendMail({
+    mail: {
+      to: input.email,
+      subject: "Sign in to Astro TanStack Start",
+      text: `Open this link to sign in: ${input.url}`,
+      html: `<p>Open this link to sign in:</p><p><a href="${input.url}">${input.url}</a></p>`,
+    },
+    reason: "better-auth-magic-link",
+  });
+}
