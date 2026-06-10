@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import guitars from "../../data/example-guitars";
+import guitars from "../../lib/demo/data/example-guitars";
 
 /** Served at `/app/example/guitars/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/example/guitars/")({
