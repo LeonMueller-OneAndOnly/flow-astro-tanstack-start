@@ -4,13 +4,20 @@
   "categories": {
     "correctness": "error"
   },
-  "jsPlugins": ["./oxlint-rules/astro-pages.js"],
+  "jsPlugins": ["./oxlint-rules/astro-pages.js", "eslint-plugin-better-tailwindcss"],
+  "settings": {
+    "better-tailwindcss": {
+      "entryPoint": "./src/styles/globals.css"
+    }
+  },
   "ignorePatterns": [".claude", ".agents"],
   "rules": {
     "react/rules-of-hooks": "error",
     "typescript/no-unused-vars": "off",
     "typescript/triple-slash-reference": "off",
-    "flowoffice/require-prerender-export": "error"
+    "omnis/require-prerender-export": "error",
+    "better-tailwindcss/no-conflicting-classes": "warn",
+    "better-tailwindcss/no-unknown-classes": "warn"
   },
   "env": {
     "builtin": true

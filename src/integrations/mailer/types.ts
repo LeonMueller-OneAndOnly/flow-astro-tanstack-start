@@ -7,12 +7,7 @@ const ZMailAttachment = z.object({
   encoding: z.string().optional(),
 });
 
-const ZMailAddress = z.union([
-  z.string(),
-  z.array(z.string()),
-  z.object({ name: z.string().optional(), address: z.string() }),
-  z.array(z.object({ name: z.string().optional(), address: z.string() })),
-]);
+const ZMailAddress = z.union([z.email(), z.array(z.email())]);
 
 export const ZMail = z.object({
   to: ZMailAddress,

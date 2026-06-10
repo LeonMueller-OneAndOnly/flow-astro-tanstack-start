@@ -20,10 +20,10 @@ Use oxlint for linting, tsc for typechecking and vitest for testing.
 Make Illegal States Unrepresentable.
 Use the type system to prevent invalid states and missing functionality at compile time.
 
+Use type-safe routing for all internal links.
+For TanStack Start routes, use the `Link` component.
+For Astro routes, use the `$path` helper.
+
 ## Error Handling: Result Pattern
 
 DO NOT use try-catch to handle errors. Use the Result.from or Result.fromAsync functions from `@/lib/result.ts` instead. Errors as values are easier to deal with than thrown errors, since they interrupt the control flow of the program.
-
-## Routing
-
-For internal app inks use typesafe helpers. FOr linking to Tanstack Start pages use the Link Component. for linkin to astro pages use the $path helper.

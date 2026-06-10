@@ -65,7 +65,7 @@ function isAstroFrontmatterProgram(node) {
 
 export default {
   meta: {
-    name: "flowoffice",
+    name: "omnis",
   },
   rules: {
     "require-prerender-export": requirePrerenderExport,

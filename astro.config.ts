@@ -103,6 +103,12 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
+      // Display name used in outgoing mail From headers.
+      MAIL_FROM_NAME: envField.string({
+        context: "server",
+        access: "public",
+        default: "Starter Kit",
+      }),
     },
   },
 });
