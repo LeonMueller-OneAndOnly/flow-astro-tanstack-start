@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
 
-function getNames() {
+async function getNames() {
   return fetch("/app/demo/api/names").then((res) => res.json());
 }
 

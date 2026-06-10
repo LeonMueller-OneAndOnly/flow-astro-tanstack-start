@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Result } from "@/lib/result";
 
 const ZMailWorkerInput = z.object({
-  to: z.string().email(),
+  to: z.email(),
   subject: z.string().trim().min(1),
   message: z.string().trim().min(1),
 });

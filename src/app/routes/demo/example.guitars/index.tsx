@@ -1,8 +1,8 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import guitars from "../../lib/demo/data/example-guitars";
+import guitars from "../../../lib/demo/data/example-guitars";
 
 /** Served at `/app/example/guitars/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
-export const Route = createFileRoute("/example/guitars/")({
+export const Route = createFileRoute("/demo/example/guitars/")({
   component: GuitarsIndex,
 });
 
@@ -17,7 +17,7 @@ function GuitarsIndex() {
             className="w-full md:w-[calc(50%-1.5rem)] xl:w-[calc(33.333%-2rem)] relative mb-24"
           >
             <Link
-              to="/example/guitars/$guitarId"
+              to="/demo/example/guitars/$guitarId"
               params={{
                 guitarId: guitar.id.toString(),
               }}

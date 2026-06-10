@@ -11,8 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
-import { Route as ExampleGuitarsGuitarIdRouteImport } from './routes/example.guitars/$guitarId'
 import { Route as DemoStartUploadsRouteImport } from './routes/demo/start.uploads'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartMailWorkerRouteImport } from './routes/demo/start.mail-worker'
@@ -21,9 +19,11 @@ import { Route as DemoApiUploadsRouteImport } from './routes/demo/api.uploads'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
+import { Route as DemoExampleGuitarsIndexRouteImport } from './routes/demo/example.guitars/index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
+import { Route as DemoExampleGuitarsGuitarIdRouteImport } from './routes/demo/example.guitars/$guitarId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -33,16 +33,6 @@ const IndexRoute = IndexRouteImport.update({
 const DemoStoreRoute = DemoStoreRouteImport.update({
   id: '/demo/store',
   path: '/demo/store',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExampleGuitarsIndexRoute = ExampleGuitarsIndexRouteImport.update({
-  id: '/example/guitars/',
-  path: '/example/guitars/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExampleGuitarsGuitarIdRoute = ExampleGuitarsGuitarIdRouteImport.update({
-  id: '/example/guitars/$guitarId',
-  path: '/example/guitars/$guitarId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartUploadsRoute = DemoStartUploadsRouteImport.update({
@@ -85,6 +75,11 @@ const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   path: '/demo/start/ssr/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoExampleGuitarsIndexRoute = DemoExampleGuitarsIndexRouteImport.update({
+  id: '/demo/example/guitars/',
+  path: '/demo/example/guitars/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
   id: '/demo/start/ssr/spa-mode',
   path: '/demo/start/ssr/spa-mode',
@@ -100,6 +95,12 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
   path: '/demo/start/ssr/data-only',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoExampleGuitarsGuitarIdRoute =
+  DemoExampleGuitarsGuitarIdRouteImport.update({
+    id: '/demo/example/guitars/$guitarId',
+    path: '/demo/example/guitars/$guitarId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -111,11 +112,11 @@ export interface FileRoutesByFullPath {
   '/demo/start/mail-worker': typeof DemoStartMailWorkerRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/demo/start/uploads': typeof DemoStartUploadsRoute
-  '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
-  '/example/guitars': typeof ExampleGuitarsIndexRoute
+  '/demo/example/guitars/$guitarId': typeof DemoExampleGuitarsGuitarIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/demo/example/guitars': typeof DemoExampleGuitarsIndexRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
@@ -128,11 +129,11 @@ export interface FileRoutesByTo {
   '/demo/start/mail-worker': typeof DemoStartMailWorkerRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/demo/start/uploads': typeof DemoStartUploadsRoute
-  '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
-  '/example/guitars': typeof ExampleGuitarsIndexRoute
+  '/demo/example/guitars/$guitarId': typeof DemoExampleGuitarsGuitarIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/demo/example/guitars': typeof DemoExampleGuitarsIndexRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesById {
@@ -146,11 +147,11 @@ export interface FileRoutesById {
   '/demo/start/mail-worker': typeof DemoStartMailWorkerRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/demo/start/uploads': typeof DemoStartUploadsRoute
-  '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
-  '/example/guitars/': typeof ExampleGuitarsIndexRoute
+  '/demo/example/guitars/$guitarId': typeof DemoExampleGuitarsGuitarIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/demo/example/guitars/': typeof DemoExampleGuitarsIndexRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRouteTypes {
@@ -165,11 +166,11 @@ export interface FileRouteTypes {
     | '/demo/start/mail-worker'
     | '/demo/start/server-funcs'
     | '/demo/start/uploads'
-    | '/example/guitars/$guitarId'
-    | '/example/guitars'
+    | '/demo/example/guitars/$guitarId'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/demo/example/guitars'
     | '/demo/start/ssr'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -182,11 +183,11 @@ export interface FileRouteTypes {
     | '/demo/start/mail-worker'
     | '/demo/start/server-funcs'
     | '/demo/start/uploads'
-    | '/example/guitars/$guitarId'
-    | '/example/guitars'
+    | '/demo/example/guitars/$guitarId'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/demo/example/guitars'
     | '/demo/start/ssr'
   id:
     | '__root__'
@@ -199,11 +200,11 @@ export interface FileRouteTypes {
     | '/demo/start/mail-worker'
     | '/demo/start/server-funcs'
     | '/demo/start/uploads'
-    | '/example/guitars/$guitarId'
-    | '/example/guitars/'
+    | '/demo/example/guitars/$guitarId'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/demo/example/guitars/'
     | '/demo/start/ssr/'
   fileRoutesById: FileRoutesById
 }
@@ -217,11 +218,11 @@ export interface RootRouteChildren {
   DemoStartMailWorkerRoute: typeof DemoStartMailWorkerRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   DemoStartUploadsRoute: typeof DemoStartUploadsRoute
-  ExampleGuitarsGuitarIdRoute: typeof ExampleGuitarsGuitarIdRoute
-  ExampleGuitarsIndexRoute: typeof ExampleGuitarsIndexRoute
+  DemoExampleGuitarsGuitarIdRoute: typeof DemoExampleGuitarsGuitarIdRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
+  DemoExampleGuitarsIndexRoute: typeof DemoExampleGuitarsIndexRoute
   DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
 
@@ -239,20 +240,6 @@ declare module '@tanstack/react-router' {
       path: '/demo/store'
       fullPath: '/demo/store'
       preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/example/guitars/': {
-      id: '/example/guitars/'
-      path: '/example/guitars'
-      fullPath: '/example/guitars'
-      preLoaderRoute: typeof ExampleGuitarsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/example/guitars/$guitarId': {
-      id: '/example/guitars/$guitarId'
-      path: '/example/guitars/$guitarId'
-      fullPath: '/example/guitars/$guitarId'
-      preLoaderRoute: typeof ExampleGuitarsGuitarIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/uploads': {
@@ -311,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartSsrIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/example/guitars/': {
+      id: '/demo/example/guitars/'
+      path: '/demo/example/guitars'
+      fullPath: '/demo/example/guitars'
+      preLoaderRoute: typeof DemoExampleGuitarsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/start/ssr/spa-mode': {
       id: '/demo/start/ssr/spa-mode'
       path: '/demo/start/ssr/spa-mode'
@@ -332,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/example/guitars/$guitarId': {
+      id: '/demo/example/guitars/$guitarId'
+      path: '/demo/example/guitars/$guitarId'
+      fullPath: '/demo/example/guitars/$guitarId'
+      preLoaderRoute: typeof DemoExampleGuitarsGuitarIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -345,11 +346,11 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartMailWorkerRoute: DemoStartMailWorkerRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   DemoStartUploadsRoute: DemoStartUploadsRoute,
-  ExampleGuitarsGuitarIdRoute: ExampleGuitarsGuitarIdRoute,
-  ExampleGuitarsIndexRoute: ExampleGuitarsIndexRoute,
+  DemoExampleGuitarsGuitarIdRoute: DemoExampleGuitarsGuitarIdRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
+  DemoExampleGuitarsIndexRoute: DemoExampleGuitarsIndexRoute,
   DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
 }
 export const routeTree = rootRouteImport
