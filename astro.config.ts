@@ -17,6 +17,8 @@ const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN;
 const configuredPort = process.env.PORT ?? configEnv.PORT;
 const port = configuredPort ? Number(configuredPort) : undefined;
 
+const isProduction = (process.env.APP_ENV ?? configEnv.APP_ENV) === "production";
+
 // https://astro.build/config
 export default defineConfig({
   site: appOrigin,
@@ -74,7 +76,7 @@ export default defineConfig({
       SESSION_SECRET_KEY: envField.string({
         context: "server",
         access: "secret",
-        optional: true,
+        optional: !isProduction,
       }),
       // Example file upload storage root for the Flydrive local filesystem driver.
       // Use an absolute path or a path relative to the project root.
