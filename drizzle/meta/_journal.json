@@ -36,6 +36,20 @@
       "when": 1781023664201,
       "tag": "0004_needy_enchantress",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1781075260505,
+      "tag": "0005_confused_machine_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1781075717193,
+      "tag": "0006_outgoing_tarot",
+      "breakpoints": true
     }
   ]
 }

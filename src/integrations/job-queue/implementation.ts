@@ -93,12 +93,14 @@ export type JobRegistry = {
   ) => DefinedJob<TName, TSchema>;
   getJobs: () => WorkerJob[];
   getCrons: () => WorkerCron[];
+  getVersion: () => number;
 };
 
 export type JobQueueWorkerOptions = {
   concurrency?: number;
   pollIntervalMs?: number;
   claimBatchSize?: number;
+  cronBatchSize?: number;
   retryDelayMs?: number;
   lockTimeoutMs?: number;
   workerId?: string;
@@ -125,74 +127,108 @@ const defaultWorkerId = `job-queue@${hostname()}-${process.pid}`;
 export function createJobRegistry(): JobRegistry {
   const jobs = new Map<string, WorkerJob>();
   const crons = new Map<string, WorkerCron>();
+  let version = 0;
 
   return {
     defineJob(options) {
       const job = createDefinedJob(options, (cron) => {
-        if (crons.has(cron.key)) throw new Error(`Cron job key already registered: ${cron.key}`);
+        if (!import.meta.hot && crons.has(cron.key)) {
+          throw new Error(`Cron job key already registered: ${cron.key}`);
+        }
+
         crons.set(cron.key, { ...cron, job: toWorkerJob(cron.job) });
+        version += 1;
       });
 
-      if (jobs.has(job.name)) throw new Error(`Job already registered: ${job.name}`);
+      if (!import.meta.hot && jobs.has(job.name))
+        throw new Error(`Job already registered: ${job.name}`);
+
       jobs.set(job.name, toWorkerJob(job));
+      version += 1;
 
       return job;
     },
     getJobs: () => [...jobs.values()],
     getCrons: () => [...crons.values()],
+    getVersion: () => version,
   };
 }
 
 export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWorkerOptions = {}) {
   const concurrency = options.concurrency ?? 1;
   const pollIntervalMs = options.pollIntervalMs ?? 1_000;
-  const claimBatchSize = options.claimBatchSize ?? concurrency;
+  const claimBatchSize = options.claimBatchSize ?? Math.max(concurrency, 10);
+  const cronBatchSize = options.cronBatchSize ?? 100;
   const retryDelayMs = options.retryDelayMs ?? 30_000;
   const lockTimeoutMs = options.lockTimeoutMs ?? 5 * 60_000;
   const workerId = options.workerId ?? defaultWorkerId;
   const queue = new PQueue({ concurrency });
-  const registeredJobs = registry.getJobs();
-  const registeredCrons = registry.getCrons();
-  const handlers = new Map(registeredJobs.map((job) => [job.name, job]));
 
   let interval: NodeJS.Timeout | undefined;
   let isTicking = false;
-  let didSyncCrons = false;
+  let registryVersion = -1;
+  let handlers = new Map<string, WorkerJob>();
+  let isStarted = false;
+  let isIdleTickScheduled = false;
+
+  function tickWhenIdle() {
+    if (isIdleTickScheduled) return;
+
+    isIdleTickScheduled = true;
+
+    void queue.onIdle().then(() => {
+      isIdleTickScheduled = false;
+      if (isStarted) void tick();
+    });
+  }
 
   async function tick() {
     if (isTicking) return;
 
-    const openSlots = concurrency - queue.pending - queue.size;
-    if (openSlots <= 0) return;
+    if (queue.pending > 0 || queue.size > 0) return;
 
     isTicking = true;
 
     try {
-      if (!didSyncCrons) {
-        await syncRegisteredCronSchedules(registeredCrons);
-        didSyncCrons = true;
-      }
+      await refreshRegisteredJobs();
 
       await releaseStaleJobs(lockTimeoutMs);
-      await enqueueDueCronSchedules();
-      const claimedJobs = await claimJobs(Math.min(openSlots, claimBatchSize), workerId);
+      await enqueueDueCronSchedules(cronBatchSize, lockTimeoutMs);
+      const claimedJobs = await claimJobs(claimBatchSize, workerId);
 
       for (const job of claimedJobs) {
-        queue.add(() => processJob(job, handlers, retryDelayMs));
+        queue.add(() => processJob(job, handlers, retryDelayMs, workerId));
       }
+
+      if (claimedJobs.length > 0) tickWhenIdle();
     } finally {
       isTicking = false;
     }
   }
 
+  async function refreshRegisteredJobs() {
+    const currentRegistryVersion = registry.getVersion();
+
+    if (currentRegistryVersion === registryVersion) return;
+
+    const registeredJobs = registry.getJobs();
+    const registeredCrons = registry.getCrons();
+
+    handlers = new Map(registeredJobs.map((job) => [job.name, job]));
+    await syncRegisteredCronSchedules(registeredCrons);
+    registryVersion = currentRegistryVersion;
+  }
+
   return {
     async start() {
-      if (interval) return;
+      if (isStarted) return;
 
+      isStarted = true;
       await tick();
       interval = setInterval(() => void tick(), pollIntervalMs);
     },
     async stop() {
+      isStarted = false;
       if (interval) clearInterval(interval);
       interval = undefined;
 
@@ -340,12 +376,23 @@ async function syncRegisteredCronSchedules(crons: WorkerCron[]) {
   }
 }
 
-async function enqueueDueCronSchedules() {
+async function enqueueDueCronSchedules(limit: number, lockTimeoutMs: number) {
   const now = Date.now();
+  const staleBefore = now - lockTimeoutMs;
+
+  await db.run(sql`
+    update ${jobQueueCronSchedules}
+    set
+      status = 'active',
+      updated_at = ${now}
+    where status = 'enqueuing'
+      and updated_at < ${staleBefore}
+  `);
 
   const dueSchedules = await db.all<typeof jobQueueCronSchedules.$inferSelect>(sql`
     update ${jobQueueCronSchedules}
     set
+      status = 'enqueuing',
       last_enqueued_at = ${now},
       updated_at = ${now}
     where id in (
@@ -354,7 +401,7 @@ async function enqueueDueCronSchedules() {
       where status = 'active'
         and next_run_at <= ${now}
       order by next_run_at asc, id asc
-      limit 25
+      limit ${limit}
     )
     returning *
   `);
@@ -376,7 +423,7 @@ async function enqueueDueCronSchedules() {
 
     await db
       .update(jobQueueCronSchedules)
-      .set({ nextRunAt, updatedAt: now })
+      .set({ status: "active", nextRunAt, updatedAt: now })
       .where(eq(jobQueueCronSchedules.id, schedule.id));
   }
 }
@@ -389,16 +436,14 @@ async function claimJobs(limit: number, workerId: string): Promise<ClaimedJobRow
   return db.all(sql<ClaimedJobRow>`
     update ${jobQueueJobs}
     set
-      status = 'running',
       locked_at = ${now},
       locked_by = ${workerId},
-      started_at = ${now},
-      attempt = attempt + 1,
       updated_at = ${now}
     where id in (
       select id
       from ${jobQueueJobs}
       where status = 'pending'
+        and locked_at is null
         and available_at <= ${now}
       order by priority desc, available_at asc, id asc
       limit ${limit}
@@ -411,7 +456,14 @@ async function processJob(
   job: ClaimedJobRow,
   handlers: Map<string, WorkerJob>,
   retryDelayMs: number,
+  workerId: string,
 ) {
+  const startedJob = await startJob(job.id, workerId);
+
+  if (!startedJob) return;
+
+  job = startedJob;
+
   const registeredJob = handlers.get(job.name);
 
   if (!registeredJob) {
@@ -444,6 +496,26 @@ async function processJob(
   }
 
   await completeJob(job.id, handlerResult.data);
+}
+
+async function startJob(id: number, workerId: string): Promise<ClaimedJobRow | undefined> {
+  const now = Date.now();
+  const [job] = await db.all(sql<ClaimedJobRow>`
+    update ${jobQueueJobs}
+    set
+      status = 'running',
+      locked_at = ${now},
+      locked_by = ${workerId},
+      started_at = ${now},
+      attempt = attempt + 1,
+      updated_at = ${now}
+    where id = ${id}
+      and status = 'pending'
+      and locked_by = ${workerId}
+    returning *
+  `);
+
+  return job as ClaimedJobRow | undefined;
 }
 
 function parsePayload<TSchema extends z.ZodTypeAny>(job: ClaimedJobRow, schema: TSchema) {
@@ -492,6 +564,17 @@ async function failJob(job: ClaimedJobRow, error: unknown, retryDelayMs: number)
 async function releaseStaleJobs(lockTimeoutMs: number) {
   const now = Date.now();
   const staleBefore = now - lockTimeoutMs;
+
+  await db.run(sql`
+    update ${jobQueueJobs}
+    set
+      locked_at = null,
+      locked_by = null,
+      updated_at = ${now}
+    where status = 'pending'
+      and locked_at is not null
+      and locked_at < ${staleBefore}
+  `);
 
   await db.run(sql`
     update ${jobQueueJobs}

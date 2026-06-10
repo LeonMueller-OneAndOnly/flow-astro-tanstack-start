@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
@@ -108,7 +109,13 @@ export const jobQueueJobs = sqliteTable(
     updatedAt: integer("updated_at").notNull(),
   },
   (table) => [
-    index("job_queue_jobs_claim_idx").on(table.status, table.availableAt, table.priority),
+    index("job_queue_jobs_claim_idx").on(
+      table.status,
+      table.lockedAt,
+      sql`${table.priority} desc`,
+      table.availableAt,
+      table.id,
+    ),
     index("job_queue_jobs_cron_schedule_idx").on(table.cronScheduleId),
     index("job_queue_jobs_locked_idx").on(table.status, table.lockedAt),
     index("job_queue_jobs_name_idx").on(table.name),
