@@ -3,6 +3,12 @@ type AstroServerEnv = {
 };
 
 declare global {
+  interface ImportMeta {
+    readonly hot?: {
+      dispose(callback: () => void): void;
+    };
+  }
+
   namespace NodeJS {
     interface ProcessEnv extends AstroServerEnv {}
   }
