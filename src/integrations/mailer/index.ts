@@ -13,20 +13,18 @@ import { htmlToText } from "nodemailer-html-to-text";
 
 import previewEmail_inBrowser from "preview-email";
 
-const ZMailAttachment = z
-  .object({
-    filename: z.string().optional(),
-    content: z.any(),
-    contentType: z.string().optional(),
-    encoding: z.string().optional(),
-  })
-  .passthrough();
+const ZMailAttachment = z.object({
+  filename: z.string().optional(),
+  content: z.any(),
+  contentType: z.string().optional(),
+  encoding: z.string().optional(),
+});
 
 const ZMailAddress = z.union([
   z.string(),
   z.array(z.string()),
-  z.object({ name: z.string().optional(), address: z.string() }).passthrough(),
-  z.array(z.object({ name: z.string().optional(), address: z.string() }).passthrough()),
+  z.object({ name: z.string().optional(), address: z.string() }),
+  z.array(z.object({ name: z.string().optional(), address: z.string() })),
 ]);
 
 export const ZMail = z
