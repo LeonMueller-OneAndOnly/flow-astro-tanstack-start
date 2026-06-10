@@ -30,18 +30,6 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
 
         <div class="actions" aria-label="Primary actions">
           <a class="btn btn-primary" href={demoHubHref}>Browse the demos</a>
-          <a
-            class="btn btn-secondary"
-            href="https://docs.astro.build"
-            target="_blank"
-            rel="noopener noreferrer">Astro docs</a
-          >
-          <a
-            class="btn btn-secondary"
-            href="https://tanstack.com/start"
-            target="_blank"
-            rel="noopener noreferrer">TanStack Start docs</a
-          >
         </div>
       </div>
 
@@ -58,31 +46,147 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
     </section>
 
     <section class="section split" aria-label="Stack overview">
-      <article>
-        <span>Astro</span>
+      <a
+        class="card"
+        href="https://docs.astro.build"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div class="card-head">
+          <span class="card-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect width="18" height="7" x="3" y="3" rx="1"></rect>
+              <rect width="9" height="7" x="3" y="14" rx="1"></rect>
+              <rect width="5" height="7" x="16" y="14" rx="1"></rect>
+            </svg>
+          </span>
+          <span class="tag">Astro</span>
+        </div>
         <h2>Static front door</h2>
         <p>
           Marketing, content, docs, and low-interactivity SSR. Fast to ship, easy to replace. This
           page is one of them.
         </p>
-      </article>
-      <article>
-        <span>TanStack Start</span>
+        <span class="card-cta">
+          Astro docs
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M7 7h10v10"></path>
+            <path d="M7 17 17 7"></path>
+          </svg>
+        </span>
+      </a>
+
+      <a
+        class="card"
+        href="https://tanstack.com/start"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div class="card-head">
+          <span class="card-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
+              <rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
+              <line x1="6" x2="6.01" y1="6" y2="6"></line>
+              <line x1="6" x2="6.01" y1="18" y2="18"></line>
+            </svg>
+          </span>
+          <span class="tag">TanStack Start</span>
+        </div>
         <h2>App under <code>/app</code></h2>
         <p>
           Typed server functions, mutations, shared client/server loading, and authenticated flows
           for richer client behavior.
         </p>
-      </article>
-      <article>
-        <span>Demos</span>
+        <span class="card-cta">
+          TanStack Start docs
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M7 7h10v10"></path>
+            <path d="M7 17 17 7"></path>
+          </svg>
+        </span>
+      </a>
+
+      <a class="card" href={demoHubHref}>
+        <div class="card-head">
+          <span class="card-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect width="7" height="7" x="3" y="3" rx="1"></rect>
+              <rect width="7" height="7" x="14" y="3" rx="1"></rect>
+              <rect width="7" height="7" x="14" y="14" rx="1"></rect>
+              <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+            </svg>
+          </span>
+          <span class="tag">Demos</span>
+        </div>
         <h2>All under <code>/app/demo</code></h2>
         <p>
           Every example sits beneath the <code>/app/demo</code> route segment. Drop <code
             >src/app/routes/demo</code
           > and <code>src/app/lib/demo</code> to remove them all.
         </p>
-      </article>
+        <span class="card-cta">
+          Browse the demos
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </span>
+      </a>
     </section>
   </main>
 </BaseLayout>
@@ -190,16 +294,6 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
     box-shadow: 0 18px 36px color-mix(in oklch, var(--foreground) 18%, transparent);
   }
 
-  .btn-secondary {
-    border-color: color-mix(in oklch, var(--foreground) 20%, transparent);
-    background: color-mix(in oklch, var(--card) 72%, transparent);
-    color: var(--foreground);
-  }
-
-  .btn-secondary:hover {
-    border-color: color-mix(in oklch, var(--brand-secondary-600) 55%, transparent);
-  }
-
   .section {
     width: min(1100px, 100%);
     margin-inline: auto;
@@ -212,21 +306,62 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
     padding-bottom: clamp(32px, 6vw, 72px);
   }
 
-  .split article {
-    border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
-    border-radius: 26px;
-    padding: 24px;
-    background: color-mix(in oklch, var(--card) 76%, transparent);
+  .split .card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid color-mix(in oklch, var(--foreground) 11%, transparent);
+    border-radius: 24px;
+    padding: 28px;
+    background: color-mix(in oklch, var(--card) 78%, transparent);
+    color: inherit;
+    text-decoration: none;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
   }
 
-  .split span {
+  .split .card:hover,
+  .split .card:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklch, var(--brand-secondary-600) 55%, transparent);
+    box-shadow: 0 24px 54px color-mix(in oklch, var(--foreground) 14%, transparent);
+    outline: none;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .card-icon {
     display: inline-flex;
-    margin-bottom: 26px;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: color-mix(in oklch, var(--brand-secondary-500) 14%, transparent);
+    color: var(--brand-secondary-700);
+    transition: background 180ms ease;
+  }
+
+  .split .card:hover .card-icon,
+  .split .card:focus-visible .card-icon {
+    background: color-mix(in oklch, var(--brand-secondary-500) 22%, transparent);
+  }
+
+  .card-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .split .tag {
+    display: inline-flex;
     border-radius: 999px;
-    padding: 7px 11px;
+    padding: 6px 11px;
     background: color-mix(in oklch, var(--brand-secondary-500) 13%, transparent);
     color: var(--brand-secondary-800);
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     font-weight: 900;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -242,6 +377,28 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
     margin: 0;
     color: color-mix(in oklch, var(--foreground) 60%, transparent);
     line-height: 1.65;
+  }
+
+  .card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: auto;
+    padding-top: 20px;
+    color: var(--brand-secondary-700);
+    font-size: 0.95rem;
+    font-weight: 850;
+  }
+
+  .card-cta svg {
+    width: 17px;
+    height: 17px;
+    transition: transform 180ms ease;
+  }
+
+  .split .card:hover .card-cta svg,
+  .split .card:focus-visible .card-cta svg {
+    transform: translateX(3px);
   }
 
   code {

@@ -32,4 +32,4 @@ DO NOT use try-catch to handle errors. Use the Result.from or Result.fromAsync f
 
 # Design Guide
 
-Use Shadcn. Keep a global brand color scheme under 'src/styles/globals.css'.
+Use Shadcn and tailwindcss. Keep a global brand color scheme under 'src/styles/globals.css'.
