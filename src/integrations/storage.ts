@@ -6,13 +6,25 @@ import { FSDriver } from "flydrive/drivers/fs";
 
 export const UploadDisk = "local";
 
-export const localFilesystemDisk = new Disk(
-  new FSDriver({
-    location: getUploadDir(),
-    visibility: "private",
-  }),
-);
+let localFilesystemDisk: Disk | undefined;
+
+export function getLocalFilesystemDisk() {
+  localFilesystemDisk ??= new Disk(
+    new FSDriver({
+      location: getUploadDir(),
+      visibility: "private",
+    }),
+  );
+
+  return localFilesystemDisk;
+}
 
 export function getUploadDir() {
-  return path.isAbsolute(UPLOADS_DIR) ? UPLOADS_DIR : path.resolve(process.cwd(), UPLOADS_DIR);
+  const uploadsDir = UPLOADS_DIR?.trim();
+
+  if (!uploadsDir) {
+    throw new Error("UPLOADS_DIR must be set before using local upload storage.");
+  }
+
+  return path.isAbsolute(uploadsDir) ? uploadsDir : path.resolve(process.cwd(), uploadsDir);
 }

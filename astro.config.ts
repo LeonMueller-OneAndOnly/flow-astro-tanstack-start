@@ -90,7 +90,7 @@ export default defineConfig({
       PORT: envField.string({
         context: "server",
         access: "public",
-        optional: true,
+        optional: false,
       }),
       // SQLite/libSQL database connection URL.
       DATABASE_URL: envField.string({
@@ -109,7 +109,7 @@ export default defineConfig({
       UPLOADS_DIR: envField.string({
         context: "server",
         access: "secret",
-        default: ".uploads",
+        optional: true,
       }),
       // SMTP configuration used when production mail is sent directly.
       SMTP_HOST: envField.string({
@@ -130,10 +130,10 @@ export default defineConfig({
         optional: true,
       }),
       // Display name used in outgoing mail From headers.
-      MAIL_FROM_NAME: envField.string({
+      SMTP_FROM_NAME: envField.string({
         context: "server",
         access: "public",
-        default: "Starter Kit",
+        optional: true,
       }),
     },
   },

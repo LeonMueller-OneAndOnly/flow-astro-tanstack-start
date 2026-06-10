@@ -6,7 +6,7 @@ import { json } from "@tanstack/react-start";
 
 import { db } from "../../../db/client";
 import { demoUserUploads } from "../../../db/schema";
-import { UploadDisk, localFilesystemDisk, getUploadDir } from "../../../integrations/storage";
+import { UploadDisk, getLocalFilesystemDisk, getUploadDir } from "../../../integrations/storage";
 import { $appPath } from "../../lib/typesafe-paths";
 
 export const MAX_DEMO_UPLOAD_BYTES = 5 * 1024 * 1024;
@@ -56,6 +56,8 @@ export const Route = createFileRoute("/demo/api/uploads")({
         const key = createDemoUploadKey(originalName);
         const bytes = new Uint8Array(await file.arrayBuffer());
 
+        const localFilesystemDisk = getLocalFilesystemDisk();
+
         await localFilesystemDisk.put(key, bytes, {
           contentLength: file.size,
           contentType,
@@ -100,6 +102,8 @@ function serializeUpload(upload: typeof demoUserUploads.$inferSelect) {
 }
 
 async function downloadUpload(key: string) {
+  const localFilesystemDisk = getLocalFilesystemDisk();
+
   const [upload] = await db
     .select()
     .from(demoUserUploads)

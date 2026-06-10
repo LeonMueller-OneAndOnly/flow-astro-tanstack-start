@@ -89,7 +89,7 @@ async function sendMailViaSmtp(mail: TMail, reason: string) {
             ...mail,
 
             from: {
-              name: process.env.MAIL_FROM_NAME ?? "Starter Kit",
+              name: process.env.SMTP_FROM_NAME,
               address: process.env.SMTP_USERNAME, // listed in rfc822 message header
             },
             /**
