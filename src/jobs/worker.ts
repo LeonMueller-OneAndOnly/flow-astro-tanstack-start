@@ -1,5 +1,5 @@
-import { createJobQueueWorker } from "../integrations/job-queue";
-import { jobs } from "./registry";
+import { createJobQueueWorker } from "../integrations/job-queue/implementation";
+import { jobs } from "../integrations/job-queue";
 import "./send-mail";
 
 const worker = createJobQueueWorker(jobs, {
