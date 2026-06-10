@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 
+import Header from "../app/components/Header";
 import { brandPageBackground } from "../app/lib/brand-theme";
 import { $appPath } from "../app/lib/typesafe-paths";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -15,6 +16,7 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
   title="Astro + TanStack Start Starter"
   description="A starter kit pairing static Astro pages with a TanStack Start app mounted under /app."
 >
+  <Header variant="site" client:load />
   <main class="page-shell" style={`background:${brandPageBackground.background}`}>
     <section class="hero">
       <div class="hero-copy">
@@ -101,7 +103,7 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
     align-items: center;
     width: min(1100px, 100%);
     margin: 0 auto;
-    padding: clamp(48px, 10vw, 120px) 0 clamp(28px, 5vw, 56px);
+    padding: clamp(16px, 3vw, 40px) 0 clamp(28px, 5vw, 56px);
   }
 
   /* Two columns when there is room: copy left, robot to the right of the title. */
