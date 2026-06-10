@@ -1,6 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {
-  Boxes,
   CloudUpload,
   Database,
   FileText,
@@ -10,12 +9,12 @@ import {
   ShoppingBag,
 } from "lucide-react";
 
-/** Served at `/app`; child routes append their TanStack path after `/app`. */
-export const Route = createFileRoute("/")({
-  component: App,
+/** Served at `/app/demo`; lists every starter demo. Delete `src/app/routes/demo` to drop them all. */
+export const Route = createFileRoute("/demo/")({
+  component: DemoIndex,
 });
 
-function App() {
+function DemoIndex() {
   const demos = [
     {
       icon: <Server className="w-9 h-9 text-cyan-300" />,
@@ -59,16 +58,9 @@ function App() {
       icon: <ShoppingBag className="w-9 h-9 text-cyan-300" />,
       title: "Dynamic Routes",
       description: "A placeholder catalog with list and detail routes using route params.",
-      to: "/example/guitars",
+      to: "/demo/example/guitars",
     },
-    {
-      icon: <Boxes className="w-9 h-9 text-cyan-300" />,
-      title: "Replace Me",
-      description:
-        "The sample content is deliberately generic so real product pages can replace it cleanly.",
-      to: "/",
-    },
-  ];
+  ] as const;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -76,21 +68,15 @@ function App() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.22),transparent_35%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.16),transparent_30%)]" />
         <div className="relative max-w-5xl mx-auto">
           <p className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
-            Placeholder TanStack Start app
+            TanStack Start demos
           </p>
-          <div className="flex flex-col items-center justify-center gap-5 md:flex-row md:gap-6 mb-6">
-            <img
-              src="/tanstack-circle-logo.png"
-              alt="TanStack Logo"
-              className="w-20 h-20 md:w-28 md:h-28"
-            />
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
-              Starter app scaffold
-            </h1>
-          </div>
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6">
+            Starter demo hub
+          </h1>
           <p className="mx-auto mb-8 max-w-3xl text-lg leading-8 text-slate-300 md:text-xl">
-            This is not a real application yet. It is a small set of regular framework examples for
-            routing, API handlers, server functions, SSR modes, state, and dynamic params.
+            A small set of framework examples for routing, API handlers, server functions, SSR
+            modes, state, and dynamic params. Every demo lives under{" "}
+            <code className="rounded bg-slate-900 px-2 py-1 text-cyan-300">/app/demo</code>.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
@@ -126,8 +112,8 @@ function App() {
           ))}
         </div>
         <p className="mt-10 text-center text-sm text-slate-500">
-          Replace these placeholder demos as the real application takes shape. Start at{" "}
-          <code className="rounded bg-slate-900 px-2 py-1 text-cyan-300">src/app/routes</code>.
+          Replace these placeholder demos as the real application takes shape. Routes live in{" "}
+          <code className="rounded bg-slate-900 px-2 py-1 text-cyan-300">src/app/routes/demo</code>.
         </p>
       </section>
     </div>

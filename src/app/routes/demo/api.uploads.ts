@@ -6,15 +6,10 @@ import { json } from "@tanstack/react-start";
 
 import { db } from "../../../db/client";
 import { demoUserUploads } from "../../../db/schema";
-import {
-  createDemoUploadKey,
-  DEMO_UPLOAD_DISK,
-  DEMO_UPLOAD_PREFIX,
-  demoUploadDisk,
-  getDemoUploadsRoot,
-  isDemoUploadKey,
-  MAX_DEMO_UPLOAD_BYTES,
-} from "../../lib/demo/demo-file-storage";
+import { UploadDisk, localFilesystemDisk, getUploadDir } from "../../../integrations/storage";
+
+export const MAX_DEMO_UPLOAD_BYTES = 5 * 1024 * 1024;
+export const DEMO_UPLOAD_PREFIX = "demo-uploads";
 
 /**
  * Reference-only upload API served at `/app/demo/api/uploads`.
@@ -32,7 +27,7 @@ export const Route = createFileRoute("/demo/api/uploads")({
         }
 
         return json({
-          uploadsRoot: getDemoUploadsRoot(),
+          uploadsRoot: getUploadDir(),
           files: await listUploads(),
         });
       },
@@ -57,7 +52,7 @@ export const Route = createFileRoute("/demo/api/uploads")({
         const key = createDemoUploadKey(originalName);
         const bytes = new Uint8Array(await file.arrayBuffer());
 
-        await demoUploadDisk.put(key, bytes, {
+        await localFilesystemDisk.put(key, bytes, {
           contentLength: file.size,
           contentType,
           visibility: "private",
@@ -71,7 +66,7 @@ export const Route = createFileRoute("/demo/api/uploads")({
             originalName,
             contentType,
             size: file.size,
-            disk: DEMO_UPLOAD_DISK,
+            disk: UploadDisk,
             createdAt: new Date(),
           })
           .returning();
@@ -84,7 +79,6 @@ export const Route = createFileRoute("/demo/api/uploads")({
 
 async function listUploads() {
   const uploads = await db.select().from(demoUserUploads).orderBy(desc(demoUserUploads.createdAt));
-
   return uploads.map(serializeUpload);
 }
 
@@ -108,11 +102,11 @@ async function downloadUpload(key: string) {
     .where(eq(demoUserUploads.storageKey, key))
     .limit(1);
 
-  if (!upload || !isDemoUploadKey(key) || !(await demoUploadDisk.exists(key))) {
+  if (!upload || !isDemoUploadKey(key) || !(await localFilesystemDisk.exists(key))) {
     return json({ error: "File not found." }, { status: 404 });
   }
 
-  const bytes = await demoUploadDisk.getBytes(key);
+  const bytes = await localFilesystemDisk.getBytes(key);
   const name = upload.originalName.replaceAll('"', "");
   const body = bytes.buffer.slice(
     bytes.byteOffset,
@@ -126,4 +120,18 @@ async function downloadUpload(key: string) {
       "Content-Type": upload.contentType,
     },
   });
+}
+
+function createDemoUploadKey(fileName: string) {
+  const safeName = fileName
+    .normalize("NFKD")
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+
+  return `${DEMO_UPLOAD_PREFIX}/${randomUUID()}/${safeName || "upload.bin"}`;
+}
+
+function isDemoUploadKey(key: string) {
+  return key.startsWith(`${DEMO_UPLOAD_PREFIX}/`);
 }
