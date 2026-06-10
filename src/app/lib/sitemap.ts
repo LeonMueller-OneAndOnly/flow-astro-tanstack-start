@@ -4,7 +4,15 @@ import { getConfig, physicalGetRouteNodes } from "@tanstack/router-generator";
 export const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
 const APP_BASE_PATH = "/app";
 
-const SITEMAP_EXCLUDED_PATH_PREFIXES = ["/_", "/app/api", "/app/demo/api"] as const;
+const shouldIncludeInSitemap = createSitemapFilter({
+  excludePathPrefixes: ["/_", "/app/api", "/app/demo/api"],
+});
+
+type SitemapRules = {
+  excludePathPrefixes: ReadonlyArray<`/${string}`>;
+};
+
+type SitemapFilter = (urlOrPath: string) => boolean;
 
 type SitemapOptions = {
   exclude?: boolean;
@@ -22,20 +30,44 @@ type SitemapOptions = {
   }>;
 };
 
-export type AppSitemapPage = {
+type AppSitemapPage = {
   path: `/${string}`;
   sitemap?: SitemapOptions;
 };
 
-export function shouldIncludeInSitemap(urlOrPath: string): boolean {
-  const pathname = toPathname(urlOrPath);
+export async function getUnifiedSitemapOptions(origin: string) {
+  const appPages = await getAppSitemapPages(shouldIncludeInSitemap);
 
-  return !SITEMAP_EXCLUDED_PATH_PREFIXES.some((prefix) =>
-    pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
+  return {
+    astro: {
+      customSitemaps: origin ? [getAppSitemapUrl(origin)] : [],
+      filter: shouldIncludeInSitemap,
+    },
+    tanstackStart: {
+      pages: appPages,
+      sitemap: origin
+        ? {
+            host: origin,
+            outputPath: APP_SITEMAP_OUTPUT_PATH,
+          }
+        : undefined,
+    },
+  };
 }
 
-export async function getAppSitemapPages(): Promise<Array<AppSitemapPage>> {
+function createSitemapFilter(rules: SitemapRules): SitemapFilter {
+  return (urlOrPath) => {
+    const pathname = toPathname(urlOrPath);
+
+    return !rules.excludePathPrefixes.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    );
+  };
+}
+
+async function getAppSitemapPages(
+  filter: SitemapFilter = shouldIncludeInSitemap,
+): Promise<Array<AppSitemapPage>> {
   const routesDirectory = path.resolve(process.cwd(), "src/app/routes");
   const config = getConfig({ routesDirectory }, process.cwd());
   const { routeNodes } = await physicalGetRouteNodes(config, process.cwd());
@@ -44,10 +76,10 @@ export async function getAppSitemapPages(): Promise<Array<AppSitemapPage>> {
     .map(routeNodeToSitemapPage)
     .filter((page): page is AppSitemapPage => page !== null);
 
-  return pages.filter((page) => shouldIncludeInSitemap(page.path));
+  return pages.filter((page) => filter(page.path));
 }
 
-export function getAppSitemapUrl(origin: string): string {
+function getAppSitemapUrl(origin: string): string {
   return new URL(APP_SITEMAP_OUTPUT_PATH, origin).href;
 }
 
@@ -56,7 +88,11 @@ function toPathname(urlOrPath: string): string {
 }
 
 function routeNodeToSitemapPage(routeNode: { routePath?: string }): AppSitemapPage | null {
-  if (!routeNode.routePath || routeNode.routePath === "/__root" || routeNode.routePath.includes("$")) {
+  if (
+    !routeNode.routePath ||
+    routeNode.routePath === "/__root" ||
+    routeNode.routePath.includes("$")
+  ) {
     return null;
   }
 
