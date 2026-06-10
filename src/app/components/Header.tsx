@@ -93,7 +93,7 @@ export default function Header({ variant = "app" }: { variant?: HeaderVariant })
             <img
               src="/images/demo/flowoffice-schritmarke-light.svg"
               alt="FlowOffice"
-              className="h-4 sm:h-5 w-auto"
+              className="h-3.5 sm:h-4 w-auto"
             />
           </a>
         </h1>
