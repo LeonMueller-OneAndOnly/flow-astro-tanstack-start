@@ -32,7 +32,11 @@ export default function Header() {
         </button>
         <h1 className="ml-4 text-xl font-semibold">
           <a href={$astroPath({ to: "/" })}>
-            <img src="/tanstack-word-logo-white.svg" alt="TanStack Logo" className="h-10" />
+            <img
+              src="/images/demo/tanstack-word-logo-white.svg"
+              alt="TanStack Logo"
+              className="h-10"
+            />
           </a>
         </h1>
       </header>
