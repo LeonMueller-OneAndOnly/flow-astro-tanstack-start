@@ -1,6 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 
-import { startJobQueueWorker } from "./jobs/worker";
+import { startJobQueueWorker } from "./integrations/job-queue/worker";
 
 startJobQueueWorker();
 
