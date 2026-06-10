@@ -2,9 +2,6 @@
 import { defineConfig, envField } from "astro/config";
 import node from "@astrojs/node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import { parse } from "dotenv";
 
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
@@ -12,50 +9,9 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import typesafeRoutes from "astro-typesafe-routes";
 import { astroGrab } from "astro-grab";
+import { loadConfigEnv } from "@/lib/config-env";
 
-type ConfigMode = "local" | "test" | "production";
-
-const loadConfigEnv = (mode: ConfigMode) => {
-  const envFiles = [".env", ".env.local", `.env.${mode}`, `.env.${mode}.local`];
-
-  return envFiles.reduce<Record<string, string>>((env, envFile) => {
-    const path = join(process.cwd(), envFile);
-
-    if (!existsSync(path)) {
-      return env;
-    }
-
-    return { ...env, ...parse(readFileSync(path)) };
-  }, {});
-};
-
-const getConfigMode = () => {
-  const modeFlag = process.argv.find((arg) => arg.startsWith("--mode="));
-
-  if (modeFlag) {
-    return modeFlag.slice("--mode=".length);
-  }
-
-  const modeFlagIndex = process.argv.indexOf("--mode");
-
-  if (modeFlagIndex !== -1) {
-    return process.argv[modeFlagIndex + 1] ?? "development";
-  }
-
-  if (process.argv.includes("build") || process.argv.includes("preview")) {
-    return "production";
-  }
-
-  return "development";
-};
-
-const toConfigMode = (mode: string): ConfigMode => {
-  if (mode === "test" || mode === "production") return mode;
-
-  return "local";
-};
-
-const configEnv = loadConfigEnv(toConfigMode(getConfigMode()));
+const configEnv = loadConfigEnv();
 const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN;
 
 const configuredPort = process.env.PORT ?? configEnv.PORT;

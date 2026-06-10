@@ -102,8 +102,18 @@ export type JobQueueWorkerOptions = {
   claimBatchSize?: number;
   cronBatchSize?: number;
   retryDelayMs?: number;
+  retryMaxDelayMs?: number;
   lockTimeoutMs?: number;
   workerId?: string;
+};
+
+export type CleanupJobQueueJobsOptions = {
+  completedRetentionMs: number;
+  failedRetentionMs: number;
+};
+
+export type CleanupJobQueueJobsResult = {
+  deleted: number;
 };
 
 type ClaimedJobRow = typeof jobQueueJobs.$inferSelect;
@@ -120,6 +130,11 @@ type WorkerCron = {
   cron: string;
   payload: unknown;
   options: ScheduleJobOptions;
+};
+
+type JobRetryOptions = {
+  baseDelayMs: number;
+  maxDelayMs: number;
 };
 
 const defaultWorkerId = `job-queue@${hostname()}-${process.pid}`;
@@ -159,7 +174,11 @@ export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWor
   const pollIntervalMs = options.pollIntervalMs ?? 1_000;
   const claimBatchSize = options.claimBatchSize ?? Math.max(concurrency, 10);
   const cronBatchSize = options.cronBatchSize ?? 100;
-  const retryDelayMs = options.retryDelayMs ?? 30_000;
+  const retryBaseDelayMs = options.retryDelayMs ?? 30_000;
+  const retryOptions: JobRetryOptions = {
+    baseDelayMs: retryBaseDelayMs,
+    maxDelayMs: Math.max(retryBaseDelayMs, options.retryMaxDelayMs ?? 15 * 60_000),
+  };
   const lockTimeoutMs = options.lockTimeoutMs ?? 5 * 60_000;
   const workerId = options.workerId ?? defaultWorkerId;
   const queue = new PQueue({ concurrency });
@@ -206,7 +225,7 @@ export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWor
         void Result.fromAsync(() =>
           queue.add(async () => {
             const jobResult = await Result.fromAsync(() =>
-              processJob(job, handlers, retryDelayMs, workerId),
+              processJob(job, handlers, retryOptions, workerId),
             );
 
             if (!jobResult.success) {
@@ -485,7 +504,7 @@ async function claimJobs(limit: number, workerId: string): Promise<ClaimedJobRow
 async function processJob(
   job: ClaimedJobRow,
   handlers: Map<string, WorkerJob>,
-  retryDelayMs: number,
+  retryOptions: JobRetryOptions,
   workerId: string,
 ) {
   const startedJob = await startJob(job.id, workerId);
@@ -497,14 +516,18 @@ async function processJob(
   const registeredJob = handlers.get(job.name);
 
   if (!registeredJob) {
-    await failJob(job, new Error(`No handler registered for job "${job.name}"`), retryDelayMs);
+    await recordJobFailure(
+      job,
+      new Error(`No handler registered for job "${job.name}"`),
+      retryOptions,
+    );
     return;
   }
 
   const payloadResult = parsePayload(job, registeredJob.schema);
 
   if (!payloadResult.success) {
-    await failJob(job, payloadResult.error, retryDelayMs);
+    await recordJobFailure(job, payloadResult.error, retryOptions);
     return;
   }
 
@@ -521,7 +544,7 @@ async function processJob(
   );
 
   if (!handlerResult.success) {
-    await failJob(job, handlerResult.error, retryDelayMs);
+    await recordJobFailure(job, handlerResult.error, retryOptions);
     return;
   }
 
@@ -572,9 +595,10 @@ async function completeJob(id: number, result: unknown) {
     .where(eq(jobQueueJobs.id, id));
 }
 
-async function failJob(job: ClaimedJobRow, error: unknown, retryDelayMs: number) {
+async function failJob(job: ClaimedJobRow, error: unknown, retryOptions: JobRetryOptions) {
   const now = Date.now();
   const shouldRetry = job.attempt < job.maxAttempts;
+  const retryDelayMs = getRetryDelayMs(job.attempt, retryOptions);
   const message = serializeError(error);
 
   await db
@@ -589,6 +613,59 @@ async function failJob(job: ClaimedJobRow, error: unknown, retryDelayMs: number)
       updatedAt: now,
     })
     .where(eq(jobQueueJobs.id, job.id));
+}
+
+async function recordJobFailure(job: ClaimedJobRow, error: unknown, retryOptions: JobRetryOptions) {
+  const shouldRetry = job.attempt < job.maxAttempts;
+  const retryDelayMs = getRetryDelayMs(job.attempt, retryOptions);
+  const result = await Result.fromAsync(() => failJob(job, error, retryOptions));
+
+  if (!result.success) {
+    logJobQueueError(
+      `Job queue failed to record failure for job ${job.id} (${job.name})`,
+      result.error,
+    );
+    logJobQueueError(`Job queue original failure for job ${job.id} (${job.name})`, error);
+    return;
+  }
+
+  logJobQueueError(
+    shouldRetry
+      ? `Job queue job ${job.id} (${job.name}) failed attempt ${job.attempt}/${job.maxAttempts}; retry scheduled in ${retryDelayMs}ms`
+      : `Job queue job ${job.id} (${job.name}) failed permanently after ${job.attempt}/${job.maxAttempts} attempts`,
+    error,
+  );
+}
+
+function getRetryDelayMs(attempt: number, options: JobRetryOptions) {
+  if (options.strategy === "static") return options.delayMs;
+
+  return Math.min(options.baseDelayMs * 2 ** Math.max(attempt - 1, 0), options.maxDelayMs);
+}
+
+function resolveJobRetryOptions(options: JobQueueRetryOptions | undefined): JobRetryOptions {
+  if (!options) {
+    return {
+      strategy: "exponential",
+      baseDelayMs: defaultRetryBaseDelayMs,
+      maxDelayMs: defaultRetryMaxDelayMs,
+    };
+  }
+
+  if (options.strategy === "static") {
+    return {
+      strategy: "static",
+      delayMs: options.delayMs ?? defaultRetryBaseDelayMs,
+    };
+  }
+
+  const baseDelayMs = options.baseDelayMs ?? defaultRetryBaseDelayMs;
+
+  return {
+    strategy: "exponential",
+    baseDelayMs,
+    maxDelayMs: Math.max(baseDelayMs, options.maxDelayMs ?? defaultRetryMaxDelayMs),
+  };
 }
 
 async function releaseStaleJobs(lockTimeoutMs: number) {
@@ -644,6 +721,23 @@ function serializeError(error: unknown) {
 
 function logJobQueueError(message: string, error: unknown) {
   console.error(message, error);
+}
+
+export async function cleanupJobQueueJobs(
+  options: CleanupJobQueueJobsOptions,
+): Promise<CleanupJobQueueJobsResult> {
+  const now = Date.now();
+  const completedBefore = now - options.completedRetentionMs;
+  const failedBefore = now - options.failedRetentionMs;
+
+  const deletedJobs = await db.all<{ id: number }>(sql`
+    delete from ${jobQueueJobs}
+    where (status = 'completed' and completed_at is not null and completed_at < ${completedBefore})
+      or (status = 'failed' and failed_at is not null and failed_at < ${failedBefore})
+    returning id
+  `);
+
+  return { deleted: deletedJobs.length };
 }
 
 function getNextCronRunAt(cron: string, timezone: string | null | undefined, from: Date) {

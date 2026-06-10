@@ -1,6 +1,7 @@
 import { Result } from "../../app/lib/result";
 import { createJobQueueWorker } from "./implementation";
 import { jobs } from ".";
+import "../../jobs/job-queue-cleanup";
 import "../../jobs/send-mail";
 
 const globalWithJobQueueWorker = globalThis as typeof globalThis & {
@@ -17,7 +18,6 @@ if (import.meta.hot && globalWithJobQueueWorker.__jobQueueWorker) {
 
 const worker = createJobQueueWorker(jobs, {
   concurrency: 1,
-  retryDelayMs: 30_000,
 });
 
 if (import.meta.hot) {

@@ -63,30 +63,46 @@ export const ZMailOutgoingMailer = z.object({ type: z.literal("internal") });
 
 export type TMailOutgoingMailer = z.infer<typeof ZMailOutgoingMailer>;
 
+export const ZMailTransport = z.enum(["send-via-smtp", "preview-in-browser", "ignore"]);
+
+export type TMailTransport = z.infer<typeof ZMailTransport>;
+
 export const isTestEnv = [process.env.APP_ENV, process.env.NODE_ENV].includes("test");
+
+export function getDefaultMailTransport(): TMailTransport {
+  if (process.env.APP_ENV === "production") return "send-via-smtp";
+
+  if (isTestEnv) return "ignore";
+
+  return "preview-in-browser";
+}
+
+function getSendMailTransport(): TMailTransport {
+  if (process.env["open-preview-for-all-mails_DEV_ONLY"] && process.env.APP_ENV !== "production") {
+    return "preview-in-browser";
+  }
+
+  if (
+    process.env["send-out-mail-without-job-queue-usage_DEV_ONLY"] &&
+    process.env.APP_ENV !== "production"
+  ) {
+    return "send-via-smtp";
+  }
+
+  return getDefaultMailTransport();
+}
 
 export async function handleJob_sendMail(
   mail: TMail,
   reason: string,
   outgoingMailer: TMailOutgoingMailer = { type: "internal" },
+  transport: TMailTransport = getDefaultMailTransport(),
 ) {
-  const strategy = (() => {
-    if (process.env.APP_ENV === "production") {
-      return "send-via-smtp";
-    }
-
-    if (isTestEnv) {
-      return "ignore";
-    }
-
-    return "preview-in-browser";
-  })();
-
-  if (strategy === "send-via-smtp") {
+  if (transport === "send-via-smtp") {
     await sendMailViaOutgoingMailer(mail, reason, outgoingMailer);
   }
 
-  if (strategy === "preview-in-browser") {
+  if (transport === "preview-in-browser") {
     await previewEmail_inBrowser(mail);
   }
 }
@@ -231,20 +247,17 @@ export async function sendMail(
 ) {
   const mail = ZMail.parse(theMail);
   const outgoingMailer = ZMailOutgoingMailer.parse(options?.outgoingMailer ?? { type: "internal" });
-
-  if (process.env["open-preview-for-all-mails_DEV_ONLY"] && process.env.APP_ENV !== "production") {
-    return previewEmail_inBrowser(mail);
-  }
+  const transport = getSendMailTransport();
 
   if (
     process.env["send-out-mail-without-job-queue-usage_DEV_ONLY"] &&
     process.env.APP_ENV !== "production"
   ) {
-    return sendMailViaOutgoingMailer(mail, reason, outgoingMailer);
+    return handleJob_sendMail(mail, reason, outgoingMailer, transport);
   }
 
   if (isTestEnv) return;
 
   const { sendMailJob } = await import("../../jobs/send-mail");
-  await sendMailJob.enqueue({ mail, reason, outgoingMailer }, { maxAttempts: 3 });
+  await sendMailJob.enqueue({ mail, reason, outgoingMailer, transport }, { maxAttempts: 3 });
 }
