@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BackLink } from "@/components/BackLink";
+import { DemoExplainer } from "@/components/DemoExplainer";
 import { getPunkSongs } from "@/lib/demo/data/demo.punk-songs";
 import { brandPageBackground } from "@/lib/brand-theme";
 
@@ -23,6 +24,11 @@ function RouteComponent() {
         <h1 className="mb-6 bg-linear-to-r from-brand-primary-600 to-brand-secondary-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
           Data Only SSR - Punk Songs
         </h1>
+        <DemoExplainer feature='ssr: "data-only"'>
+          The <code>loader</code> runs on the server and its data is serialized into the page, but
+          the component renders only on the client. You skip the client-side data waterfall without
+          paying to render the markup on the server.
+        </DemoExplainer>
         <ul className="space-y-3">
           {punkSongs.map((song) => (
             <li

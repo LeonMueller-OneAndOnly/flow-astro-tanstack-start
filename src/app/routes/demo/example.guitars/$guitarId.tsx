@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BackLink } from "@/components/BackLink";
+import { DemoExplainer } from "@/components/DemoExplainer";
 import guitars from "../../../lib/demo/data/example-guitars";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../../lib/brand-theme";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,10 @@ function RouteComponent() {
     >
       <div className="relative z-10 w-[60%] rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-md">
         <BackLink to="/demo/example/guitars" label="Back to all guitars" />
+        <DemoExplainer feature="Route loader resolved this page">
+          The <code>$guitarId</code> from the URL was handed to the route <code>loader</code>, which
+          looked up this guitar before the component rendered — so there's no loading state here.
+        </DemoExplainer>
         <h1 className="mb-4 text-3xl font-bold tracking-tight">{guitar.name}</h1>
         <p className="mb-6 text-muted-foreground">{guitar.description}</p>
         <div className="flex items-center justify-between">

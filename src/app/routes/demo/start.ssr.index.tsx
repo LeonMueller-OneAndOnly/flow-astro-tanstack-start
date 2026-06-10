@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { BackLink } from "@/components/BackLink";
+import { DemoExplainer } from "@/components/DemoExplainer";
 import { brandPageBackground } from "../../lib/brand-theme";
 
 /** Served at `/app/demo/start/ssr/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
@@ -19,10 +20,15 @@ function RouteComponent() {
         <h1 className="bg-linear-to-r from-brand-primary-600 to-brand-secondary-600 bg-clip-text text-center text-4xl font-black tracking-tight text-transparent">
           SSR Demos
         </h1>
-        <p className="mx-auto mt-3 mb-8 max-w-md text-center text-sm leading-relaxed text-muted-foreground">
+        <p className="mx-auto mt-3 mb-6 max-w-md text-center text-sm leading-relaxed text-muted-foreground">
           The same punk-songs list, rendered three ways. Each route picks a different point on the
           server-vs-client spectrum — open them and watch where the work happens.
         </p>
+
+        <DemoExplainer feature="Per-route ssr option">
+          One <code>ssr</code> field on each route definition decides where rendering happens. Same
+          loader, same component — only the rendering boundary changes.
+        </DemoExplainer>
 
         <div className="flex flex-col gap-4">
           <Link

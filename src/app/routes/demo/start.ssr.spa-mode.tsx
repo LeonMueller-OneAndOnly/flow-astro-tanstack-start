@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { BackLink } from "@/components/BackLink";
+import { DemoExplainer } from "@/components/DemoExplainer";
 import { getPunkSongs } from "@/lib/demo/data/demo.punk-songs";
 import { brandPageBackground } from "@/lib/brand-theme";
 
@@ -27,6 +28,11 @@ function RouteComponent() {
         <h1 className="mb-6 text-3xl font-bold tracking-tight text-brand-primary-700">
           SPA Mode - Punk Songs
         </h1>
+        <DemoExplainer feature="ssr: false">
+          Nothing on this route renders on the server. The browser receives an empty shell, then
+          fetches the songs client-side in an effect after hydration — expect a brief blank moment
+          before the list appears.
+        </DemoExplainer>
         <ul className="space-y-3">
           {punkSongs.map((song) => (
             <li

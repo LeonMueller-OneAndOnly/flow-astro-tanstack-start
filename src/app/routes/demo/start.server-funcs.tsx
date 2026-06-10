@@ -6,6 +6,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { db } from "../../../db/client";
 import { demoTodos } from "../../../db/schema";
 import { BackLink } from "@/components/BackLink";
+import { DemoExplainer } from "@/components/DemoExplainer";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 
 /*
@@ -92,20 +95,38 @@ function Home() {
         <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
           Server functions
         </p>
-        <h1 className="mb-5 text-2xl font-bold tracking-tight text-foreground">Todo example</h1>
-        <ul className="mb-4 space-y-2">
-          {todos?.map((t) => (
-            <li
-              key={t.id}
-              className="rounded-lg border border-foreground/10 bg-foreground/5 p-3 shadow-sm"
-            >
-              <span className="text-lg text-foreground">{t.name}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="mb-5 flex items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Todo example</h1>
+          {todos ? <Badge variant="secondary">{todos.length} todos</Badge> : null}
+        </div>
+        <DemoExplainer feature="TanStack Start server functions">
+          The route <code>loader</code> calls <code>getTodos</code> on the server to read the list.
+          Adding one runs the <code>addTodo</code> POST server function — typed RPC that writes to
+          the database — then <code>router.invalidate()</code> refetches the loader.
+        </DemoExplainer>
+        {todos && todos.length > 0 ? (
+          <ul className="mb-4 space-y-2">
+            {todos.map((t) => (
+              <li
+                key={t.id}
+                className="rounded-lg border border-foreground/10 bg-foreground/5 p-3 shadow-sm"
+              >
+                <span className="text-lg text-foreground">{t.name}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mb-4 rounded-lg border border-dashed border-border p-6 text-center text-muted-foreground">
+            No todos yet — add the first one below.
+          </p>
+        )}
         <div className="flex flex-col gap-2">
+          <Label id="new-todo-label" htmlFor="new-todo">
+            New todo
+          </Label>
           <input
-            aria-label="New todo"
+            id="new-todo"
+            aria-labelledby="new-todo-label"
             type="text"
             value={todo}
             onChange={(e) => setTodo(e.target.value)}

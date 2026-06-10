@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CloudUpload, FileDown, RefreshCw } from "lucide-react";
 
 import { BackLink } from "@/components/BackLink";
+import { DemoExplainer } from "@/components/DemoExplainer";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 import { $appPath } from "../../lib/typesafe-paths";
 
@@ -91,11 +92,16 @@ function UploadsDemo() {
           <h1 className="mb-4 max-w-3xl text-4xl font-black tracking-tight text-foreground md:text-5xl">
             File uploads with local Flydrive storage
           </h1>
-          <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
+          <p className="mb-6 max-w-3xl text-lg leading-8 text-muted-foreground">
             This demo stores upload metadata in the demo_user_uploads table, stores bytes through
             Flydrive, and reads everything back through a TanStack API route. Treat it as
             starter-kit reference code, not a finished product flow.
           </p>
+          <DemoExplainer feature="TanStack API route (multipart upload)" className="mb-0 max-w-3xl">
+            One route handler answers both verbs: <code>GET</code> lists stored files and
+            <code>POST</code> receives the <code>multipart/form-data</code> upload. The client just
+            posts a <code>FormData</code> body to <code>/app/demo/api/uploads</code>.
+          </DemoExplainer>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">

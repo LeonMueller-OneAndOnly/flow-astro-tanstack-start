@@ -5,6 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { BackLink } from "@/components/BackLink";
+import { DemoExplainer } from "@/components/DemoExplainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -100,6 +101,11 @@ function MailWorkerTestPage() {
             Submitting this form inserts a <code>send-mail</code> job. The background worker should
             pick it up and open the generated email preview.
           </p>
+          <DemoExplainer feature="Server function → background job queue" className="mt-6 max-w-2xl">
+            The form calls a POST server function that validates input with Zod and only{" "}
+            <em>enqueues</em> a job — it returns immediately. A separate worker process drains the
+            queue and does the slow work, so the request never blocks on sending mail.
+          </DemoExplainer>
         </div>
 
         <Card className="border-foreground/10 bg-card/80 shadow-xl backdrop-blur-sm">
