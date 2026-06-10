@@ -14,6 +14,7 @@ import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
 import { Route as ExampleGuitarsGuitarIdRouteImport } from './routes/example.guitars/$guitarId'
 import { Route as DemoStartUploadsRouteImport } from './routes/demo/start.uploads'
+import { Route as DemoStartMailWorkerRouteImport } from './routes/demo/start.mail-worker'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiUploadsRouteImport } from './routes/demo/api.uploads'
@@ -47,6 +48,11 @@ const ExampleGuitarsGuitarIdRoute = ExampleGuitarsGuitarIdRouteImport.update({
 const DemoStartUploadsRoute = DemoStartUploadsRouteImport.update({
   id: '/demo/start/uploads',
   path: '/demo/start/uploads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoStartMailWorkerRoute = DemoStartMailWorkerRouteImport.update({
+  id: '/demo/start/mail-worker',
+  path: '/demo/start/mail-worker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/uploads': typeof DemoApiUploadsRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/mail-worker': typeof DemoStartMailWorkerRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/demo/start/uploads': typeof DemoStartUploadsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/uploads': typeof DemoApiUploadsRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/mail-worker': typeof DemoStartMailWorkerRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/demo/start/uploads': typeof DemoStartUploadsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/uploads': typeof DemoApiUploadsRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/mail-worker': typeof DemoStartMailWorkerRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/demo/start/uploads': typeof DemoStartUploadsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/demo/api/names'
     | '/demo/api/uploads'
     | '/demo/start/api-request'
+    | '/demo/start/mail-worker'
     | '/demo/start/server-funcs'
     | '/demo/start/uploads'
     | '/example/guitars/$guitarId'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/demo/api/names'
     | '/demo/api/uploads'
     | '/demo/start/api-request'
+    | '/demo/start/mail-worker'
     | '/demo/start/server-funcs'
     | '/demo/start/uploads'
     | '/example/guitars/$guitarId'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/demo/api/names'
     | '/demo/api/uploads'
     | '/demo/start/api-request'
+    | '/demo/start/mail-worker'
     | '/demo/start/server-funcs'
     | '/demo/start/uploads'
     | '/example/guitars/$guitarId'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiUploadsRoute: typeof DemoApiUploadsRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
+  DemoStartMailWorkerRoute: typeof DemoStartMailWorkerRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   DemoStartUploadsRoute: typeof DemoStartUploadsRoute
   ExampleGuitarsGuitarIdRoute: typeof ExampleGuitarsGuitarIdRoute
@@ -247,6 +260,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/start/uploads'
       fullPath: '/demo/start/uploads'
       preLoaderRoute: typeof DemoStartUploadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/start/mail-worker': {
+      id: '/demo/start/mail-worker'
+      path: '/demo/start/mail-worker'
+      fullPath: '/demo/start/mail-worker'
+      preLoaderRoute: typeof DemoStartMailWorkerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiUploadsRoute: DemoApiUploadsRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
+  DemoStartMailWorkerRoute: DemoStartMailWorkerRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   DemoStartUploadsRoute: DemoStartUploadsRoute,
   ExampleGuitarsGuitarIdRoute: ExampleGuitarsGuitarIdRoute,

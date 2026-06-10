@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import {
-  getDefaultMailTransport,
   handleJob_sendMail,
   ZMail,
   ZMailOutgoingMailer,
@@ -13,14 +12,14 @@ const ZSendMailJobPayload = z.object({
   mail: ZMail,
   reason: z.string(),
   outgoingMailer: ZMailOutgoingMailer.default({ type: "internal" }),
-  transport: ZMailTransport.optional(),
+  transport: ZMailTransport,
 });
 
 export const sendMailJob = jobs.defineJob({
   name: "send-mail",
   schema: ZSendMailJobPayload,
   async handler({ mail, reason, outgoingMailer, transport }) {
-    await handleJob_sendMail(mail, reason, outgoingMailer, transport ?? getDefaultMailTransport());
+    await handleJob_sendMail(mail, reason, outgoingMailer, transport);
 
     return { to: mail.to, reason };
   },

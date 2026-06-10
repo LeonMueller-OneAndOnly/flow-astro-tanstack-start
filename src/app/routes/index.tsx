@@ -4,6 +4,7 @@ import {
   CloudUpload,
   Database,
   FileText,
+  Mail,
   Route as RouteIcon,
   Server,
   ShoppingBag,
@@ -47,6 +48,12 @@ function App() {
       description:
         "Reference upload flow using Flydrive with local storage and an S3 migration path.",
       to: "/demo/start/uploads",
+    },
+    {
+      icon: <Mail className="w-9 h-9 text-cyan-300" />,
+      title: "Mail Worker",
+      description: "Queues a preview email so the background worker can process the job.",
+      to: "/demo/start/mail-worker",
     },
     {
       icon: <ShoppingBag className="w-9 h-9 text-cyan-300" />,

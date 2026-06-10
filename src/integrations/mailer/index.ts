@@ -1,24 +1,17 @@
-import { createRequire } from "node:module";
-
-import { z } from "zod";
-
 import { Result } from "../../app/lib/result";
-
-const require = createRequire(import.meta.url);
-
-const nodemailer = require("nodemailer") as {
-  createTransport(config: unknown): NodeMailerTransporter;
-};
-const htmlToText = require("nodemailer-html-to-text").htmlToText as () => unknown;
-export const previewEmail_inBrowser = require("preview-email") as (
-  message: TMail,
-) => Promise<string>;
+import { z } from "zod";
 
 type NodeMailerTransporter = {
   sendMail(mail: unknown, callback: (err: Error | null, info: unknown) => void): void;
   use(step: string, plugin: unknown): void;
   verify(callback: (error: Error | null, success: boolean) => void): void;
 };
+
+import nodemailer from "nodemailer";
+
+import { htmlToText } from "nodemailer-html-to-text";
+
+import previewEmail_inBrowser from "preview-email";
 
 const ZMailAttachment = z
   .object({
@@ -69,15 +62,7 @@ export type TMailTransport = z.infer<typeof ZMailTransport>;
 
 export const isTestEnv = [process.env.APP_ENV, process.env.NODE_ENV].includes("test");
 
-export function getDefaultMailTransport(): TMailTransport {
-  if (process.env.APP_ENV === "production") return "send-via-smtp";
-
-  if (isTestEnv) return "ignore";
-
-  return "preview-in-browser";
-}
-
-function getSendMailTransport(): TMailTransport {
+function getMailTransport(): TMailTransport {
   if (process.env["open-preview-for-all-mails_DEV_ONLY"] && process.env.APP_ENV !== "production") {
     return "preview-in-browser";
   }
@@ -89,14 +74,18 @@ function getSendMailTransport(): TMailTransport {
     return "send-via-smtp";
   }
 
-  return getDefaultMailTransport();
+  if (process.env.APP_ENV === "production") return "send-via-smtp";
+
+  if (isTestEnv) return "ignore";
+
+  return "preview-in-browser";
 }
 
 export async function handleJob_sendMail(
   mail: TMail,
   reason: string,
-  outgoingMailer: TMailOutgoingMailer = { type: "internal" },
-  transport: TMailTransport = getDefaultMailTransport(),
+  outgoingMailer: TMailOutgoingMailer,
+  transport: TMailTransport,
 ) {
   if (transport === "send-via-smtp") {
     await sendMailViaOutgoingMailer(mail, reason, outgoingMailer);
@@ -247,7 +236,7 @@ export async function sendMail(
 ) {
   const mail = ZMail.parse(theMail);
   const outgoingMailer = ZMailOutgoingMailer.parse(options?.outgoingMailer ?? { type: "internal" });
-  const transport = getSendMailTransport();
+  const transport = getMailTransport();
 
   if (
     process.env["send-out-mail-without-job-queue-usage_DEV_ONLY"] &&

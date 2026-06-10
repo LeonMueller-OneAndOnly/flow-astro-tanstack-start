@@ -101,11 +101,21 @@ export type JobQueueWorkerOptions = {
   pollIntervalMs?: number;
   claimBatchSize?: number;
   cronBatchSize?: number;
-  retryDelayMs?: number;
-  retryMaxDelayMs?: number;
+  retry?: JobQueueRetryOptions;
   lockTimeoutMs?: number;
   workerId?: string;
 };
+
+export type JobQueueRetryOptions =
+  | {
+      strategy: "exponential";
+      baseDelayMs?: number;
+      maxDelayMs?: number;
+    }
+  | {
+      strategy: "static";
+      delayMs?: number;
+    };
 
 export type CleanupJobQueueJobsOptions = {
   completedRetentionMs: number;
@@ -132,12 +142,20 @@ type WorkerCron = {
   options: ScheduleJobOptions;
 };
 
-type JobRetryOptions = {
-  baseDelayMs: number;
-  maxDelayMs: number;
-};
+type JobRetryOptions =
+  | {
+      strategy: "exponential";
+      baseDelayMs: number;
+      maxDelayMs: number;
+    }
+  | {
+      strategy: "static";
+      delayMs: number;
+    };
 
 const defaultWorkerId = `job-queue@${hostname()}-${process.pid}`;
+const defaultRetryBaseDelayMs = 30_000;
+const defaultRetryMaxDelayMs = 15 * 60_000;
 
 export function createJobRegistry(): JobRegistry {
   const jobs = new Map<string, WorkerJob>();
@@ -174,11 +192,7 @@ export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWor
   const pollIntervalMs = options.pollIntervalMs ?? 1_000;
   const claimBatchSize = options.claimBatchSize ?? Math.max(concurrency, 10);
   const cronBatchSize = options.cronBatchSize ?? 100;
-  const retryBaseDelayMs = options.retryDelayMs ?? 30_000;
-  const retryOptions: JobRetryOptions = {
-    baseDelayMs: retryBaseDelayMs,
-    maxDelayMs: Math.max(retryBaseDelayMs, options.retryMaxDelayMs ?? 15 * 60_000),
-  };
+  const retryOptions = resolveJobRetryOptions(options.retry);
   const lockTimeoutMs = options.lockTimeoutMs ?? 5 * 60_000;
   const workerId = options.workerId ?? defaultWorkerId;
   const queue = new PQueue({ concurrency });
