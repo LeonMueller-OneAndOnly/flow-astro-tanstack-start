@@ -176,9 +176,15 @@ export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWor
 
     isIdleTickScheduled = true;
 
-    void queue.onIdle().then(() => {
+    void Result.fromAsync(async () => {
+      await queue.onIdle();
       isIdleTickScheduled = false;
-      if (isStarted) void tick();
+      if (isStarted) await tick();
+    }).then((result) => {
+      if (!result.success) {
+        isIdleTickScheduled = false;
+        logJobQueueError("Job queue idle tick failed", result.error);
+      }
     });
   }
 
@@ -189,7 +195,7 @@ export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWor
 
     isTicking = true;
 
-    try {
+    const tickResult = await Result.fromAsync(async () => {
       await refreshRegisteredJobs();
 
       await releaseStaleJobs(lockTimeoutMs);
@@ -197,12 +203,36 @@ export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWor
       const claimedJobs = await claimJobs(claimBatchSize, workerId);
 
       for (const job of claimedJobs) {
-        queue.add(() => processJob(job, handlers, retryDelayMs, workerId));
+        void Result.fromAsync(() =>
+          queue.add(async () => {
+            const jobResult = await Result.fromAsync(() =>
+              processJob(job, handlers, retryDelayMs, workerId),
+            );
+
+            if (!jobResult.success) {
+              logJobQueueError(
+                `Job queue failed to process job ${job.id} (${job.name})`,
+                jobResult.error,
+              );
+            }
+          }),
+        ).then((queueResult) => {
+          if (!queueResult.success) {
+            logJobQueueError(
+              `Job queue failed to enqueue job ${job.id} (${job.name})`,
+              queueResult.error,
+            );
+          }
+        });
       }
 
       if (claimedJobs.length > 0) tickWhenIdle();
-    } finally {
-      isTicking = false;
+    });
+
+    isTicking = false;
+
+    if (!tickResult.success) {
+      logJobQueueError("Job queue tick failed", tickResult.error);
     }
   }
 
@@ -610,6 +640,10 @@ function serializeError(error: unknown) {
   }
 
   return JSON.stringify({ message: String(error) });
+}
+
+function logJobQueueError(message: string, error: unknown) {
+  console.error(message, error);
 }
 
 function getNextCronRunAt(cron: string, timezone: string | null | undefined, from: Date) {
