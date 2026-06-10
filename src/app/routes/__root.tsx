@@ -1,6 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import { useEffect, type ReactNode } from "react";
 
 import Header from "../components/Header";
 
@@ -37,7 +38,20 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 });
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      void import("react-grab/core").then(({ init }) =>
+        init({
+          activationKey: (event) =>
+            event.code === "KeyC" &&
+            (/mac/i.test(navigator.userAgent) ? event.metaKey : event.ctrlKey),
+          activationMode: "toggle",
+        }),
+      );
+    }
+  }, []);
+
   return (
     <html lang="en">
       <head>

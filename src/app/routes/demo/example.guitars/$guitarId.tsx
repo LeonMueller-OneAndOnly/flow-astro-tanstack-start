@@ -1,4 +1,5 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { BackLink } from "@/components/BackLink";
 import guitars from "../../../lib/demo/data/example-guitars";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../../lib/brand-theme";
 import { cn } from "@/lib/utils";
@@ -27,12 +28,7 @@ function RouteComponent() {
       style={brandPageBackground}
     >
       <div className="relative z-10 w-[60%] rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-md">
-        <Link
-          to="/demo/example/guitars"
-          className="mb-4 inline-block text-brand-primary-600 hover:text-brand-primary-700"
-        >
-          &larr; Back to all guitars
-        </Link>
+        <BackLink to="/demo/example/guitars" label="Back to all guitars" />
         <h1 className="mb-4 text-3xl font-bold tracking-tight">{guitar.name}</h1>
         <p className="mb-6 text-muted-foreground">{guitar.description}</p>
         <div className="flex items-center justify-between">

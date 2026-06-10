@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { BackLink } from "@/components/BackLink";
 import { getPunkSongs } from "@/lib/demo/data/demo.punk-songs";
 import { brandPageBackground } from "@/lib/brand-theme";
 
@@ -18,12 +19,7 @@ function RouteComponent() {
       style={brandPageBackground}
     >
       <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
-        <Link
-          to="/demo/start/ssr"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <span aria-hidden>←</span> Back to SSR demos
-        </Link>
+        <BackLink to="/demo/start/ssr" label="Back to SSR demos" />
         <h1 className="mb-6 bg-linear-to-r from-brand-primary-600 to-brand-secondary-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
           Data Only SSR - Punk Songs
         </h1>

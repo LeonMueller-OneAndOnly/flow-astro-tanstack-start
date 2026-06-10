@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
+import { BackLink } from "@/components/BackLink";
 import { brandPageBackground } from "../../lib/brand-theme";
 
 /** Served at `/app/demo/start/ssr/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
@@ -14,13 +15,13 @@ function RouteComponent() {
       style={brandPageBackground}
     >
       <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+        <BackLink to="/demo" />
         <h1 className="bg-linear-to-r from-brand-primary-600 to-brand-secondary-600 bg-clip-text text-center text-4xl font-black tracking-tight text-transparent">
           SSR Demos
         </h1>
         <p className="mx-auto mt-3 mb-8 max-w-md text-center text-sm leading-relaxed text-muted-foreground">
-          The same punk-songs list, rendered three ways. Each route picks a
-          different point on the server-vs-client spectrum — open them and watch
-          where the work happens.
+          The same punk-songs list, rendered three ways. Each route picks a different point on the
+          server-vs-client spectrum — open them and watch where the work happens.
         </p>
 
         <div className="flex flex-col gap-4">
@@ -35,9 +36,9 @@ function RouteComponent() {
               </code>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Nothing for this route renders on the server. The browser receives
-              an empty shell, then fetches the data and renders the whole list on
-              the client — fastest shell, slowest data.
+              Nothing for this route renders on the server. The browser receives an empty shell,
+              then fetches the data and renders the whole list on the client — fastest shell,
+              slowest data.
             </p>
           </Link>
 
@@ -52,9 +53,9 @@ function RouteComponent() {
               </code>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              The default. The loader runs on the server and the component is
-              rendered to HTML there, then hydrated in the browser. Best for SEO
-              and first paint — the list is in the initial response.
+              The default. The loader runs on the server and the component is rendered to HTML
+              there, then hydrated in the browser. Best for SEO and first paint — the list is in the
+              initial response.
             </p>
           </Link>
 
@@ -69,10 +70,9 @@ function RouteComponent() {
               </code>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              The loader runs on the server and its data is serialized into the
-              page, but the component renders only on the client. You skip the
-              client-side data waterfall without paying to render the markup on
-              the server.
+              The loader runs on the server and its data is serialized into the page, but the
+              component renders only on the client. You skip the client-side data waterfall without
+              paying to render the markup on the server.
             </p>
           </Link>
         </div>

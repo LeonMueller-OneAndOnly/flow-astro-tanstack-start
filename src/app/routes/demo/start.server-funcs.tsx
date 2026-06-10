@@ -5,6 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { db } from "../../../db/client";
 import { demoTodos } from "../../../db/schema";
+import { BackLink } from "@/components/BackLink";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 
 /*
@@ -87,6 +88,7 @@ function Home() {
       style={brandPageBackground}
     >
       <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+        <BackLink to="/demo" />
         <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
           Server functions
         </p>

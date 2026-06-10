@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { BackLink } from "@/components/BackLink";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -89,6 +90,7 @@ function MailWorkerTestPage() {
       style={brandPageBackground}
     >
       <div className="mx-auto max-w-3xl">
+        <BackLink to="/demo" />
         <div className="mb-8">
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
             Worker smoke test

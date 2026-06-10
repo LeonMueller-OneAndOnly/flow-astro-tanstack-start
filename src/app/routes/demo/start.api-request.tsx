@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { BackLink } from "@/components/BackLink";
 import { brandPageBackground } from "../../lib/brand-theme";
 import { $appPath } from "../../lib/typesafe-paths";
 
@@ -27,6 +28,7 @@ function Home() {
       style={brandPageBackground}
     >
       <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+        <BackLink to="/demo" />
         <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
           API endpoint
         </p>

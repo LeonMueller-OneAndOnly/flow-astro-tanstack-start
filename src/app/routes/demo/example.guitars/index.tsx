@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import guitars from "../../../lib/demo/data/example-guitars";
 import { brandPageBackground } from "../../../lib/brand-theme";
+import { BackLink } from "@/components/BackLink";
 import { cn } from "@/lib/utils";
 
 /** Served at `/app/example/guitars/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/demo/example/guitars/")({
 function GuitarsIndex() {
   return (
     <div className="min-h-screen bg-background p-5 text-foreground" style={brandPageBackground}>
+      <BackLink to="/demo" />
       <h1 className="mb-8 text-center text-3xl font-black tracking-tight">Featured Guitars</h1>
       <div className="flex flex-wrap justify-center gap-12">
         {guitars.map((guitar) => (

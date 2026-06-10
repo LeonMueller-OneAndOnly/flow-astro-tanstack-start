@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CloudUpload, FileDown, RefreshCw } from "lucide-react";
 
+import { BackLink } from "@/components/BackLink";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 import { $appPath } from "../../lib/typesafe-paths";
 
@@ -82,6 +83,7 @@ function UploadsDemo() {
       style={brandPageBackground}
     >
       <div className="mx-auto max-w-5xl">
+        <BackLink to="/demo" />
         <div className="mb-8 rounded-3xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
             Reference example
