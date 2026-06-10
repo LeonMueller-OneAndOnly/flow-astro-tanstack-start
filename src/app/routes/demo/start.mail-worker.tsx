@@ -112,7 +112,8 @@ function MailWorkerTestPage() {
           <CardHeader>
             <CardTitle>Mail job payload</CardTitle>
             <CardDescription>
-              Uses <code>preview-in-browser</code>; no SMTP configuration is needed.
+              Uses <code>preview-in-browser</code>; no SMTP configuration is needed. Outside
+              production, no real email is sent — it only opens as a preview.
             </CardDescription>
           </CardHeader>
           <CardContent>
