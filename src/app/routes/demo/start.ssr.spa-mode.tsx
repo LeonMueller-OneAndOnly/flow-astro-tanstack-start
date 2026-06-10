@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { getPunkSongs } from "@/lib/demo/data/demo.punk-songs";
+import { demoPageBackground } from "@/lib/demo/demo-theme";
 
 /** Served at `/app/demo/start/ssr/spa-mode`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/start/ssr/spa-mode")({
@@ -17,22 +18,21 @@ function RouteComponent() {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-zinc-800 to-black p-4 text-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(50% 50% at 20% 60%, #1a1a1a 0%, #0a0a0a 50%, #000000 100%)",
-      }}
+      className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
+      style={demoPageBackground}
     >
-      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
-        <h1 className="text-3xl font-bold mb-6 text-green-400">SPA Mode - Punk Songs</h1>
+      <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+        <h1 className="mb-6 text-3xl font-bold tracking-tight text-brand-primary-700">
+          SPA Mode - Punk Songs
+        </h1>
         <ul className="space-y-3">
           {punkSongs.map((song) => (
             <li
               key={song.id}
-              className="bg-white/10 border border-white/20 rounded-lg p-4 backdrop-blur-sm shadow-md"
+              className="rounded-lg border border-foreground/10 bg-foreground/5 p-4 shadow-sm"
             >
-              <span className="text-lg text-white font-medium">{song.name}</span>
-              <span className="text-white/60"> - {song.artist}</span>
+              <span className="text-lg font-medium text-foreground">{song.name}</span>
+              <span className="text-muted-foreground"> - {song.artist}</span>
             </li>
           ))}
         </ul>

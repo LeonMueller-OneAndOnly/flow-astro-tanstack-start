@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { demoPageBackground } from "../../lib/demo/demo-theme";
+import { $appPath } from "../../lib/typesafe-paths";
+
 async function getNames() {
-  return fetch("/app/demo/api/names").then((res) => res.json());
+  return fetch($appPath({ to: "/demo/api/names" })).then((res) => res.json());
 }
 
 /** Served at `/app/demo/start/api-request`; TanStack route paths are mounted under Astro's `/app` catch-all. */
@@ -20,22 +23,21 @@ function Home() {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen p-4 text-white"
-      style={{
-        backgroundColor: "#000",
-        backgroundImage:
-          "radial-gradient(ellipse 60% 60% at 0% 100%, #444 0%, #222 60%, #000 100%)",
-      }}
+      className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
+      style={demoPageBackground}
     >
-      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
-        <h1 className="text-2xl mb-4">Start API Request Demo - Names List</h1>
+      <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
+          API endpoint
+        </p>
+        <h1 className="mb-5 text-2xl font-bold tracking-tight text-foreground">Names list</h1>
         <ul className="mb-4 space-y-2">
           {names.map((name) => (
             <li
               key={name}
-              className="bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md"
+              className="rounded-lg border border-foreground/10 bg-foreground/5 p-3 shadow-sm"
             >
-              <span className="text-lg text-white">{name}</span>
+              <span className="text-lg text-foreground">{name}</span>
             </li>
           ))}
         </ul>

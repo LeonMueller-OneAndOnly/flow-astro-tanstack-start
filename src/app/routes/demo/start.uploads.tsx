@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CloudUpload, FileDown, RefreshCw } from "lucide-react";
 
+import { $appPath } from "../../lib/typesafe-paths";
+
 type DemoUpload = {
   id: string;
   key: string;
@@ -18,6 +20,8 @@ type UploadListResponse = {
   files: Array<DemoUpload>;
 };
 
+const uploadsApiPath = $appPath({ to: "/demo/api/uploads" });
+
 /** Served at `/app/demo/start/uploads`; this is a reference-only file upload example. */
 export const Route = createFileRoute("/demo/start/uploads")({
   component: UploadsDemo,
@@ -31,7 +35,7 @@ function UploadsDemo() {
   const [isPending, setIsPending] = useState(false);
 
   const refreshFiles = async () => {
-    const response = await fetch("/app/demo/api/uploads");
+    const response = await fetch(uploadsApiPath);
     const data = (await response.json()) as UploadListResponse;
     setUploadsRoot(data.uploadsRoot);
     setFiles(data.files);
@@ -53,7 +57,7 @@ function UploadsDemo() {
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    const response = await fetch("/app/demo/api/uploads", {
+    const response = await fetch(uploadsApiPath, {
       method: "POST",
       body: formData,
     });

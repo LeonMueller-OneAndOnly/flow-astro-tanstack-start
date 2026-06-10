@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
+import { demoPageBackground } from "../../lib/demo/demo-theme";
+
 /** Served at `/app/demo/start/ssr/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/start/ssr/")({
   component: RouteComponent,
@@ -8,32 +10,29 @@ export const Route = createFileRoute("/demo/start/ssr/")({
 function RouteComponent() {
   return (
     <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-zinc-900 to-black p-4 text-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(50% 50% at 20% 60%, #1a1a1a 0%, #0a0a0a 50%, #000000 100%)",
-      }}
+      className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
+      style={demoPageBackground}
     >
-      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
-        <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-green-400 bg-clip-text text-transparent">
+      <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+        <h1 className="mb-8 bg-linear-to-r from-brand-primary-600 to-brand-secondary-600 bg-clip-text text-center text-4xl font-black tracking-tight text-transparent">
           SSR Demos
         </h1>
         <div className="flex flex-col gap-4">
           <Link
             to="/demo/start/ssr/spa-mode"
-            className="text-2xl font-bold py-6 px-8 rounded-lg bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-700 hover:to-pink-600 text-white text-center shadow-lg transform transition-all hover:scale-105 hover:shadow-pink-500/50 border-2 border-pink-400"
+            className="rounded-xl border border-brand-primary-500/30 bg-brand-primary-600 px-8 py-6 text-center text-2xl font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-brand-primary-700"
           >
             SPA Mode
           </Link>
           <Link
             to="/demo/start/ssr/full-ssr"
-            className="text-2xl font-bold py-6 px-8 rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white text-center shadow-lg transform transition-all hover:scale-105 hover:shadow-purple-500/50 border-2 border-purple-400"
+            className="rounded-xl border border-brand-secondary-500/30 bg-brand-secondary-600 px-8 py-6 text-center text-2xl font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-brand-secondary-700"
           >
             Full SSR
           </Link>
           <Link
             to="/demo/start/ssr/data-only"
-            className="text-2xl font-bold py-6 px-8 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-center shadow-lg transform transition-all hover:scale-105 hover:shadow-green-500/50 border-2 border-green-400"
+            className="rounded-xl border border-foreground/10 bg-linear-to-r from-brand-primary-600 to-brand-secondary-600 px-8 py-6 text-center text-2xl font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-110"
           >
             Data Only
           </Link>

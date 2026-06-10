@@ -7,6 +7,7 @@ import { json } from "@tanstack/react-start";
 import { db } from "../../../db/client";
 import { demoUserUploads } from "../../../db/schema";
 import { UploadDisk, localFilesystemDisk, getUploadDir } from "../../../integrations/storage";
+import { $appPath } from "../../lib/typesafe-paths";
 
 export const MAX_DEMO_UPLOAD_BYTES = 5 * 1024 * 1024;
 export const DEMO_UPLOAD_PREFIX = "demo-uploads";
@@ -16,6 +17,9 @@ export const DEMO_UPLOAD_PREFIX = "demo-uploads";
  * Real apps should attach ownership/authorization and use S3/R2 signed URLs for larger files.
  */
 export const Route = createFileRoute("/demo/api/uploads")({
+  validateSearch: (search): { key?: string } => ({
+    key: typeof search.key === "string" ? search.key : undefined,
+  }),
   server: {
     handlers: {
       GET: async ({ request }) => {
@@ -91,7 +95,7 @@ function serializeUpload(upload: typeof demoUserUploads.$inferSelect) {
     size: upload.size,
     disk: upload.disk,
     createdAt: upload.createdAt.toISOString(),
-    url: `/app/demo/api/uploads?key=${encodeURIComponent(upload.storageKey)}`,
+    url: $appPath({ to: "/demo/api/uploads", search: { key: upload.storageKey } }),
   };
 }
 

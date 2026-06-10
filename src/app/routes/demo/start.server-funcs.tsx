@@ -5,6 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { db } from "../../../db/client";
 import { demoTodos } from "../../../db/schema";
+import { demoPageBackground } from "../../lib/demo/demo-theme";
 
 /*
 const loggingMiddleware = createMiddleware().server(
@@ -82,21 +83,21 @@ function Home() {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-zinc-800 to-black p-4 text-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(50% 50% at 20% 60%, #23272a 0%, #18181b 50%, #000000 100%)",
-      }}
+      className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
+      style={demoPageBackground}
     >
-      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
-        <h1 className="text-2xl mb-4">Start Server Functions - Todo Example</h1>
+      <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
+          Server functions
+        </p>
+        <h1 className="mb-5 text-2xl font-bold tracking-tight text-foreground">Todo example</h1>
         <ul className="mb-4 space-y-2">
           {todos?.map((t) => (
             <li
               key={t.id}
-              className="bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md"
+              className="rounded-lg border border-foreground/10 bg-foreground/5 p-3 shadow-sm"
             >
-              <span className="text-lg text-white">{t.name}</span>
+              <span className="text-lg text-foreground">{t.name}</span>
             </li>
           ))}
         </ul>
@@ -112,12 +113,12 @@ function Home() {
               }
             }}
             placeholder="Enter a new todo..."
-            className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
           />
           <button
             disabled={todo.trim().length === 0}
             onClick={submitTodo}
-            className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors"
+            className="rounded-lg bg-brand-primary-600 px-4 py-3 font-bold text-white transition-colors hover:bg-brand-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Add todo
           </button>

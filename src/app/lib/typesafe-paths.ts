@@ -1,6 +1,5 @@
 import { defaultStringifySearch, interpolatePath } from "@tanstack/react-router";
-import type { LinkOptions, RegisteredRouter } from "@tanstack/react-router";
-import type { FileRouteTypes } from "../routeTree.gen";
+import type { FileRoutesByPath } from "@tanstack/react-router";
 
 import { $path, type RouteId, type RouteOptions } from "astro-typesafe-routes/path";
 
@@ -33,32 +32,26 @@ export function $appPath<const TTo extends AppRouteTo>(
   return `${APP_BASE_PATH}${path}${search}${hash}`;
 }
 
-type Updater = (...args: never[]) => unknown;
-type StaticValue<TValue> = Exclude<TValue, true | Updater>;
-type AppRouteTo = FileRouteTypes["to"];
+type FileRoutePath = Extract<keyof FileRoutesByPath, string>;
+type AppRouteTo = FileRoutePath | TrimIndexRoute<FileRoutePath>;
+type PathParamValue = string | number | boolean;
 
-type AppLinkOptions<TTo extends AppRouteTo> = LinkOptions<RegisteredRouter, string, TTo>;
+type TrimIndexRoute<TPath extends string> = TPath extends `${infer TPrefix}/` ? TPrefix : TPath;
+type PathParamName<TName extends string> = TName extends "" ? "_splat" : TName;
+type PathParamNames<TPath extends string> = TPath extends `${string}$${infer TName}/${infer TRest}`
+  ? PathParamName<TName> | PathParamNames<`/${TRest}`>
+  : TPath extends `${string}$${infer TName}`
+    ? PathParamName<TName>
+    : never;
 
-type ParamsOption<TTo extends AppRouteTo> =
-  AppLinkOptions<TTo> extends {
-    params: infer TParams;
-  }
-    ? { params: StaticValue<TParams> }
-    : AppLinkOptions<TTo> extends { params?: infer TParams }
-      ? { params?: StaticValue<TParams> }
-      : Record<string, never>;
+type ParamsOption<TTo extends AppRouteTo> = [PathParamNames<TTo>] extends [never]
+  ? { params?: never }
+  : { params: Record<PathParamNames<TTo>, PathParamValue> };
 
-type SearchOption<TTo extends AppRouteTo> =
-  AppLinkOptions<TTo> extends {
-    search: infer TSearch;
-  }
-    ? { search: StaticValue<TSearch> }
-    : AppLinkOptions<TTo> extends { search?: infer TSearch }
-      ? { search?: StaticValue<TSearch> }
-      : Record<string, never>;
+type SearchOption = { search?: Record<string, unknown> };
 
 type TanStackStartPathOptions<TTo extends AppRouteTo> = { to: TTo } & ParamsOption<TTo> &
-  SearchOption<TTo> & {
+  SearchOption & {
     hash?: string;
   };
 

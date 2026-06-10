@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useStore } from "@tanstack/react-store";
 
+import { demoPageBackground } from "@/lib/demo/demo-theme";
 import { fullName, store } from "@/lib/demo/demo-store";
+
+const fieldClass =
+  "rounded-lg border border-border bg-card px-4 py-2 text-foreground outline-none transition-colors duration-200 placeholder:text-muted-foreground hover:border-brand-primary-400 focus:border-brand-primary-500";
 
 /** Served at `/app/demo/store`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/store")({
@@ -16,7 +20,7 @@ function FirstName() {
       type="text"
       value={firstName}
       onChange={(e) => store.setState((state) => ({ ...state, firstName: e.target.value }))}
-      className="bg-white/10 rounded-lg px-4 py-2 outline-none border border-white/20 hover:border-white/40 focus:border-white/60 transition-colors duration-200 placeholder-white/40"
+      className={fieldClass}
     />
   );
 }
@@ -29,27 +33,28 @@ function LastName() {
       type="text"
       value={lastName}
       onChange={(e) => store.setState((state) => ({ ...state, lastName: e.target.value }))}
-      className="bg-white/10 rounded-lg px-4 py-2 outline-none border border-white/20 hover:border-white/40 focus:border-white/60 transition-colors duration-200 placeholder-white/40"
+      className={fieldClass}
     />
   );
 }
 
 function FullName() {
   const fName = useStore(fullName);
-  return <div className="bg-white/10 rounded-lg px-4 py-2 outline-none ">{fName}</div>;
+  return (
+    <div className="rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-2 text-foreground">
+      {fName}
+    </div>
+  );
 }
 
 function DemoStore() {
   return (
     <div
-      className="min-h-[calc(100vh-32px)] text-white p-8 flex items-center justify-center w-full h-full"
-      style={{
-        backgroundImage:
-          "radial-gradient(50% 50% at 80% 80%, #f4a460 0%, #8b4513 70%, #1a0f0a 100%)",
-      }}
+      className="flex h-full min-h-[calc(100vh-32px)] w-full items-center justify-center bg-background p-8 text-foreground"
+      style={demoPageBackground}
     >
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 shadow-lg flex flex-col gap-4 text-3xl min-w-1/2">
-        <h1 className="text-4xl font-bold mb-5">Store Example</h1>
+      <div className="flex min-w-1/2 flex-col gap-4 rounded-2xl border border-foreground/10 bg-card/80 p-8 text-3xl shadow-xl backdrop-blur-sm">
+        <h1 className="mb-5 text-4xl font-bold tracking-tight">Store example</h1>
         <FirstName />
         <LastName />
         <FullName />
