@@ -7,25 +7,28 @@ const APP_BASE_PATH = "/app";
 const shouldIncludeInSitemap: SitemapFilter = (page) => {
   if (page.pathname.startsWith("/_")) return false;
   if (page.pathname === "/app/api" || page.pathname.startsWith("/app/api/")) return false;
-  if (page.pathname === "/app/demo/api" || page.pathname.startsWith("/app/demo/api/")) return false;
+  if (page.pathname === "/app/demo" || page.pathname.startsWith("/app/demo/")) return false;
 
   return true;
 };
 
 export async function getUnifiedSitemapOptions(origin: string) {
   const appPages = await getAppSitemapPages(shouldIncludeInSitemap);
+  const hasAppPages = appPages.length > 0;
 
   return {
     astro: {
-      customSitemaps: [new URL(APP_SITEMAP_OUTPUT_PATH, origin).href],
+      customSitemaps: hasAppPages ? [new URL(APP_SITEMAP_OUTPUT_PATH, origin).href] : [],
       filter: (url: string) => shouldIncludeInSitemap(toSitemapPage(url)),
     },
     tanstackStart: {
       pages: appPages,
-      sitemap: {
-        host: origin,
-        outputPath: APP_SITEMAP_OUTPUT_PATH,
-      },
+      sitemap: hasAppPages
+        ? {
+            host: origin,
+            outputPath: APP_SITEMAP_OUTPUT_PATH,
+          }
+        : undefined,
     },
   };
 }
@@ -81,7 +84,10 @@ function toSitemapPage(urlOrPath: string): SitemapFilterPage {
   };
 }
 
-function routeNodeToSitemapPage(routeNode: { routePath?: string }): AppSitemapPage | null {
+function routeNodeToSitemapPage(routeNode: {
+  filePath?: string;
+  routePath?: string;
+}): AppSitemapPage | null {
   if (
     !routeNode.routePath ||
     routeNode.routePath === "/__root" ||
