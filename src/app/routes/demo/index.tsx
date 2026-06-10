@@ -196,7 +196,9 @@ function DemoIndex() {
           ))}
         </div>
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Replace these placeholder demos as the real application takes shape. Routes live in{" "}
+          Keep these demos around while building — they are a working reference for how this
+          project wires up routing, server functions, uploads, and SSR, so an agent can follow the
+          established conventions. Delete them before deploying. Routes live in{" "}
           <code className="rounded bg-foreground/5 px-2 py-1 font-semibold text-brand-secondary-700">
             src/app/routes/demo
           </code>
