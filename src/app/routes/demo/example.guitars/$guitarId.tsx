@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import guitars from "../../../lib/demo/data/example-guitars";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../../lib/brand-theme";
+import { cn } from "@/lib/utils";
 
 /**
  * Served at `/app/example/guitars/:guitarId`.
@@ -45,7 +46,11 @@ function RouteComponent() {
           <img
             src={guitar.image}
             alt={guitar.name}
-            className="w-full h-full object-cover guitar-image"
+            className={cn(
+              // oxlint-disable-next-line better-tailwindcss/no-unknown-classes
+              "guitar-image",
+              "w-full h-full object-cover",
+            )}
           />
         </div>
       </div>

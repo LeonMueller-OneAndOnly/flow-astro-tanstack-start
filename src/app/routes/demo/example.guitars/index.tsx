@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import guitars from "../../../lib/demo/data/example-guitars";
 import { brandPageBackground } from "../../../lib/brand-theme";
+import { cn } from "@/lib/utils";
 
 /** Served at `/app/example/guitars/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/example/guitars/")({
@@ -28,7 +29,11 @@ function GuitarsIndex() {
                   <img
                     src={guitar.image}
                     alt={guitar.name}
-                    className="guitar-image h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className={cn(
+                      // oxlint-disable-next-line better-tailwindcss/no-unknown-classes
+                      "guitar-image",
+                      "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
+                    )}
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                 </div>
