@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { demoPageBackground } from "@/lib/demo/demo-theme";
 import { Result } from "@/lib/result";
 
 const ZMailWorkerInput = z.object({
@@ -83,23 +84,26 @@ function MailWorkerTestPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#164e63,transparent_28%),linear-gradient(135deg,#020617,#0f172a_55%,#111827)] px-6 py-16 text-slate-100">
+    <main
+      className="min-h-screen bg-background px-6 py-16 text-foreground"
+      style={demoPageBackground}
+    >
       <div className="mx-auto max-w-3xl">
         <div className="mb-8">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
             Worker smoke test
           </p>
-          <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Queue a preview email</h1>
-          <p className="mt-4 max-w-2xl text-slate-300">
+          <h1 className="text-4xl font-black tracking-tight md:text-5xl">Queue a preview email</h1>
+          <p className="mt-4 max-w-2xl text-muted-foreground">
             Submitting this form inserts a <code>send-mail</code> job. The background worker should
             pick it up and open the generated email preview.
           </p>
         </div>
 
-        <Card className="border-slate-700 bg-slate-950/70 text-slate-100 shadow-2xl shadow-cyan-950/30">
+        <Card className="border-foreground/10 bg-card/80 shadow-xl backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Mail job payload</CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription>
               Uses <code>preview-in-browser</code>; no SMTP configuration is needed.
             </CardDescription>
           </CardHeader>
@@ -112,7 +116,6 @@ function MailWorkerTestPage() {
                   type="email"
                   value={form.to}
                   onChange={(event) => setForm({ ...form, to: event.target.value })}
-                  className="border-slate-700 bg-slate-900"
                   required
                 />
               </div>
@@ -122,7 +125,6 @@ function MailWorkerTestPage() {
                   id="mail-subject"
                   value={form.subject}
                   onChange={(event) => setForm({ ...form, subject: event.target.value })}
-                  className="border-slate-700 bg-slate-900"
                   required
                 />
               </div>
@@ -132,7 +134,7 @@ function MailWorkerTestPage() {
                   id="mail-message"
                   value={form.message}
                   onChange={(event) => setForm({ ...form, message: event.target.value })}
-                  className="min-h-36 border-slate-700 bg-slate-900"
+                  className="min-h-36"
                   required
                 />
               </div>
@@ -142,12 +144,12 @@ function MailWorkerTestPage() {
                   {isSubmitting ? "Queueing..." : "Queue mail job"}
                 </Button>
                 {status?.success ? (
-                  <p className="text-sm text-emerald-300">
+                  <p className="text-sm font-medium text-emerald-600">
                     Queued job #{status.jobId} for {status.to}. Watch for the preview window.
                   </p>
                 ) : null}
                 {status && !status.success ? (
-                  <p className="text-sm text-red-300">{status.error}</p>
+                  <p className="text-sm text-destructive">{status.error}</p>
                 ) : null}
               </div>
             </form>

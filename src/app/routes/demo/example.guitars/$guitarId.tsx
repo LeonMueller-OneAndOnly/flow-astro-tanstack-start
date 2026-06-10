@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import guitars from "../../../lib/demo/data/example-guitars";
+import { demoPageBackground } from "../../../lib/demo/demo-theme";
 
 /**
  * Served at `/app/example/guitars/:guitarId`.
@@ -20,26 +21,29 @@ function RouteComponent() {
   const guitar = Route.useLoaderData();
 
   return (
-    <div className="relative min-h-[100vh] flex items-center bg-black text-white p-5">
-      <div className="relative z-10 w-[60%] bg-gray-900/60 backdrop-blur-md rounded-2xl p-8 border border-gray-800/50 shadow-xl">
+    <div
+      className="relative flex min-h-screen items-center bg-background p-5 text-foreground"
+      style={demoPageBackground}
+    >
+      <div className="relative z-10 w-[60%] rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-md">
         <Link
           to="/demo/example/guitars"
-          className="inline-block mb-4 text-emerald-400 hover:text-emerald-300"
+          className="mb-4 inline-block text-brand-primary-600 hover:text-brand-primary-700"
         >
           &larr; Back to all guitars
         </Link>
-        <h1 className="text-3xl font-bold mb-4">{guitar.name}</h1>
-        <p className="text-gray-300 mb-6">{guitar.description}</p>
+        <h1 className="mb-4 text-3xl font-bold tracking-tight">{guitar.name}</h1>
+        <p className="mb-6 text-muted-foreground">{guitar.description}</p>
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-emerald-400">${guitar.price}</div>
-          <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
+          <div className="text-2xl font-bold text-brand-primary-600">${guitar.price}</div>
+          <button className="rounded-lg bg-brand-primary-600 px-6 py-2 text-white transition-colors hover:bg-brand-primary-700">
             Add to Cart
           </button>
         </div>
       </div>
 
-      <div className="absolute top-0 right-0 w-[55%] h-full z-0">
-        <div className="w-full h-full overflow-hidden rounded-2xl border-4 border-gray-800 shadow-2xl">
+      <div className="absolute right-0 top-0 z-0 h-full w-[55%]">
+        <div className="h-full w-full overflow-hidden rounded-2xl border-4 border-foreground/10 shadow-2xl">
           <img
             src={guitar.image}
             alt={guitar.name}

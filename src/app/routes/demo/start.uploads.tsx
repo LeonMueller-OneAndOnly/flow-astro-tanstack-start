@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CloudUpload, FileDown, RefreshCw } from "lucide-react";
 
+import { demoPageBackground } from "../../lib/demo/demo-theme";
 import { $appPath } from "../../lib/typesafe-paths";
 
 type DemoUpload = {
@@ -76,16 +77,19 @@ function UploadsDemo() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 px-6 py-12 text-stone-100">
+    <div
+      className="min-h-screen bg-background px-6 py-12 text-foreground"
+      style={demoPageBackground}
+    >
       <div className="mx-auto max-w-5xl">
-        <div className="mb-8 rounded-3xl border border-amber-400/20 bg-gradient-to-br from-stone-900 to-stone-950 p-8 shadow-2xl shadow-black/30">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-amber-300">
+        <div className="mb-8 rounded-3xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
+          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
             Reference example
           </p>
-          <h1 className="mb-4 max-w-3xl text-4xl font-bold tracking-tight text-white md:text-5xl">
+          <h1 className="mb-4 max-w-3xl text-4xl font-black tracking-tight text-foreground md:text-5xl">
             File uploads with local Flydrive storage
           </h1>
-          <p className="max-w-3xl text-lg leading-8 text-stone-300">
+          <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
             This demo stores upload metadata in the demo_user_uploads table, stores bytes through
             Flydrive, and reads everything back through a TanStack API route. Treat it as
             starter-kit reference code, not a finished product flow.
@@ -93,12 +97,12 @@ function UploadsDemo() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-          <section className="rounded-2xl border border-stone-800 bg-stone-900/80 p-6">
+          <section className="rounded-2xl border border-foreground/10 bg-card/70 p-6">
             <div className="mb-5 flex items-center gap-3">
-              <CloudUpload className="h-8 w-8 text-amber-300" />
+              <CloudUpload className="h-8 w-8 text-brand-primary-600" />
               <div>
                 <h2 className="text-xl font-semibold">Upload</h2>
-                <p className="text-sm text-stone-400">Max 5 MB in this example.</p>
+                <p className="text-sm text-muted-foreground">Max 5 MB in this example.</p>
               </div>
             </div>
 
@@ -106,38 +110,40 @@ function UploadsDemo() {
               aria-label="File to upload"
               type="file"
               onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-              className="mb-4 block w-full rounded-xl border border-stone-700 bg-stone-950 p-3 text-sm text-stone-200 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-300 file:px-4 file:py-2 file:font-semibold file:text-stone-950"
+              className="mb-4 block w-full rounded-xl border border-border bg-card p-3 text-sm text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-brand-primary-600 file:px-4 file:py-2 file:font-semibold file:text-white"
             />
 
             <button
               type="button"
               onClick={uploadFile}
               disabled={isPending}
-              className="inline-flex w-full items-center justify-center rounded-xl bg-amber-300 px-5 py-3 font-semibold text-stone-950 transition-colors hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center rounded-xl bg-brand-primary-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-brand-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPending ? "Uploading" : "Upload file"}
             </button>
 
-            <p className="mt-4 rounded-xl border border-stone-800 bg-stone-950 p-3 text-sm text-stone-300">
+            <p className="mt-4 rounded-xl border border-foreground/10 bg-foreground/5 p-3 text-sm text-muted-foreground">
               {message}
             </p>
 
-            <div className="mt-4 rounded-xl bg-stone-950 p-3 text-xs text-stone-500">
-              <p className="mb-1 font-semibold text-stone-400">Local root</p>
+            <div className="mt-4 rounded-xl bg-foreground/5 p-3 text-xs text-muted-foreground">
+              <p className="mb-1 font-semibold text-foreground">Local root</p>
               <code className="break-all">{uploadsRoot || "Loading..."}</code>
             </div>
           </section>
 
-          <section className="rounded-2xl border border-stone-800 bg-stone-900/80 p-6">
+          <section className="rounded-2xl border border-foreground/10 bg-card/70 p-6">
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold">Stored files</h2>
-                <p className="text-sm text-stone-400">Listed from the demo_user_uploads table.</p>
+                <p className="text-sm text-muted-foreground">
+                  Listed from the demo_user_uploads table.
+                </p>
               </div>
               <button
                 type="button"
                 onClick={refreshFiles}
-                className="rounded-lg border border-stone-700 p-2 text-stone-300 transition-colors hover:border-amber-300 hover:text-amber-200"
+                className="rounded-lg border border-border p-2 text-muted-foreground transition-colors hover:border-brand-primary-500 hover:text-brand-primary-700"
                 aria-label="Refresh uploads"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -145,7 +151,7 @@ function UploadsDemo() {
             </div>
 
             {files.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-stone-700 p-6 text-center text-stone-400">
+              <p className="rounded-xl border border-dashed border-border p-6 text-center text-muted-foreground">
                 No uploaded files yet.
               </p>
             ) : (
@@ -154,16 +160,16 @@ function UploadsDemo() {
                   <a
                     key={file.id}
                     href={file.url}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-stone-800 bg-stone-950 p-4 transition-colors hover:border-amber-300/70"
+                    className="flex items-center justify-between gap-4 rounded-xl border border-foreground/10 bg-foreground/5 p-4 transition-colors hover:border-brand-primary-500/60"
                   >
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-stone-100">{file.name}</p>
-                      <p className="mt-1 text-xs text-stone-500">
+                      <p className="truncate font-medium text-foreground">{file.name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {formatBytes(file.size)} · {file.contentType} · {file.disk} ·{" "}
                         {formatDate(file.createdAt)}
                       </p>
                     </div>
-                    <FileDown className="h-5 w-5 shrink-0 text-amber-300" />
+                    <FileDown className="h-5 w-5 shrink-0 text-brand-primary-600" />
                   </a>
                 ))}
               </div>
@@ -171,12 +177,12 @@ function UploadsDemo() {
           </section>
         </div>
 
-        <section className="mt-6 rounded-2xl border border-stone-800 bg-stone-900/70 p-6 text-sm leading-7 text-stone-300">
-          <h2 className="mb-2 text-lg font-semibold text-white">Migration note</h2>
+        <section className="mt-6 rounded-2xl border border-foreground/10 bg-card/70 p-6 text-sm leading-7 text-muted-foreground">
+          <h2 className="mb-2 text-lg font-semibold text-foreground">Migration note</h2>
           <p>
             This example uses a local filesystem driver. To migrate to S3 or R2, swap the driver in{" "}
-            <code className="text-amber-200">src/app/demo/file-storage.ts</code> and keep storing
-            database records by stable object key rather than by local path.
+            <code className="text-brand-secondary-700">src/app/demo/file-storage.ts</code> and keep
+            storing database records by stable object key rather than by local path.
           </p>
         </section>
       </div>
