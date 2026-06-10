@@ -8,6 +8,7 @@ Dont start the dev server, ask the user to do that - if you want to access it an
 
 Prefer hardcoded defaults. Add env variables only for secrets or deployment-specific configuration.
 Document every env variable in `astro.config.ts`.
+Do not create helper functions unless they are reused or encapsulate complex code.
 
 # Framework
 

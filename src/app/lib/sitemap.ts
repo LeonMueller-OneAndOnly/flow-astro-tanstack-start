@@ -13,7 +13,7 @@ export async function getUnifiedSitemapOptions(origin: string) {
 
   return {
     astro: {
-      customSitemaps: getAppSitemapUrl(origin),
+      customSitemaps: new URL(APP_SITEMAP_OUTPUT_PATH, origin).href,
       filter: shouldIncludeInSitemap,
     },
     tanstackStart: {
@@ -77,10 +77,6 @@ async function getAppSitemapPages(
     .filter((page): page is AppSitemapPage => page !== null);
 
   return pages.filter((page) => filter(page.path));
-}
-
-function getAppSitemapUrl(origin: string): string {
-  return new URL(APP_SITEMAP_OUTPUT_PATH, origin).href;
 }
 
 function toPathname(urlOrPath: string): string {
