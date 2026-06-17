@@ -189,7 +189,7 @@ function UploadsDemo() {
           <h2 className="mb-2 text-lg font-semibold text-foreground">Migration note</h2>
           <p>
             This example uses a local filesystem driver. To migrate to S3 or R2, swap the driver in{" "}
-            <code className="text-brand-secondary-700">src/app/demo/file-storage.ts</code> and keep
+            <code className="text-brand-secondary-700">src/integrations/storage.ts</code> and keep
             storing database records by stable object key rather than by local path.
           </p>
         </section>
