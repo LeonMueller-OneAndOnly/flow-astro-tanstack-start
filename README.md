@@ -28,14 +28,18 @@ Everything under `src/app` belongs to TanStack Start. See the [TanStack Start do
 
 ## Auth
 
-Better Auth is configured in `src/app/lib/auth.ts` with Drizzle, username/password auth, and magic links through the existing `sendMail` integration.
+Better Auth is configured in `src/app/lib/auth/better-auth.ts` with Drizzle, email/password auth, username support, magic links through `sendMail`, and TanStack Start cookie handling. The shared API base path is defined in `src/app/lib/auth/auth-config.ts` and resolves to `/app/api/auth`.
+
+The auth API route is `src/app/routes/api/auth/$.ts`. It forwards `GET` and `POST` requests under `/app/api/auth/*` to `auth.handler(request)`. Server-side session reads use `getSession` from `src/app/lib/auth/auth-server.ts`; client auth helpers come from `src/app/lib/auth/auth-client.ts`.
 
 Set `SESSION_SECRET_KEY` in production. It is the shared server-side secret used for signing/encrypting session and auth data. Set `APP_ORIGIN` to the public origin, for example `https://example.com`, so Astro canonical URLs and Better Auth magic links use the correct host.
 
 ## Reference File Uploads
 
-The upload example uses [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver in `src/app/demo/file-storage.ts`.
+The upload UI route is `src/app/routes/demo/start.uploads.tsx`, served at `/app/demo/start/uploads`. It posts a `multipart/form-data` body to the TanStack API route at `/app/demo/api/uploads`.
 
-Set `UPLOADS_DIR` to control where local example uploads are stored. The default is `.uploads`, relative to the project root. `UPLOADS_DIR` is defined in the Astro env schema in `astro.config.ts`.
+The upload API route is `src/app/routes/demo/api.uploads.ts`. `GET` lists uploads, `GET ?key=...` downloads one stored file, and `POST` accepts one `file` field. The example rejects missing files, empty files, and files larger than 5 MB.
 
-The demo stores metadata in the `demo_user_uploads` table via the `demoUserUploads` schema export. For production, attach ownership/authorization and persist stable storage keys, not generated URLs or local paths. To migrate to S3, R2, or another S3-compatible provider, swap the Flydrive driver and keep the rest of the app code using storage keys.
+Local storage is configured in `src/integrations/storage.ts` using [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver. Set `UPLOADS_DIR` to an absolute path or a path relative to the project root before using the demo; `getUploadDir()` throws if it is unset. `UPLOADS_DIR` is defined in the Astro env schema in `astro.config.ts`.
+
+The demo stores metadata in the `demo_user_uploads` table via the `demoUserUploads` schema export in `src/db/schema.ts`. Stored object keys use the `demo-uploads/<uuid>/<safe-name>` shape, and downloads verify both the database record and local file exist. For production, attach ownership/authorization and persist stable storage keys, not generated URLs or local paths. To migrate to S3, R2, or another S3-compatible provider, swap the Flydrive driver in `src/integrations/storage.ts` and keep the route code using storage keys.
