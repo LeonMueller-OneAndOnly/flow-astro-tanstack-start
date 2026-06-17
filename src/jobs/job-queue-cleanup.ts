@@ -13,6 +13,7 @@ const ZJobQueueCleanupPayload = z.object({
 });
 
 export const jobQueueCleanupJob = jobs.defineJob({
+  importMeta: import.meta,
   name: "job-queue-cleanup",
   schema: ZJobQueueCleanupPayload,
   async handler({ completedRetentionMs, failedRetentionMs }) {

@@ -45,7 +45,14 @@ export type JobHandler<TPayload> = (
   context: JobQueueContext<TPayload>,
 ) => unknown;
 
+type HotImportMeta = ImportMeta & {
+  hot?: {
+    accept: () => void;
+  };
+};
+
 export type DefineJobOptions<TName extends string, TSchema extends z.ZodTypeAny> = {
+  importMeta?: HotImportMeta;
   name: TName;
   schema: TSchema;
   handler: JobHandler<z.output<TSchema>>;
@@ -164,6 +171,8 @@ export function createJobRegistry(): JobRegistry {
 
   return {
     defineJob(options) {
+      options.importMeta?.hot?.accept();
+
       const job = createDefinedJob(options, (cron) => {
         if (!import.meta.hot && crons.has(cron.key)) {
           throw new Error(`Cron job key already registered: ${cron.key}`);

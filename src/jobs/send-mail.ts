@@ -11,6 +11,7 @@ const ZSendMailJobPayload = z.object({
 });
 
 export const sendMailJob = jobs.defineJob({
+  importMeta: import.meta,
   name: "send-mail",
   schema: ZSendMailJobPayload,
   async handler({ mail, reason, transport }) {
