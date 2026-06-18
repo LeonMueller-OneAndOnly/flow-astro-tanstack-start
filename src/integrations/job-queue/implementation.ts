@@ -9,7 +9,7 @@ import { z } from "zod";
 import { db } from "../../db/client";
 import { Result } from "../../app/lib/result";
 import { jobQueueCronSchedules, jobQueueJobs } from "../../db/schema";
-import type { TQueueName } from "src/jobs/registry";
+import type { TQueueName } from "src/integrations/job-queue/registry";
 
 export type JobQueueStatus = "pending" | "running" | "completed" | "failed";
 

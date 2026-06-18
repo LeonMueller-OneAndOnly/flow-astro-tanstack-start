@@ -1,4 +1,4 @@
-import "../../jobs/registry";
+import "./registry";
 import { Result } from "../../app/lib/result";
 import { createJobQueueWorker } from "./implementation";
 import { jobs } from ".";

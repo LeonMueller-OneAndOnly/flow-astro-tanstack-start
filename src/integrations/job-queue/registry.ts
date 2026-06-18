@@ -1,6 +1,6 @@
 import type { DefinedJob } from "src/integrations/job-queue/implementation";
-import { jobQueueCleanupJob } from "./job-queue-cleanup";
-import { sendMailJob } from "./send-mail";
+import { jobQueueCleanupJob } from "../../jobs/job-queue-cleanup";
+import { sendMailJob } from "../../jobs/send-mail";
 import type z from "zod";
 
 export const jobQueueNames = ["job-queue-cleanup", "send-mail"] as const;
