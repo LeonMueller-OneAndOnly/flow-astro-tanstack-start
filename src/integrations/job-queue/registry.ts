@@ -11,6 +11,10 @@ type TJobRegistryMap = {
   [TName in TQueueName]: DefinedJob<TName, z.ZodSchema<any>>;
 };
 
+/**
+ * This map ensures all modules that register a job queue also get loaded when starting the job queue.
+ * This module is imported in src/integrations/job-queue/worker.ts
+ */
 export const jobRegistryMap: TJobRegistryMap = {
   [jobQueueCleanupJob.name]: jobQueueCleanupJob,
   [sendMailJob.name]: sendMailJob,
