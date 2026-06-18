@@ -1,8 +1,7 @@
+import "../../jobs/registry";
 import { Result } from "../../app/lib/result";
 import { createJobQueueWorker } from "./implementation";
 import { jobs } from ".";
-import "../../jobs/job-queue-cleanup";
-import "../../jobs/send-mail";
 
 const worker = createJobQueueWorker(jobs, {
   concurrency: 1,
