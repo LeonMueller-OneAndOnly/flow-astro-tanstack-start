@@ -78,12 +78,14 @@ export default defineConfig({
         context: "server",
         access: "public",
         optional: false,
+        default: "localhost:4321",
       }),
       // Optional dev server port override.
       PORT: envField.string({
         context: "server",
         access: "public",
         optional: false,
+        default: "4321",
       }),
       // SQLite/libSQL database connection URL. Defaults to a local SQLite file under ./data.
       DATABASE_URL: envField.string({
