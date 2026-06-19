@@ -20,7 +20,7 @@ pnpm-debug.log*
 .env.production
 
 # local databases
-data/
+data/*
 *.db
 *.db-shm
 *.db-wal
