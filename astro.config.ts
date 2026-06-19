@@ -22,7 +22,7 @@ const port = configuredPort ? Number(configuredPort) : undefined;
 const isProduction = appEnv === "production";
 const sitemapOptions = await getUnifiedSitemapOptions(appOrigin);
 const defaultDatabaseUrl = "file:./data/db.sqlite3";
-const defaultUploadsDir = ".data/user-uploads";
+const defaultUploadsDir = "data/user-uploads";
 
 // https://astro.build/config
 export default defineConfig({
@@ -94,7 +94,7 @@ export default defineConfig({
         optional: !isProduction,
       }),
       // Example file upload storage root for the Flydrive local filesystem driver.
-      // Use an absolute path or a path relative to the project root. Defaults to .data/user-uploads.
+      // Use an absolute path or a path relative to the project root. Defaults to data/user-uploads.
       UPLOADS_DIR: envField.string({
         context: "server",
         access: "secret",

@@ -40,6 +40,6 @@ The upload UI route is `src/app/routes/demo/start.uploads.tsx`, served at `/app/
 
 The upload API route is `src/app/routes/demo/api.uploads.ts`. `GET` lists uploads, `GET ?key=...` downloads one stored file, and `POST` accepts one `file` field. The example rejects missing files, empty files, and files larger than 5 MB.
 
-Local storage is configured in `src/integrations/storage.ts` using [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver. `UPLOADS_DIR` may be set to an absolute path or a path relative to the project root; when unset, it defaults to `.data/user-uploads`. `UPLOADS_DIR` is defined in the Astro env schema in `astro.config.ts`.
+Local storage is configured in `src/integrations/storage.ts` using [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver. `UPLOADS_DIR` may be set to an absolute path or a path relative to the project root; when unset, it defaults to `data/user-uploads`. `UPLOADS_DIR` is defined in the Astro env schema in `astro.config.ts`.
 
 The demo stores metadata in the `demo_user_uploads` table via the `demoUserUploads` schema export in `src/db/schema.ts`. Stored object keys use the `demo-uploads/<uuid>/<safe-name>` shape, and downloads verify both the database record and local file exist. For production, attach ownership/authorization and persist stable storage keys, not generated URLs or local paths. To migrate to S3, R2, or another S3-compatible provider, swap the Flydrive driver in `src/integrations/storage.ts` and keep the route code using storage keys.
