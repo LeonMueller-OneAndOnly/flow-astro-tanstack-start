@@ -21,6 +21,7 @@ const port = configuredPort ? Number(configuredPort) : undefined;
 
 const isProduction = appEnv === "production";
 const sitemapOptions = await getUnifiedSitemapOptions(appOrigin);
+
 const defaultDatabaseUrl = "file:./data/db.sqlite3";
 const defaultUploadsDir = "data/user-uploads";
 

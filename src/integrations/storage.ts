@@ -20,7 +20,11 @@ export function getLocalFilesystemDisk() {
 }
 
 export function getUploadDir() {
-  const uploadsDir = UPLOADS_DIR?.trim() || ".data/user-uploads";
+  const uploadsDir = UPLOADS_DIR?.trim();
+
+  if (!uploadsDir) {
+    throw new Error("UPLOADS_DIR is not configured in env");
+  }
 
   return path.isAbsolute(uploadsDir) ? uploadsDir : path.resolve(process.cwd(), uploadsDir);
 }
