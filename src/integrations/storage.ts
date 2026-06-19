@@ -20,11 +20,7 @@ export function getLocalFilesystemDisk() {
 }
 
 export function getUploadDir() {
-  const uploadsDir = UPLOADS_DIR?.trim();
-
-  if (!uploadsDir) {
-    throw new Error("UPLOADS_DIR must be set before using local upload storage.");
-  }
+  const uploadsDir = UPLOADS_DIR?.trim() || ".data/user-uploads";
 
   return path.isAbsolute(uploadsDir) ? uploadsDir : path.resolve(process.cwd(), uploadsDir);
 }

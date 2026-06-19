@@ -4,11 +4,7 @@ import { defineConfig } from "drizzle-kit";
 
 const configEnv = loadConfigEnv();
 
-const databaseUrl = process.env.DATABASE_URL ?? configEnv.DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is required to run Drizzle Kit commands");
-}
+const databaseUrl = process.env.DATABASE_URL ?? configEnv.DATABASE_URL ?? "file:./data/db.sqlite3";
 
 export default defineConfig({
   schema: "./src/db/schema.ts",
