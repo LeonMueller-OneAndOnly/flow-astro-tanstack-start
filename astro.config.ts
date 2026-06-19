@@ -11,6 +11,7 @@ import typesafeRoutes from "astro-typesafe-routes";
 import { astroGrab } from "astro-grab";
 import { loadConfigEnv } from "./src/app/lib/config-env";
 import { getUnifiedSitemapOptions } from "./src/app/lib/sitemap";
+import { composeAstroTanStackBuild } from "./src/integrations/compose-astro-tanstack-build";
 
 const configEnv = loadConfigEnv();
 const appEnv = process.env.APP_ENV ?? configEnv.APP_ENV;
@@ -40,14 +41,16 @@ export default defineConfig({
       "import.meta.env.APP_ENV": JSON.stringify(appEnv),
     },
     plugins: [
-      tanstackStart({
-        srcDirectory: "./src/app",
-        router: {
-          basepath: "app",
-        },
-        pages: sitemapOptions.tanstackStart.pages,
-        sitemap: sitemapOptions.tanstackStart.sitemap,
-      }),
+      ...composeAstroTanStackBuild(
+        tanstackStart({
+          srcDirectory: "./src/app",
+          router: {
+            basepath: "app",
+          },
+          pages: sitemapOptions.tanstackStart.pages,
+          sitemap: sitemapOptions.tanstackStart.sitemap,
+        }),
+      ),
       viteTsConfigPaths(),
       tailwindcss(),
     ],
