@@ -25,6 +25,7 @@ pnpm-debug.log*
 *.db-wal
 
 data/*
+!data/.gitkeep
 
 # macOS-specific files
 .DS_Store
