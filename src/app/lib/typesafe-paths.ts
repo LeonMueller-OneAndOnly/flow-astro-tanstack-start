@@ -33,7 +33,7 @@ export function $appPath<const TTo extends AppRouteTo>(
 }
 
 type FileRoutePath = Extract<keyof FileRoutesByPath, string>;
-type AppRouteTo = FileRoutePath | TrimIndexRoute<FileRoutePath>;
+type AppRouteTo = "/" | FileRoutePath | TrimIndexRoute<FileRoutePath>;
 type PathParamValue = string | number | boolean;
 
 type TrimIndexRoute<TPath extends string> = TPath extends `${infer TPrefix}/` ? TPrefix : TPath;
