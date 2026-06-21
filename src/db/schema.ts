@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { blob, index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -91,7 +91,7 @@ export const jobQueueJobs = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
     name: text("name", { length: 255 }).notNull(),
-    payload: text("payload").notNull(),
+    payload: blob("payload", { mode: "buffer" }).notNull(),
     status: text("status", { length: 32 }).notNull().default("pending"),
     priority: integer("priority").notNull().default(0),
     attempt: integer("attempt").notNull().default(0),
@@ -103,7 +103,7 @@ export const jobQueueJobs = sqliteTable(
     startedAt: integer("started_at"),
     completedAt: integer("completed_at"),
     failedAt: integer("failed_at"),
-    result: text("result"),
+    result: blob("result", { mode: "buffer" }),
     lastError: text("last_error"),
     createdAt: integer("created_at").notNull(),
     updatedAt: integer("updated_at").notNull(),
@@ -128,7 +128,7 @@ export const jobQueueCronSchedules = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
     key: text("key", { length: 255 }),
     name: text("name", { length: 255 }).notNull(),
-    payload: text("payload").notNull(),
+    payload: blob("payload", { mode: "buffer" }).notNull(),
     cron: text("cron", { length: 255 }).notNull(),
     timezone: text("timezone", { length: 255 }),
     status: text("status", { length: 32 }).notNull().default("active"),

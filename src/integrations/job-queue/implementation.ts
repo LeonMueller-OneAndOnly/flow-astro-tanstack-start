@@ -134,7 +134,8 @@ export type CleanupJobQueueJobsResult = {
   deleted: number;
 };
 
-type ClaimedJobRow = typeof jobQueueJobs.$inferSelect;
+type JobQueueJobRow = typeof jobQueueJobs.$inferSelect;
+type ClaimedJobRow = Omit<JobQueueJobRow, "payload"> & { payload: string };
 
 type WorkerJob = {
   name: TQueueName;
@@ -164,6 +165,41 @@ type JobRetryOptions =
 const defaultWorkerId = `job-queue@${hostname()}-${process.pid}`;
 const defaultRetryBaseDelayMs = 30_000;
 const defaultRetryMaxDelayMs = 15 * 60_000;
+const claimedJobReturning = {
+  id: jobQueueJobs.id,
+  name: jobQueueJobs.name,
+  payload: sql<string>`json(${jobQueueJobs.payload})`,
+  status: jobQueueJobs.status,
+  priority: jobQueueJobs.priority,
+  attempt: jobQueueJobs.attempt,
+  maxAttempts: jobQueueJobs.maxAttempts,
+  cronScheduleId: jobQueueJobs.cronScheduleId,
+  availableAt: jobQueueJobs.availableAt,
+  lockedAt: jobQueueJobs.lockedAt,
+  lockedBy: jobQueueJobs.lockedBy,
+  startedAt: jobQueueJobs.startedAt,
+  completedAt: jobQueueJobs.completedAt,
+  failedAt: jobQueueJobs.failedAt,
+  result: jobQueueJobs.result,
+  lastError: jobQueueJobs.lastError,
+  createdAt: jobQueueJobs.createdAt,
+  updatedAt: jobQueueJobs.updatedAt,
+};
+const dueScheduleReturning = {
+  id: jobQueueCronSchedules.id,
+  key: jobQueueCronSchedules.key,
+  name: jobQueueCronSchedules.name,
+  payload: jobQueueCronSchedules.payload,
+  cron: jobQueueCronSchedules.cron,
+  timezone: jobQueueCronSchedules.timezone,
+  status: jobQueueCronSchedules.status,
+  priority: jobQueueCronSchedules.priority,
+  maxAttempts: jobQueueCronSchedules.maxAttempts,
+  lastEnqueuedAt: jobQueueCronSchedules.lastEnqueuedAt,
+  nextRunAt: jobQueueCronSchedules.nextRunAt,
+  createdAt: jobQueueCronSchedules.createdAt,
+  updatedAt: jobQueueCronSchedules.updatedAt,
+};
 
 export function createJobRegistry(): JobRegistry {
   const jobs = new Map<string, WorkerJob>();
@@ -365,7 +401,7 @@ async function enqueueJob<TSchema extends z.ZodTypeAny>(
     .insert(jobQueueJobs)
     .values({
       name,
-      payload: JSON.stringify(parsedPayload),
+      payload: sql`jsonb(${JSON.stringify(parsedPayload)})`,
       status: "pending",
       cronScheduleId: options.cronScheduleId,
       priority: options.priority ?? 0,
@@ -396,7 +432,7 @@ async function scheduleJob<TSchema extends z.ZodTypeAny>(
     .values({
       key: key ?? `${name}:${randomUUID()}`,
       name,
-      payload: JSON.stringify(parsedPayload),
+      payload: sql`jsonb(${JSON.stringify(parsedPayload)})`,
       cron,
       timezone: options.timezone,
       status: "active",
@@ -422,7 +458,7 @@ async function syncRegisteredCronSchedules(crons: WorkerCron[]) {
       .values({
         key: cron.key,
         name: cron.job.name,
-        payload: JSON.stringify(parsedPayload),
+        payload: sql`jsonb(${JSON.stringify(parsedPayload)})`,
         cron: cron.cron,
         timezone: cron.options.timezone,
         status: "active",
@@ -436,7 +472,7 @@ async function syncRegisteredCronSchedules(crons: WorkerCron[]) {
         target: jobQueueCronSchedules.key,
         set: {
           name: cron.job.name,
-          payload: JSON.stringify(parsedPayload),
+          payload: sql`jsonb(${JSON.stringify(parsedPayload)})`,
           cron: cron.cron,
           timezone: cron.options.timezone,
           status: "active",
@@ -462,22 +498,18 @@ async function enqueueDueCronSchedules(limit: number, lockTimeoutMs: number) {
       and updated_at < ${staleBefore}
   `);
 
-  const dueSchedules = await db.all<typeof jobQueueCronSchedules.$inferSelect>(sql`
-    update ${jobQueueCronSchedules}
-    set
-      status = 'enqueuing',
-      last_enqueued_at = ${now},
-      updated_at = ${now}
-    where id in (
+  const dueSchedules = await db
+    .update(jobQueueCronSchedules)
+    .set({ status: "enqueuing", lastEnqueuedAt: now, updatedAt: now })
+    .where(sql`${jobQueueCronSchedules.id} in (
       select id
       from ${jobQueueCronSchedules}
-      where status = 'active'
-        and next_run_at <= ${now}
-      order by next_run_at asc, id asc
+      where ${jobQueueCronSchedules.status} = 'active'
+        and ${jobQueueCronSchedules.nextRunAt} <= ${now}
+      order by ${jobQueueCronSchedules.nextRunAt} asc, ${jobQueueCronSchedules.id} asc
       limit ${limit}
-    )
-    returning *
-  `);
+    )`)
+    .returning(dueScheduleReturning);
 
   for (const schedule of dueSchedules) {
     const nextRunAt = getNextCronRunAt(schedule.cron, schedule.timezone, new Date(now + 1));
@@ -506,23 +538,19 @@ async function claimJobs(limit: number, workerId: string): Promise<ClaimedJobRow
 
   const now = Date.now();
 
-  return db.all(sql<ClaimedJobRow>`
-    update ${jobQueueJobs}
-    set
-      locked_at = ${now},
-      locked_by = ${workerId},
-      updated_at = ${now}
-    where id in (
+  return db
+    .update(jobQueueJobs)
+    .set({ lockedAt: now, lockedBy: workerId, updatedAt: now })
+    .where(sql`${jobQueueJobs.id} in (
       select id
       from ${jobQueueJobs}
-      where status = 'pending'
-        and locked_at is null
-        and available_at <= ${now}
-      order by priority desc, available_at asc, id asc
+      where ${jobQueueJobs.status} = 'pending'
+        and ${jobQueueJobs.lockedAt} is null
+        and ${jobQueueJobs.availableAt} <= ${now}
+      order by ${jobQueueJobs.priority} desc, ${jobQueueJobs.availableAt} asc, ${jobQueueJobs.id} asc
       limit ${limit}
-    )
-    returning *
-  `);
+    )`)
+    .returning(claimedJobReturning);
 }
 
 async function processJob(
@@ -577,20 +605,22 @@ async function processJob(
 
 async function startJob(id: number, workerId: string): Promise<ClaimedJobRow | undefined> {
   const now = Date.now();
-  const [job] = await db.all(sql<ClaimedJobRow>`
-    update ${jobQueueJobs}
-    set
-      status = 'running',
-      locked_at = ${now},
-      locked_by = ${workerId},
-      started_at = ${now},
-      attempt = attempt + 1,
-      updated_at = ${now}
-    where id = ${id}
-      and status = 'pending'
-      and locked_by = ${workerId}
-    returning *
-  `);
+  const [job] = await db
+    .update(jobQueueJobs)
+    .set({
+      status: "running",
+      lockedAt: now,
+      lockedBy: workerId,
+      startedAt: now,
+      attempt: sql`${jobQueueJobs.attempt} + 1`,
+      updatedAt: now,
+    })
+    .where(
+      sql`${jobQueueJobs.id} = ${id}
+        and ${jobQueueJobs.status} = 'pending'
+        and ${jobQueueJobs.lockedBy} = ${workerId}`,
+    )
+    .returning(claimedJobReturning);
 
   return job as ClaimedJobRow | undefined;
 }
@@ -613,7 +643,7 @@ async function completeJob(id: number, result: unknown) {
       completedAt: now,
       lockedAt: null,
       lockedBy: null,
-      result: JSON.stringify(result ?? null),
+      result: sql`jsonb(${JSON.stringify(result ?? null)})`,
       updatedAt: now,
     })
     .where(eq(jobQueueJobs.id, id));

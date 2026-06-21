@@ -2,7 +2,7 @@ import z from "zod";
 
 const ZMailAttachment = z.object({
   filename: z.string().optional(),
-  content: z.any(),
+  content: z.string(),
   contentType: z.string().optional(),
   encoding: z.string().optional(),
 });
@@ -21,7 +21,7 @@ export const ZMail = z.object({
   icalEvent: z
     .object({
       filename: z.string(),
-      content: z.any(),
+      content: z.string(),
       method: z.string(),
     })
     .optional(),

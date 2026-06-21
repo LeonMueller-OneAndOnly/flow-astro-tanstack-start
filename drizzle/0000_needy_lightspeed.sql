@@ -39,7 +39,7 @@ CREATE TABLE `job_queue_cron_schedules` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`key` text(255),
 	`name` text(255) NOT NULL,
-	`payload` text NOT NULL,
+	`payload` blob NOT NULL,
 	`cron` text(255) NOT NULL,
 	`timezone` text(255),
 	`status` text(32) DEFAULT 'active' NOT NULL,
@@ -57,7 +57,7 @@ CREATE INDEX `job_queue_cron_schedules_name_idx` ON `job_queue_cron_schedules` (
 CREATE TABLE `job_queue_jobs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text(255) NOT NULL,
-	`payload` text NOT NULL,
+	`payload` blob NOT NULL,
 	`status` text(32) DEFAULT 'pending' NOT NULL,
 	`priority` integer DEFAULT 0 NOT NULL,
 	`attempt` integer DEFAULT 0 NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE `job_queue_jobs` (
 	`started_at` integer,
 	`completed_at` integer,
 	`failed_at` integer,
-	`result` text,
+	`result` blob,
 	`last_error` text,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL

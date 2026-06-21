@@ -255,7 +255,7 @@
         },
         "payload": {
           "name": "payload",
-          "type": "text",
+          "type": "blob",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -368,7 +368,7 @@
         },
         "payload": {
           "name": "payload",
-          "type": "text",
+          "type": "blob",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -456,7 +456,7 @@
         },
         "result": {
           "name": "result",
-          "type": "text",
+          "type": "blob",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
