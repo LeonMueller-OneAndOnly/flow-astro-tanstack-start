@@ -130,6 +130,13 @@ export default defineConfig({
         access: "public",
         optional: true,
       }),
+      // Local/test mail preview behavior. "auto" stores previews through omnisd when available and falls back to browser preview.
+      MAIL_PREVIEW_MODE: envField.enum({
+        context: "server",
+        access: "secret",
+        values: ["auto", "omnis", "browser", "disabled"],
+        default: "auto",
+      }),
     },
   },
 });

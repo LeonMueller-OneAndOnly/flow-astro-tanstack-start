@@ -11,8 +11,8 @@ import nodemailer from "nodemailer";
 
 import { htmlToText } from "nodemailer-html-to-text";
 
-import previewEmail_inBrowser from "preview-email";
 import { ZMail, type TMail } from "./types";
+import { previewMail } from "./preview";
 
 export const ZMailOutgoingMailer = z.object({ type: z.literal("internal") });
 
@@ -56,7 +56,7 @@ export async function handleJob_sendMail(input: {
   }
 
   if (input.transport === "preview-in-browser") {
-    await previewEmail_inBrowser(input.mail);
+    await previewMail({ mail: input.mail, reason: input.reason });
   }
 }
 
