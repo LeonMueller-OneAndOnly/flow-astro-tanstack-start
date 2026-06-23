@@ -19,7 +19,8 @@ const defaultAppEnv = "local";
 const appEnv = process.env.APP_ENV ?? configEnv.APP_ENV ?? defaultAppEnv;
 const isProduction = appEnv === "production";
 
-const configuredPort = process.env.PORT ?? configEnv.PORT ?? "4321";
+const defaultPort = "4321";
+const configuredPort = process.env.PORT ?? configEnv.PORT ?? defaultPort;
 const port = configuredPort ? Number(configuredPort) : undefined;
 
 const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN ?? `http://localhost:${port}`;
@@ -81,7 +82,7 @@ export default defineConfig({
         context: "server",
         access: "public",
         optional: false,
-        default: defaultAppOrigin,
+        default: appOrigin,
       }),
       // Optional dev server port override.
       PORT: envField.string({
