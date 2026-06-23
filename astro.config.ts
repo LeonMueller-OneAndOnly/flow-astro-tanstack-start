@@ -14,13 +14,17 @@ import { getUnifiedSitemapOptions } from "./src/app/lib/sitemap";
 import { composeAstroTanStackBuild } from "./src/integrations/compose-astro-tanstack-build";
 
 const configEnv = loadConfigEnv();
-const appEnv = process.env.APP_ENV ?? configEnv.APP_ENV;
-const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN;
 
-const configuredPort = process.env.PORT ?? configEnv.PORT;
+const defaultAppEnv = "local";
+const appEnv = process.env.APP_ENV ?? configEnv.APP_ENV ?? defaultAppEnv;
+const isProduction = appEnv === "production";
+
+const defaultPort = "4321";
+const configuredPort = process.env.PORT ?? configEnv.PORT ?? defaultPort;
 const port = configuredPort ? Number(configuredPort) : undefined;
 
-const isProduction = appEnv === "production";
+const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN ?? `http://localhost:${port}`;
+
 const sitemapOptions = await getUnifiedSitemapOptions(appOrigin);
 
 const defaultDatabaseUrl = "file:./data/db.sqlite3";
@@ -71,21 +75,21 @@ export default defineConfig({
       APP_ENV: envField.string({
         context: "server",
         access: "public",
-        default: "local",
+        default: defaultAppEnv,
       }),
       // Public canonical origin for Astro URLs and Better Auth-generated links.
       APP_ORIGIN: envField.string({
         context: "server",
         access: "public",
         optional: false,
-        default: "localhost:4321",
+        default: appOrigin,
       }),
       // Optional dev server port override.
       PORT: envField.string({
         context: "server",
         access: "public",
         optional: false,
-        default: "4321",
+        default: defaultPort,
       }),
       // SQLite/libSQL database connection URL. Defaults to a local SQLite file under ./data.
       DATABASE_URL: envField.string({
