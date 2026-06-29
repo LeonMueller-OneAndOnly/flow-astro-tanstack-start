@@ -59,7 +59,13 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         <Header />
-        {children}
+        {/*
+         * Page content gets its own stacking context via `isolate`, so route-level
+         * z-indices (e.g. the guitar cards' layered z-0/z-10) stay self-contained and
+         * never paint over the fixed chrome — the MenuBar (z-20) and the offcanvas
+         * Sidebar (z-10) live outside this wrapper and must always sit on top.
+         */}
+        <div className="isolate">{children}</div>
         <TanStackDevtools
           config={{
             position: "bottom-right",
