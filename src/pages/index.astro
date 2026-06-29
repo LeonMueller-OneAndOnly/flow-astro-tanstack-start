@@ -4,12 +4,12 @@ import { Image } from "astro:assets";
 import Header from "../app/components/Header";
 import { brandPageBackground } from "../app/lib/brand-theme";
 import { $appPath } from "../app/lib/typesafe-paths";
+import omnisImage from "../assets/demo/robot-standing-2-white.png";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 export const prerender = false;
 
 const demoHubHref = $appPath({ to: "/demo" });
-const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
 ---
 
 <BaseLayout
@@ -35,9 +35,10 @@ const omnisImageSrc = "/images/demo/robot-standing-2-white.png";
 
       <figure class="omnis-visual" aria-label="Omnis robot preview">
         <Image
-          src={omnisImageSrc}
-          width={1024}
-          height={1024}
+          src={omnisImage}
+          widths={[320, 420, 640, 840]}
+          sizes="(min-width: 960px) 360px, min(420px, 100vw)"
+          format="webp"
           alt="Omnis robot standing"
           class="omnis-image"
           loading="eager"
