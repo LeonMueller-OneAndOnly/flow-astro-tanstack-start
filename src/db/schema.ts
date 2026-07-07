@@ -2,8 +2,19 @@ import { sql } from "drizzle-orm";
 import { blob, index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // ── Better Auth tables ──────────────────────────────────────────────────────
-// These tables are owned by Better Auth. Keep them auth-only. Put application
-// user data in `profiles`, linked by `profiles.userId -> authUsers.id`.
+/**
+ * Better Auth owns the auth_* tables below. Keep them limited to authentication
+ * identity, sessions, linked accounts, and verification tokens.
+ *
+ * Application/domain user data belongs in app-owned tables that reference
+ * authUsers.id. Use `profiles` for generic profile data; create domain-specific
+ * tables for billing, organizations, customer records, CRM notes, preferences,
+ * product data, etc.
+ *
+ * Only add Better Auth `additionalFields` for auth-adjacent values that must be
+ * available through Better Auth/session APIs. Security-sensitive fields such as
+ * role, isAdmin, or isBanned must set `input: false` in Better Auth config.
+ */
 export const authUsers = sqliteTable("auth_users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
