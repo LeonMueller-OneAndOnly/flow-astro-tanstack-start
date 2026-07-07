@@ -1,7 +1,10 @@
 import { sql } from "drizzle-orm";
 import { blob, index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
-export const user = sqliteTable("user", {
+// ── Better Auth tables ──────────────────────────────────────────────────────
+// These tables are owned by Better Auth. Keep them auth-only. Put application
+// user data in `profiles`, linked by `profiles.userId -> authUsers.id`.
+export const authUsers = sqliteTable("auth_users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
@@ -13,13 +16,13 @@ export const user = sqliteTable("user", {
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 });
 
-export const session = sqliteTable(
-  "session",
+export const authSessions = sqliteTable(
+  "auth_sessions",
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
+      .references(() => authUsers.id, { onDelete: "cascade" }),
     token: text("token").notNull().unique(),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
     ipAddress: text("ip_address"),
@@ -27,16 +30,16 @@ export const session = sqliteTable(
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
-  (table) => [index("session_user_id_idx").on(table.userId)],
+  (table) => [index("auth_sessions_user_id_idx").on(table.userId)],
 );
 
-export const account = sqliteTable(
-  "account",
+export const authAccounts = sqliteTable(
+  "auth_accounts",
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
+      .references(() => authUsers.id, { onDelete: "cascade" }),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     accessToken: text("access_token"),
@@ -49,10 +52,10 @@ export const account = sqliteTable(
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
-  (table) => [index("account_user_id_idx").on(table.userId)],
+  (table) => [index("auth_accounts_user_id_idx").on(table.userId)],
 );
 
-export const verification = sqliteTable("verification", {
+export const authVerifications = sqliteTable("auth_verifications", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
@@ -61,6 +64,35 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }),
 });
 
+// Better Auth's logical model names are singular. These aliases let the Drizzle
+// adapter resolve those logical names while the database keeps explicit auth_*
+// table names. Query app code should prefer the auth* exports above.
+export const user = authUsers;
+export const session = authSessions;
+export const account = authAccounts;
+export const verification = authVerifications;
+
+// ── App-owned user data ─────────────────────────────────────────────────────
+// Put product/domain user fields here instead of Better Auth's authUsers table.
+export const profiles = sqliteTable(
+  "profiles",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .unique()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
+    displayName: text("display_name"),
+    timezone: text("timezone"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("profiles_user_id_idx").on(table.userId)],
+);
+
+// ── Demo tables ─────────────────────────────────────────────────────────────
 export const demoUserUploads = sqliteTable(
   "demo_user_uploads",
   {
@@ -86,6 +118,7 @@ export const demoTodos = sqliteTable(
   (table) => [index("demo_todos_created_at_idx").on(table.createdAt)],
 );
 
+// ── Infrastructure tables ──────────────────────────────────────────────────
 export const jobQueueJobs = sqliteTable(
   "job_queue_jobs",
   {

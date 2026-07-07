@@ -15,8 +15,26 @@ export const auth = betterAuth({
   secret: process.env.SESSION_SECRET_KEY,
   database: drizzleAdapter(db, {
     provider: "sqlite",
-    schema,
+    schema: {
+      ...schema,
+      user: schema.authUsers,
+      session: schema.authSessions,
+      account: schema.authAccounts,
+      verification: schema.authVerifications,
+    },
   }),
+  user: {
+    modelName: "auth_users",
+  },
+  session: {
+    modelName: "auth_sessions",
+  },
+  account: {
+    modelName: "auth_accounts",
+  },
+  verification: {
+    modelName: "auth_verifications",
+  },
   emailAndPassword: {
     enabled: true,
   },

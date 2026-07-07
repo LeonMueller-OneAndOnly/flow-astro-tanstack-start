@@ -10,6 +10,18 @@ Prefer hardcoded defaults. Add env variables only for secrets or deployment-spec
 Document every env variable in `astro.config.ts`.
 Do not create helper functions unless they are reused or encapsulate complex code.
 
+## Auth/data model boundary
+
+Better Auth owns authentication tables only:
+- `auth_users`
+- `auth_sessions`
+- `auth_accounts`
+- `auth_verifications`
+
+Do not store application/domain data in Better Auth tables. Put app-specific user data in app-owned tables that reference `auth_users.id`; use `profiles` for generic profile data.
+
+Only add Better Auth `additionalFields` for auth-adjacent fields needed in sessions, such as `role` or `isBanned`. Security-sensitive additional fields must set `input: false` in Better Auth config. Do not add billing, customer, organization, preferences, CRM, or product data directly to the Better Auth tables.
+
 # Framework
 
 This project uses Astro plus TanStack Start. TanStack Start is mounted under `/app`.
