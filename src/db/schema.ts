@@ -75,14 +75,6 @@ export const authVerifications = sqliteTable("auth_verifications", {
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }),
 });
 
-// Better Auth's logical model names are singular. These aliases let the Drizzle
-// adapter resolve those logical names while the database keeps explicit auth_*
-// table names. Query app code should prefer the auth* exports above.
-export const user = authUsers;
-export const session = authSessions;
-export const account = authAccounts;
-export const verification = authVerifications;
-
 // ── App-owned user data ─────────────────────────────────────────────────────
 // Put product/domain user fields here instead of Better Auth's authUsers table.
 export const profiles = sqliteTable(
