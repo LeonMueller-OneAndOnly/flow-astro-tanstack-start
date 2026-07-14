@@ -1,0 +1,12 @@
+---
+import Header from "../app/components/Header";
+import NotFound from "../app/components/NotFound";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+export const prerender = false;
+---
+
+<BaseLayout title="Page not found | Omnis" description="The requested page could not be found.">
+  <Header variant="site" client:load />
+  <NotFound />
+</BaseLayout>
