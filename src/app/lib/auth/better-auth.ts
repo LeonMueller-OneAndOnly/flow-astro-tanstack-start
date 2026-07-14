@@ -10,7 +10,7 @@ import * as schema from "../../../db/schema";
 import { authBasePath } from "./auth-config";
 
 export const auth = betterAuth({
-  appName: "Astro TanStack Start",
+  appName: "Omnis Start",
   basePath: authBasePath,
   baseURL: APP_ORIGIN,
   secret: SESSION_SECRET_KEY,
@@ -53,7 +53,7 @@ async function sendMagicLink(input: { email: string; url: string }) {
   await sendMail({
     mail: {
       to: input.email,
-      subject: "Sign in to Astro TanStack Start",
+      subject: "Sign in to Omnis Start",
       text: `Open this link to sign in: ${input.url}`,
       html: `<p>Open this link to sign in:</p><p><a href="${input.url}">${input.url}</a></p>`,
     },

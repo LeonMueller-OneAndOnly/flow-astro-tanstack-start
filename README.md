@@ -1,4 +1,4 @@
-# Astro TanStack Start
+# Omnis Start
 
 This repository is a framework starter, not a real application.
 
