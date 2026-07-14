@@ -1,4 +1,5 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { APP_ORIGIN, SESSION_SECRET_KEY } from "astro:env/server";
 import { betterAuth } from "better-auth";
 import { magicLink, username } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
@@ -11,8 +12,8 @@ import { authBasePath } from "./auth-config";
 export const auth = betterAuth({
   appName: "Astro TanStack Start",
   basePath: authBasePath,
-  baseURL: process.env.APP_ORIGIN,
-  secret: process.env.SESSION_SECRET_KEY,
+  baseURL: APP_ORIGIN,
+  secret: SESSION_SECRET_KEY,
   database: drizzleAdapter(db, {
     provider: "sqlite",
     schema: {
