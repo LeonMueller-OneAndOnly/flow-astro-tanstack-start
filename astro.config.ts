@@ -34,6 +34,11 @@ const defaultUploadsDir = "data/user-uploads";
 export default defineConfig({
   site: appOrigin,
   output: "server",
+  security: {
+    // Traefik terminates TLS, so Astro sees an internal HTTP request. Origin
+    // validation is performed against APP_ORIGIN in src/middleware.ts instead.
+    checkOrigin: false,
+  },
   adapter: node({
     mode: "standalone",
   }),
