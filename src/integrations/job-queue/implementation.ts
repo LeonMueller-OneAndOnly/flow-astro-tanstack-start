@@ -478,7 +478,12 @@ async function syncRegisteredCronSchedules(crons: WorkerCron[]) {
           status: "active",
           priority: cron.options.priority ?? 0,
           maxAttempts: cron.options.maxAttempts ?? 3,
-          nextRunAt,
+          // Preserve overdue runs across a worker restart. The next tick will enqueue
+          // the missed job once and advance this timestamp to the following run.
+          nextRunAt: sql`case
+            when ${jobQueueCronSchedules.nextRunAt} <= ${now} then ${jobQueueCronSchedules.nextRunAt}
+            else ${nextRunAt}
+          end`,
           updatedAt: now,
         },
       });
