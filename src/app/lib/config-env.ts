@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 import { parse } from "dotenv";
+import { Result } from "./result";
 
 type ConfigMode = "local" | "test" | "production";
 
@@ -8,7 +10,11 @@ export function loadConfigEnv() {
   const baseEnv = loadEnvFiles([".env"]);
   const mode = toConfigMode(process.env.APP_ENV ?? baseEnv.APP_ENV ?? getConfigMode());
 
-  return { ...baseEnv, ...loadEnvFiles(getModeEnvFiles(mode)) };
+  return {
+    ...baseEnv,
+    ...loadEnvFiles(getModeEnvFiles(mode)),
+    ...loadOmnisEnv(mode),
+  };
 }
 
 function loadEnvFiles(envFiles: Array<string>) {
@@ -21,6 +27,39 @@ function loadEnvFiles(envFiles: Array<string>) {
 
     return { ...env, ...parse(readFileSync(path)) };
   }, {});
+}
+
+function loadOmnisEnv(mode: ConfigMode) {
+  const result = spawnSync("omnisd", ["env", "export", `--${mode}`, "--format", "json"], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
+  if (result.status !== 0 || result.error) return {};
+
+  const parsed = parseOmnisEnv(result.stdout);
+  return parsed ?? {};
+}
+
+function parseOmnisEnv(value: string): Record<string, string> | null {
+  const decoded = Result.from(() => JSON.parse(value) as unknown);
+  if (
+    !decoded.success ||
+    !decoded.data ||
+    typeof decoded.data !== "object" ||
+    Array.isArray(decoded.data)
+  ) {
+    return null;
+  }
+
+  const entries = Object.entries(decoded.data);
+  if (
+    entries.some(
+      ([key, envValue]) => !/^[A-Z_][A-Z0-9_]*$/.test(key) || typeof envValue !== "string",
+    )
+  ) {
+    return null;
+  }
+  return Object.fromEntries(entries);
 }
 
 function getModeEnvFiles(mode: ConfigMode) {
