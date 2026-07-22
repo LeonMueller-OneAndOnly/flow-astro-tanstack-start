@@ -30,9 +30,7 @@ function loadEnvFiles(envFiles: Array<string>) {
 }
 
 function loadOmnisEnv(mode: ConfigMode) {
-  if (mode === "production") return {};
-
-  const result = spawnSync("omnisd", ["env", "export", "--purpose", mode, "--format", "json"], {
+  const result = spawnSync("omnisd", ["env", "export", `--${mode}`, "--format", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
   });
@@ -44,12 +42,21 @@ function loadOmnisEnv(mode: ConfigMode) {
 
 function parseOmnisEnv(value: string): Record<string, string> | null {
   const decoded = Result.from(() => JSON.parse(value) as unknown);
-  if (!decoded.success || !decoded.data || typeof decoded.data !== "object" || Array.isArray(decoded.data)) {
+  if (
+    !decoded.success ||
+    !decoded.data ||
+    typeof decoded.data !== "object" ||
+    Array.isArray(decoded.data)
+  ) {
     return null;
   }
 
   const entries = Object.entries(decoded.data);
-  if (entries.some(([key, envValue]) => !/^[A-Z_][A-Z0-9_]*$/.test(key) || typeof envValue !== "string")) {
+  if (
+    entries.some(
+      ([key, envValue]) => !/^[A-Z_][A-Z0-9_]*$/.test(key) || typeof envValue !== "string",
+    )
+  ) {
     return null;
   }
   return Object.fromEntries(entries);
