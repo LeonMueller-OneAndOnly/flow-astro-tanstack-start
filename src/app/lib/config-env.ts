@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { parse } from "dotenv";
-// register-config-env loads this module - and is used via node --import so the .ts ending is required here for node resolution to work correctly. The .ts ending is also required proper module resolution
+// .ts ending is required here - register-config-env.ts loads this module - and is itself preloaded during app start. Therefore it has to adhere to node typescript resolution rules
 import { Result } from "./result.ts";
 
 type ConfigMode = "local" | "test" | "production";
