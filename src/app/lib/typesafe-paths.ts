@@ -33,10 +33,15 @@ export function $appPath<const TTo extends AppRouteTo>(
 }
 
 type FileRoutePath = Extract<keyof FileRoutesByPath, string>;
-type AppRouteTo = "/" | FileRoutePath | TrimIndexRoute<FileRoutePath>;
+type AppRouteTo =
+  | "/"
+  | FileRoutePath
+  | TrimIndexRoute<FileRoutePath>
+  | TrimSplatRoute<FileRoutePath>;
 type PathParamValue = string | number | boolean;
 
 type TrimIndexRoute<TPath extends string> = TPath extends `${infer TPrefix}/` ? TPrefix : TPath;
+type TrimSplatRoute<TPath extends string> = TPath extends `${infer TPrefix}/$` ? TPrefix : TPath;
 type PathParamName<TName extends string> = TName extends "" ? "_splat" : TName;
 type PathParamNames<TPath extends string> = TPath extends `${string}$${infer TName}/${infer TRest}`
   ? PathParamName<TName> | PathParamNames<`/${TRest}`>
