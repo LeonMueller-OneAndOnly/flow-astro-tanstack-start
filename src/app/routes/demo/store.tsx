@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useStore } from "@tanstack/react-store";
+import { useSelector } from "@tanstack/react-store";
 
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/demo/store")({
 });
 
 function FirstNameField() {
-  const firstName = useStore(demoStore, (state) => state.firstName);
+  const firstName = useSelector(demoStore, (state) => state.firstName);
   return (
     <div className="space-y-1.5">
       <Label id="firstName-label" htmlFor="firstName">
@@ -36,7 +36,7 @@ function FirstNameField() {
 }
 
 function LastNameField() {
-  const lastName = useStore(demoStore, (state) => state.lastName);
+  const lastName = useSelector(demoStore, (state) => state.lastName);
   return (
     <div className="space-y-1.5">
       <Label id="lastName-label" htmlFor="lastName">
@@ -55,7 +55,7 @@ function LastNameField() {
 }
 
 function FullNameField() {
-  const fName = useStore(demoStore, (s) => `${s.firstName} ${s.lastName}`);
+  const fName = useSelector(demoStore, (s) => `${s.firstName} ${s.lastName}`);
   return (
     <div className="space-y-1.5">
       <Label className="gap-2">
@@ -82,9 +82,9 @@ function DemoStore() {
         </p>
         <h1 className="mb-5 text-3xl font-bold tracking-tight">Reactive store</h1>
         <DemoExplainer feature="TanStack Store + derived state">
-          Each field subscribes to its own slice with <code>useStore</code>, so typing in one input
-          re-renders only that field. <code>Full name</code> is a <code>Derived</code> value that
-          recomputes automatically whenever either name changes — no manual wiring.
+          Each field subscribes to its own slice with <code>useSelector</code>, so typing in one
+          input re-renders only that field. <code>Full name</code> is a <code>Derived</code> value
+          that recomputes automatically whenever either name changes — no manual wiring.
         </DemoExplainer>
         <div className="space-y-4">
           <FirstNameField />
