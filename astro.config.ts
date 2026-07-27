@@ -3,7 +3,6 @@ import { defineConfig, envField } from "astro/config";
 import node from "@astrojs/node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 
-import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
@@ -47,6 +46,9 @@ export default defineConfig({
   server: { host, port },
 
   vite: {
+    resolve: {
+      tsconfigPaths: true,
+    },
     define: {
       "import.meta.env.APP_ENV": JSON.stringify(appEnv),
     },
@@ -61,7 +63,6 @@ export default defineConfig({
           sitemap: sitemapOptions.tanstackStart.sitemap,
         }),
       ),
-      viteTsConfigPaths(),
       tailwindcss(),
     ],
   },
