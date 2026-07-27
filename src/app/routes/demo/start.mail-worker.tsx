@@ -27,7 +27,7 @@ type QueueMailResult =
   | { success: false; error: string };
 
 const queueMail = createServerFn({ method: "POST" })
-  .inputValidator((data: MailWorkerInput) => data)
+  .validator((data: MailWorkerInput) => data)
   .handler(async ({ data }): Promise<QueueMailResult> => {
     const parsedInput = ZMailWorkerInput.safeParse(data);
 
@@ -101,7 +101,10 @@ function MailWorkerTestPage() {
             Submitting this form inserts a <code>send-mail</code> job. The background worker should
             pick it up and open the generated email preview.
           </p>
-          <DemoExplainer feature="Server function → background job queue" className="mt-6 max-w-2xl">
+          <DemoExplainer
+            feature="Server function → background job queue"
+            className="mt-6 max-w-2xl"
+          >
             The form calls a POST server function that validates input with Zod and only{" "}
             <em>enqueues</em> a job — it returns immediately. A separate worker process drains the
             queue and does the slow work, so the request never blocks on sending mail.

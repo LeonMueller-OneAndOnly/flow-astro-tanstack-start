@@ -1,5 +1,5 @@
 import path from "node:path";
-import { getConfig, physicalGetRouteNodes } from "@tanstack/router-generator";
+import { getConfig, physicalGetRouteNodes, type Config } from "@tanstack/router-generator";
 
 const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
 const APP_BASE_PATH = "/app";
@@ -68,13 +68,28 @@ async function getAppSitemapPages(
 ): Promise<Array<AppSitemapPage>> {
   const routesDirectory = path.resolve(process.cwd(), "src/app/routes");
   const config = getConfig({ routesDirectory }, process.cwd());
-  const { routeNodes } = await physicalGetRouteNodes(config, process.cwd());
+  const { routeNodes } = await physicalGetRouteNodes(config, process.cwd(), {
+    indexTokenSegmentRegex: toTokenSegmentRegex(config.indexToken),
+    routeTokenSegmentRegex: toTokenSegmentRegex(config.routeToken),
+  });
 
   const pages = routeNodes
     .map(routeNodeToSitemapPage)
     .filter((page): page is AppSitemapPage => page !== null);
 
   return pages.filter((page) => filter(toSitemapPage(page.path)));
+}
+
+function toTokenSegmentRegex(token: Config["indexToken"]): RegExp {
+  const source =
+    typeof token === "string"
+      ? token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      : token instanceof RegExp
+        ? token.source
+        : token.regex;
+  const flags = typeof token === "string" ? undefined : token.flags?.replace(/[gy]/g, "");
+
+  return new RegExp(`^(?:${source})$`, flags);
 }
 
 function toSitemapPage(urlOrPath: string): SitemapFilterPage {

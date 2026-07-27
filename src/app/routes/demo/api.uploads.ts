@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 
 import { desc, eq } from "drizzle-orm";
 import { createFileRoute } from "@tanstack/react-router";
-import { json } from "@tanstack/react-start";
 
 import { db } from "../../../db/client";
 import { demoUserUploads } from "../../../db/schema";
@@ -30,7 +29,7 @@ export const Route = createFileRoute("/demo/api/uploads")({
           return downloadUpload(key);
         }
 
-        return json({
+        return Response.json({
           uploadsRoot: getUploadDir(),
           files: await listUploads(),
         });
@@ -40,15 +39,21 @@ export const Route = createFileRoute("/demo/api/uploads")({
         const file = formData.get("file");
 
         if (!(file instanceof File)) {
-          return json({ error: "Choose a file to upload." }, { status: 400 });
+          return Response.json({ error: "Choose a file to upload." }, { status: 400 });
         }
 
         if (file.size === 0) {
-          return json({ error: "Empty files are not accepted by this example." }, { status: 400 });
+          return Response.json(
+            { error: "Empty files are not accepted by this example." },
+            { status: 400 },
+          );
         }
 
         if (file.size > MAX_DEMO_UPLOAD_BYTES) {
-          return json({ error: "This example accepts files up to 5 MB." }, { status: 400 });
+          return Response.json(
+            { error: "This example accepts files up to 5 MB." },
+            { status: 400 },
+          );
         }
 
         const contentType = file.type || "application/octet-stream";
@@ -77,7 +82,7 @@ export const Route = createFileRoute("/demo/api/uploads")({
           })
           .returning();
 
-        return json({ file: serializeUpload(upload) }, { status: 201 });
+        return Response.json({ file: serializeUpload(upload) }, { status: 201 });
       },
     },
   },
@@ -111,7 +116,7 @@ async function downloadUpload(key: string) {
     .limit(1);
 
   if (!upload || !isDemoUploadKey(key) || !(await localFilesystemDisk.exists(key))) {
-    return json({ error: "File not found." }, { status: 404 });
+    return Response.json({ error: "File not found." }, { status: 404 });
   }
 
   const bytes = await localFilesystemDisk.getBytes(key);
