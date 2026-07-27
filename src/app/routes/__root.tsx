@@ -1,14 +1,14 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import { useEffect, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 
 import Header from "../components/Header";
 import NotFound from "../components/NotFound";
 
-import { DemoStoreDevtools } from "../lib/demo/demo-store-devtools";
-
 import appCss from "../../styles/globals.css?url";
+
+const Devtools = import.meta.env.DEV
+  ? lazy(async () => ({ default: (await import("../components/Devtools")).Devtools }))
+  : null;
 
 /**
  * Astro mounts this TanStack Start router under `/app` via `src/pages/app/[...slug].ts`.
@@ -58,18 +58,11 @@ function RootDocument({ children }: { children: ReactNode }) {
          */}
         <div className="isolate">{children}</div>
 
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            DemoStoreDevtools,
-          ]}
-        />
+        {Devtools ? (
+          <Suspense fallback={null}>
+            <Devtools />
+          </Suspense>
+        ) : null}
         <Scripts />
       </body>
     </html>
