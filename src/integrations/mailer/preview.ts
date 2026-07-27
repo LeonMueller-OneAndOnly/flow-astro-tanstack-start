@@ -44,7 +44,6 @@ export async function previewMail(input: { mail: TMail; reason: string }) {
     throw new Error(`Omnis mail preview failed: ${omnisPreview.error.message}`);
   }
 
-  console.warn("Omnis mail preview failed. Falling back to browser preview.", omnisPreview.error);
   await previewEmail(input.mail);
 }
 
