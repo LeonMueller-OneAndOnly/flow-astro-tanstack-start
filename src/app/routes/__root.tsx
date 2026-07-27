@@ -6,7 +6,7 @@ import { useEffect, type ReactNode } from "react";
 import Header from "../components/Header";
 import NotFound from "../components/NotFound";
 
-import StoreDevtools from "../lib/demo/demo-store-devtools";
+import { DemoStoreDevtools } from "../lib/demo/demo-store-devtools";
 
 import appCss from "../../styles/globals.css?url";
 
@@ -41,18 +41,7 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      void import("react-grab/core").then(({ init }) =>
-        init({
-          activationKey: (event) =>
-            event.code === "KeyC" &&
-            (/mac/i.test(navigator.userAgent) ? event.metaKey : event.ctrlKey),
-          activationMode: "toggle",
-        }),
-      );
-    }
-  }, []);
+  useMountReactGrab_duringDev();
 
   return (
     <html lang="en">
@@ -68,6 +57,7 @@ function RootDocument({ children }: { children: ReactNode }) {
          * Sidebar (z-10) live outside this wrapper and must always sit on top.
          */}
         <div className="isolate">{children}</div>
+
         <TanStackDevtools
           config={{
             position: "bottom-right",
@@ -77,11 +67,26 @@ function RootDocument({ children }: { children: ReactNode }) {
               name: "Tanstack Router",
               render: <TanStackRouterDevtoolsPanel />,
             },
-            StoreDevtools,
+            DemoStoreDevtools,
           ]}
         />
         <Scripts />
       </body>
     </html>
   );
+}
+
+function useMountReactGrab_duringDev() {
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      void import("react-grab/core").then(({ init }) =>
+        init({
+          activationKey: (event) =>
+            event.code === "KeyC" &&
+            (/mac/i.test(navigator.userAgent) ? event.metaKey : event.ctrlKey),
+          activationMode: "toggle",
+        }),
+      );
+    }
+  }, []);
 }

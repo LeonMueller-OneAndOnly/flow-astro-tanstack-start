@@ -6,7 +6,7 @@ import { DemoExplainer } from "@/components/DemoExplainer";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { brandPageBackground } from "@/lib/brand-theme";
-import { fullName, store } from "@/lib/demo/demo-store";
+import { demoStore } from "@/lib/demo/demo-store";
 
 const fieldClass =
   "w-full rounded-lg border border-border bg-card px-4 py-2 text-base text-foreground outline-none transition-colors duration-200 placeholder:text-muted-foreground hover:border-brand-primary-400 focus:border-brand-primary-500";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/demo/store")({
 });
 
 function FirstNameField() {
-  const firstName = useStore(store, (state) => state.firstName);
+  const firstName = useStore(demoStore, (state) => state.firstName);
   return (
     <div className="space-y-1.5">
       <Label id="firstName-label" htmlFor="firstName">
@@ -28,7 +28,7 @@ function FirstNameField() {
         aria-labelledby="firstName-label"
         type="text"
         value={firstName}
-        onChange={(e) => store.setState((state) => ({ ...state, firstName: e.target.value }))}
+        onChange={(e) => demoStore.setState((state) => ({ ...state, firstName: e.target.value }))}
         className={fieldClass}
       />
     </div>
@@ -36,7 +36,7 @@ function FirstNameField() {
 }
 
 function LastNameField() {
-  const lastName = useStore(store, (state) => state.lastName);
+  const lastName = useStore(demoStore, (state) => state.lastName);
   return (
     <div className="space-y-1.5">
       <Label id="lastName-label" htmlFor="lastName">
@@ -47,7 +47,7 @@ function LastNameField() {
         aria-labelledby="lastName-label"
         type="text"
         value={lastName}
-        onChange={(e) => store.setState((state) => ({ ...state, lastName: e.target.value }))}
+        onChange={(e) => demoStore.setState((state) => ({ ...state, lastName: e.target.value }))}
         className={fieldClass}
       />
     </div>
@@ -55,7 +55,7 @@ function LastNameField() {
 }
 
 function FullNameField() {
-  const fName = useStore(fullName);
+  const fName = useStore(demoStore, (s) => `${s.firstName} ${s.lastName}`);
   return (
     <div className="space-y-1.5">
       <Label className="gap-2">

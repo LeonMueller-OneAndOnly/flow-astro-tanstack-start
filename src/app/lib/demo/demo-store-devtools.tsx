@@ -1,13 +1,12 @@
 import { EventClient } from "@tanstack/devtools-event-client";
 import { useState, useEffect } from "react";
 
-import { store, fullName } from "./demo-store";
+import { demoStore } from "./demo-store";
 
 type EventMap = {
   "store-devtools:state": {
     firstName: string;
     lastName: string;
-    fullName: string;
   };
 };
 
@@ -21,19 +20,17 @@ class StoreDevtoolsEventClient extends EventClient<EventMap> {
 
 const sdec = new StoreDevtoolsEventClient();
 
-store.subscribe(() => {
+demoStore.subscribe(() => {
   sdec.emit("state", {
-    firstName: store.state.firstName,
-    lastName: store.state.lastName,
-    fullName: fullName.state,
+    firstName: demoStore.state.firstName,
+    lastName: demoStore.state.lastName,
   });
 });
 
 function DevtoolPanel() {
   const [state, setState] = useState<EventMap["store-devtools:state"]>(() => ({
-    firstName: store.state.firstName,
-    lastName: store.state.lastName,
-    fullName: fullName.state,
+    firstName: demoStore.state.firstName,
+    lastName: demoStore.state.lastName,
   }));
 
   useEffect(() => {
@@ -46,13 +43,11 @@ function DevtoolPanel() {
       <div className="text-sm">{state?.firstName}</div>
       <div className="text-sm font-bold text-gray-500 whitespace-nowrap">Last Name</div>
       <div className="text-sm">{state?.lastName}</div>
-      <div className="text-sm font-bold text-gray-500 whitespace-nowrap">Full Name</div>
-      <div className="text-sm">{state?.fullName}</div>
     </div>
   );
 }
 
-export default {
-  name: "TanStack Store",
+export const DemoStoreDevtools = {
+  name: "TanStack Demo Store",
   render: <DevtoolPanel />,
 };
