@@ -1,18 +1,13 @@
-import { Result } from "../../app/lib/result";
-import { z } from "zod";
-
-type NodeMailerTransporter = {
-  sendMail(mail: unknown, callback: (err: Error | null, info: unknown) => void): void;
-  use(step: string, plugin: unknown): void;
-  verify(callback: (error: Error | null, success: boolean) => void): void;
-};
-
+import { sendMailJob } from "src/jobs/send-mail";
 import nodemailer from "nodemailer";
 
 import { htmlToText } from "nodemailer-html-to-text";
 
 import { ZMail, type TMail } from "./types";
 import { previewMail } from "./preview";
+
+import { Result } from "../../app/lib/result";
+import { z } from "zod";
 
 export const ZMailOutgoingMailer = z.object({ type: z.literal("internal") });
 
@@ -42,7 +37,6 @@ export async function sendMail(input: {
 
   if (isTestEnv) return;
 
-  const { sendMailJob } = await import("../../jobs/send-mail");
   await sendMailJob.enqueue({ mail, reason: input.reason, transport }, { maxAttempts: 3 });
 }
 
@@ -150,6 +144,12 @@ function buildMailAttachments(mail: TMail) {
 
   return returnArr.length > 0 ? returnArr : undefined;
 }
+
+type NodeMailerTransporter = {
+  sendMail(mail: unknown, callback: (err: Error | null, info: unknown) => void): void;
+  use(step: string, plugin: unknown): void;
+  verify(callback: (error: Error | null, success: boolean) => void): void;
+};
 
 let defaultMailTransporter: NodeMailerTransporter | undefined;
 
