@@ -56,7 +56,7 @@ function MenuBar() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="relative z-20 flex items-center gap-2 bg-brand-primary-950 px-4 py-3 text-white shadow-lg">
+    <header className="fixed inset-x-0 top-0 z-20 flex h-14 items-center gap-2 bg-brand-primary-950 px-4 text-white shadow-lg">
       <button
         type="button"
         aria-label="Toggle menu"
@@ -65,12 +65,11 @@ function MenuBar() {
       >
         <Menu className="size-6" />
       </button>
-      <a href={$astroPath({ to: "/" })} className="ml-1 inline-flex items-center">
-        <img
-          src="/images/demo/flowoffice-schritmarke-light.svg"
-          alt="FlowOffice"
-          className="h-3.5 w-auto sm:h-4"
-        />
+      <a
+        href={$astroPath({ to: "/" })}
+        className="ml-1 text-xl font-semibold tracking-tight text-white"
+      >
+        Omnis
       </a>
     </header>
   );
@@ -150,7 +149,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
   };
 
   return (
-    <Sidebar collapsible="offcanvas" className="pt-16">
+    <Sidebar collapsible="offcanvas" className="pt-14">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">Navigation</div>
       </SidebarHeader>
@@ -281,6 +280,7 @@ export default function Header({ variant = "app" }: { variant?: HeaderVariant })
   return (
     <SidebarProvider defaultOpen={false} className="min-h-0 flex-col">
       <MenuBar />
+      <div aria-hidden="true" className="h-14 shrink-0" />
       <AppSidebar variant={variant} />
     </SidebarProvider>
   );
