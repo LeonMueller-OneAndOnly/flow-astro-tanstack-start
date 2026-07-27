@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/libsql/node";
 import { configureLocalSqlite, isLocalSqliteFileUrl } from "./local-sqlite";
 import * as schema from "./schema";
 
-export const libsql = createClient({
+const libsql = createClient({
   url: DATABASE_URL,
 });
 
