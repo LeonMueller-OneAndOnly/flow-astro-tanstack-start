@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, envField } from "astro/config";
+import path from "node:path";
 import node from "@astrojs/node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 
@@ -62,6 +63,7 @@ export default defineConfig({
           pages: sitemapOptions.tanstackStart.pages,
           sitemap: sitemapOptions.tanstackStart.sitemap,
         }),
+        path.resolve("src/app/client.tsx"),
       ),
       tailwindcss(),
     ],

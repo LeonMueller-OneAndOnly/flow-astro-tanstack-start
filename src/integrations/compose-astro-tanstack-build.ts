@@ -1,10 +1,15 @@
+import path from "node:path";
 import type { Plugin, PluginOption, UserConfig, ViteBuilder } from "vite";
 
 type BuilderOptions = NonNullable<UserConfig["builder"]>;
 type BuildApp = NonNullable<BuilderOptions["buildApp"]>;
 
-export function composeAstroTanStackBuild(tanstackPlugins: PluginOption): Array<PluginOption> {
+export function composeAstroTanStackBuild(
+  tanstackPlugins: PluginOption,
+  clientEntry: string,
+): Array<PluginOption> {
   let astroBuilder: BuilderOptions | undefined;
+  const resolvedClientEntry = path.resolve(clientEntry);
   const pluginStack = [tanstackPlugins];
   let manifestCapturePlugin: Plugin | undefined;
 
@@ -32,7 +37,14 @@ export function composeAstroTanStackBuild(tanstackPlugins: PluginOption): Array<
     typeof generateBundleHook === "function" ? generateBundleHook : generateBundleHook.handler;
   const guardedGenerateBundle: typeof generateBundleHandler = function (options, bundle, isWrite) {
     const isTanStackClientBuild = Object.values(bundle).some(
-      (entry) => entry.type === "chunk" && entry.isEntry && entry.name === "index",
+      (entry) =>
+        entry.type === "chunk" &&
+        entry.isEntry &&
+        [entry.facadeModuleId, ...entry.moduleIds].some((moduleId) => {
+          if (!moduleId) return false;
+          const cleanModuleId = moduleId.startsWith("\0") ? moduleId.slice(1) : moduleId;
+          return path.resolve(cleanModuleId.split("?", 1)[0]) === resolvedClientEntry;
+        }),
     );
 
     if (!isTanStackClientBuild) return;
@@ -56,12 +68,15 @@ export function composeAstroTanStackBuild(tanstackPlugins: PluginOption): Array<
     {
       name: "compose-astro-tanstack-build:compose",
       enforce: "post",
-      config(config) {
+      config(config, environment) {
         const tanstackBuilder = config.builder;
         const astroBuildApp: BuildApp | undefined = astroBuilder?.buildApp;
         const tanstackBuildApp: BuildApp | undefined = tanstackBuilder?.buildApp;
 
         if (!astroBuildApp || !tanstackBuildApp || astroBuilder === tanstackBuilder) {
+          if (environment.command === "build") {
+            throw new Error("Astro and TanStack Start build coordinators could not be composed");
+          }
           return;
         }
 
