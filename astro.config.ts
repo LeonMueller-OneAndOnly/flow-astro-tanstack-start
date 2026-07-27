@@ -24,8 +24,7 @@ const configuredPort = process.env.PORT ?? configEnv.PORT ?? defaultPort;
 const port = configuredPort ? Number(configuredPort) : undefined;
 const defaultHost = "127.0.0.1";
 const host = process.env.HOST ?? defaultHost;
-
-const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN ?? `http://localhost:${port}`;
+const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN ?? `http://${host}:${port}`;
 
 const sitemapOptions = await getUnifiedSitemapOptions(appOrigin);
 
