@@ -50,6 +50,7 @@ export default defineConfig({
     resolve: {
       tsconfigPaths: true,
     },
+    server: { allowedHosts: [new URL(appOrigin).hostname] },
     define: {
       "import.meta.env.APP_ENV": JSON.stringify(appEnv),
     },
