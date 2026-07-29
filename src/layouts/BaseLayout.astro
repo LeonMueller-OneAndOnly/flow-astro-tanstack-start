@@ -27,5 +27,17 @@ const {
   </head>
   <body>
     <slot />
+    {/* iOS Safari stops delivering pointer events to a React tree whose root
+        container has `display: contents` (facebook/react#29890), and Astro sets
+        exactly that on every island. Radix triggers open on `pointerdown` alone
+        (radix-ui/primitives#2580), so an island menu renders and then ignores
+        every tap on an iPhone. Attaching one no-op listener to the body is the
+        workaround from both threads: it makes WebKit deliver pointer events for
+        the whole document again. Inline and unbundled so it runs before any
+        island hydrates. Not needed in the TanStack Start shell under /app,
+        where React owns the document and no `display: contents` root exists. */}
+    <script is:inline>
+      document.body.addEventListener("pointerdown", () => {}, { passive: true });
+    </script>
   </body>
 </html>
