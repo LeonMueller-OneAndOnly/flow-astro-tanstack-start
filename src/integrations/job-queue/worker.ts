@@ -1,6 +1,6 @@
 import "./registry";
 import { Result } from "../../app/lib/result";
-import { createJobQueueWorker } from "./implementation";
+import { createJobQueueWorker, readHotApi } from "./implementation";
 import { jobs } from ".";
 
 const worker = createJobQueueWorker(jobs, {
@@ -19,10 +19,8 @@ export async function stopJobQueueWorker() {
 
 // ---------
 
-if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    void Result.fromAsync(() => worker.stop()).then((result) => {
-      if (!result.success) console.error("Failed to stop job queue worker", result.error);
-    });
+readHotApi(import.meta)?.dispose(() => {
+  void Result.fromAsync(() => worker.stop()).then((result) => {
+    if (!result.success) console.error("Failed to stop job queue worker", result.error);
   });
-}
+});

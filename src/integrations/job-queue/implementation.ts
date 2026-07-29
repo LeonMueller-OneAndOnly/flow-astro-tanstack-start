@@ -46,11 +46,24 @@ export type JobHandler<TPayload> = (
   context: JobQueueContext<TPayload>,
 ) => unknown;
 
-type HotImportMeta = ImportMeta & {
-  hot?: {
-    accept: () => void;
-  };
+type HotApi = {
+  accept: () => void;
+  dispose: (cb: () => void) => void;
 };
+
+type HotImportMeta = ImportMeta & {
+  hot?: HotApi;
+};
+
+/**
+ * Vite's module runner exposes `import.meta.hot` as a getter that *throws*
+ * ("[module runner] HMR client was closed") once the runner is torn down, which
+ * happens on every dev server restart. Optional chaining does not protect against
+ * a throwing getter, so the read itself has to be wrapped.
+ */
+export function readHotApi(meta: ImportMeta | undefined): HotApi | undefined {
+  return Result.from(() => (meta as HotImportMeta | undefined)?.hot).unwrapOr(undefined);
+}
 
 export type DefineJobOptions<TName extends TQueueName, TSchema extends z.ZodTypeAny> = {
   importMeta?: HotImportMeta;
@@ -208,10 +221,10 @@ export function createJobRegistry(): JobRegistry {
 
   return {
     defineJob(options) {
-      options.importMeta?.hot?.accept();
+      readHotApi(options.importMeta)?.accept();
 
       const job = createDefinedJob(options, (cron) => {
-        if (!import.meta.hot && crons.has(cron.key)) {
+        if (!import.meta.env.DEV && crons.has(cron.key)) {
           throw new Error(`Cron job key already registered: ${cron.key}`);
         }
 
@@ -219,7 +232,7 @@ export function createJobRegistry(): JobRegistry {
         version += 1;
       });
 
-      if (!import.meta.hot && jobs.has(job.name))
+      if (!import.meta.env.DEV && jobs.has(job.name))
         throw new Error(`Job already registered: ${job.name}`);
 
       jobs.set(job.name, toWorkerJob(job));
