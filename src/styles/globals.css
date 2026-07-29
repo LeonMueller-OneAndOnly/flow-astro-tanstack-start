@@ -179,6 +179,13 @@
 
   html {
     @apply min-h-dvh bg-background text-foreground;
+    /* `width=device-width` already buys fast tapping on iOS, but only at
+       initial scale: once the reader pinches in, every tap waits ~350 ms again
+       while Safari watches for a second one. `manipulation` is the documented
+       opt-in that holds at all zoom scales. It drops double-tap zoom and
+       nothing else; pinch zoom, and with it the ability to enlarge the page,
+       stays. https://webkit.org/blog/5610/more-responsive-tapping-on-ios/ */
+    touch-action: manipulation;
   }
 
   body {
