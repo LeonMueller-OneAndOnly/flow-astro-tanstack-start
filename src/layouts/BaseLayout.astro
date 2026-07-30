@@ -41,21 +41,10 @@ const preview = image
   : undefined;
 const previewUrl = new URL(preview?.src ?? SITE.fallbackImage, Astro.site).href;
 
-/**
- * Read from the path rather than taken as a prop, so a page cannot be added to
- * the sitemap and left indexable, or the reverse, by forgetting to pass anything.
- * `src/middleware.ts` marks the same paths with a header, but it never runs for a
- * prerendered page — the node adapter serves those as static files — so for a
- * mostly prerendered site this tag is the mechanism that does the work, and the
- * header covers the on-demand routes and the bodies with no head. Both read
- * `isContentPath`; a path that somehow gets both is no worse for it.
- */
-const robots = isContentPath(Astro.url.pathname) ? undefined : NOINDEX;
-
 const metaTags = buildMetaTags({
   title,
   description,
-  robots,
+  robots: isContentPath(Astro.url.pathname) ? undefined : NOINDEX,
   social: {
     url: canonical,
     imageUrl: previewUrl,
