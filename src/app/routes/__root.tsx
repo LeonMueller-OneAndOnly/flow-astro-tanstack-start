@@ -1,11 +1,11 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 
-import Header from "../components/Header";
-import NotFound from "../components/NotFound";
-import { buildMetaTags, HEAD_LINKS, SITE } from "../lib/framework/site-meta";
+import Header from "@/components/Header";
+import NotFound from "@/components/NotFound";
+import { buildMetaTags, HEAD_LINKS, SITE } from "@/lib/framework/site-meta";
 
-import appCss from "../../styles/globals.css?url";
+import appCss from "src/styles/globals.css?url";
 
 const Devtools = import.meta.env.DEV
   ? lazy(async () => ({ default: (await import("../components/Devtools")).Devtools }))
