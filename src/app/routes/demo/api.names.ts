@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-/** Served at `/app/demo/api/names`; TanStack route paths are mounted under Astro's `/app` catch-all. */
+/** Served at `/demo/api/names`. */
 export const Route = createFileRoute("/demo/api/names")({
   server: {
     handlers: {

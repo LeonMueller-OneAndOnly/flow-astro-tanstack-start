@@ -1,5 +1,5 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
-import { APP_ORIGIN, SESSION_SECRET_KEY } from "astro:env/server";
+import { APP_ORIGIN, SESSION_SECRET_KEY } from "../env";
 import { betterAuth } from "better-auth";
 import { magicLink, username } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";

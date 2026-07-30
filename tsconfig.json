@@ -1,13 +1,36 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "include": ["**/*"],
+  "exclude": ["dist", ".output", ".nitro", "node_modules"],
   "compilerOptions": {
+    // Ported from astro/tsconfigs/strict, which this used to extend.
+    // Top-level await and other modern ESM features.
+    "target": "ESNext",
+    "module": "ESNext",
+    // DOM libs came from Astro's own client types before; declared explicitly now.
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    // Module resolution without file extensions on relative paths.
+    "moduleResolution": "Bundler",
+    // Allow importing TypeScript files using their native extension — required by
+    // src/app/lib/register-config-env.ts, which Node preloads directly.
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    // Enforce type-only imports where needed, which avoids bundling issues.
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "strict": true,
+
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+
     "paths": {
       "@/*": ["./src/app/*"],
       "src/*": ["./src/*"]
-    },
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    }
   }
 }

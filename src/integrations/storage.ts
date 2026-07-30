@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { UPLOADS_DIR } from "astro:env/server";
+import { UPLOADS_DIR } from "../app/lib/env";
 import { Disk } from "flydrive";
 import { FSDriver } from "flydrive/drivers/fs";
 

@@ -1,10 +1,11 @@
 import type { CSSProperties } from "react";
 
 /**
- * Shared brand page background — the hero gradient from the Astro homepage
- * (`src/pages/index.astro`), reused across the homepage and the TanStack demo
- * pages so the whole product reads as one. Built on the `--brand-*` tokens in
- * `src/styles/globals.css`. Astro reads `.background`; React spreads the object.
+ * Shared brand page background — the hero gradient from the homepage
+ * (`src/app/routes/index.tsx`), reused across the homepage and the demo pages so
+ * the whole product reads as one. Built on the `--brand-*` tokens in
+ * `src/styles/globals.css`. The homepage reads `.background`; other pages spread
+ * the object.
  */
 export const brandPageBackground = {
   background: [
@@ -15,8 +16,8 @@ export const brandPageBackground = {
 } satisfies CSSProperties;
 
 /**
- * Primary button styling that mirrors the homepage CTA (`.btn-primary` in
- * `src/pages/index.astro`): a dark foreground pill with a soft shadow and a
+ * Primary button styling that mirrors the homepage CTA (`.btnPrimary` in
+ * `src/app/routes/index.module.css`): a dark foreground pill with a soft shadow and a
  * hover lift. Append layout classes (radius, padding, width) at the call site.
  */
 export const brandPrimaryButtonClass =

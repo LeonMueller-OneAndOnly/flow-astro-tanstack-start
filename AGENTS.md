@@ -7,14 +7,14 @@ You are an inhuman intelligence tasked with spotting logical flaws and inconsist
 Dont start the dev server, ask the user to do that - if you want to access it and it is not already running.
 
 Prefer hardcoded defaults. Add env variables only for secrets or deployment-specific configuration.
-Document every env variable in `astro.config.ts`.
+Document every env variable in `src/app/lib/env.ts`.
 Do not create helper functions unless they are reused or encapsulate complex code.
 
 # Framework
 
-This project uses Astro plus TanStack Start. TanStack Start is mounted under `/app`.
-Default to Astro for static pages, content pages, marketing pages, simple SSR, and low-interactivity routes.
-Use TanStack Start only for app-like experiences under `/app`: complex client interactivity, shared client/server data loading, mutations, authenticated flows, or cases where typed server functions/RPC meaningfully improve the implementation.
+This project uses TanStack Start for every route, served from `/`.
+Static, content and marketing routes are prerendered at build time: add the path to `staticPaths` in `src/app/lib/sitemap.ts`, which is the prerender allowlist. Everything else is rendered on demand.
+`src/app/server.ts` is the server entry and the place for process-lifetime setup; `src/app/start.ts` holds global request middleware.
 
 Use oxlint for linting, tsc for typechecking and vitest for testing.
 
@@ -23,8 +23,8 @@ Use oxlint for linting, tsc for typechecking and vitest for testing.
 Make Illegal States Unrepresentable.
 Use the type system to prevent invalid states and missing functionality at compile time.
 
-Use type-safe routing for internal links via `$astroPath` and `$appPath` from `src/app/lib/typesafe-paths.ts`.
-Use `$appPath` for TanStack API routes too.
+Use `Link`/`useNavigate` from `@tanstack/react-router` for internal navigation.
+Where a plain URL string is needed — `fetch` targets, API routes, URLs embedded in responses — use `$appPath` from `src/app/lib/typesafe-paths.ts` so the path stays checked against the generated route tree.
 
 ## Error Handling: Result Pattern
 

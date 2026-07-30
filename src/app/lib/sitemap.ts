@@ -1,71 +1,34 @@
 import path from "node:path";
 import { getConfig, physicalGetRouteNodes, type Config } from "@tanstack/router-generator";
 
-const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
-const APP_BASE_PATH = "/app";
+/**
+ * Paths served as static files. Everything else is rendered on demand.
+ *
+ * TanStack Start prerenders every page in `pages` unless told otherwise, so this
+ * is passed to `prerender.filter` in vite.config.ts as an allowlist — the
+ * equivalent of Astro's per-route `export const prerender`.
+ */
+export const staticPaths: ReadonlySet<string> = new Set(["/", "/robots.txt"]);
 
-const shouldIncludeInSitemap: SitemapFilter = (page) => {
-  if (page.pathname.startsWith("/_")) return false;
-  if (page.pathname === "/app/api" || page.pathname.startsWith("/app/api/")) return false;
-  if (page.pathname === "/app/demo" || page.pathname.startsWith("/app/demo/")) return false;
+const shouldIncludeInSitemap = (pathname: string) => {
+  if (pathname.startsWith("/_")) return false;
+  if (pathname === "/api" || pathname.startsWith("/api/")) return false;
+  if (pathname === "/demo" || pathname.startsWith("/demo/")) return false;
+  if (pathname === "/robots.txt") return false;
 
   return true;
 };
 
-export async function getUnifiedSitemapOptions(origin: string) {
-  const appPages = await getAppSitemapPages(shouldIncludeInSitemap);
-  const hasAppPages = appPages.length > 0;
-
-  return {
-    astro: {
-      customSitemaps: hasAppPages ? [new URL(APP_SITEMAP_OUTPUT_PATH, origin).href] : [],
-      filter: (url: string) => shouldIncludeInSitemap(toSitemapPage(url)),
-    },
-    tanstackStart: {
-      pages: appPages,
-      sitemap: hasAppPages
-        ? {
-            host: origin,
-            outputPath: APP_SITEMAP_OUTPUT_PATH,
-          }
-        : undefined,
-    },
-  };
-}
-
-// ---
-
-type SitemapFilter = (page: SitemapFilterPage) => boolean;
-
-type SitemapFilterPage = {
-  url: string;
-  pathname: string;
-};
-
-type SitemapOptions = {
-  exclude?: boolean;
-  priority?: number;
-  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
-  lastmod?: string | Date;
-  alternateRefs?: Array<{
-    href: string;
-    hreflang: string;
-  }>;
-  images?: Array<{
-    loc: string;
-    caption?: string;
-    title?: string;
-  }>;
-};
-
-type AppSitemapPage = {
+export type SitemapPage = {
   path: `/${string}`;
-  sitemap?: SitemapOptions;
+  sitemap?: { exclude?: boolean };
 };
 
-async function getAppSitemapPages(
-  filter: SitemapFilter = shouldIncludeInSitemap,
-): Promise<Array<AppSitemapPage>> {
+/**
+ * Routes discovered from the file-based route tree, plus the non-route static
+ * files. Feeds both the generated sitemap and the prerender allowlist.
+ */
+export async function getSitemapPages(): Promise<Array<SitemapPage>> {
   const routesDirectory = path.resolve(process.cwd(), "src/app/routes");
   const config = getConfig({ routesDirectory }, process.cwd());
   const { routeNodes } = await physicalGetRouteNodes(config, process.cwd(), {
@@ -73,12 +36,16 @@ async function getAppSitemapPages(
     routeTokenSegmentRegex: toTokenSegmentRegex(config.routeToken),
   });
 
-  const pages = routeNodes
+  const routePages = routeNodes
     .map(routeNodeToSitemapPage)
-    .filter((page): page is AppSitemapPage => page !== null);
+    .filter((page): page is SitemapPage => page !== null);
 
-  return pages.filter((page) => filter(toSitemapPage(page.path)));
+  // robots.txt is a server route, so it is not a sitemap entry, but it still has
+  // to be listed for the prerender pass to emit it as a file.
+  return [...routePages, { path: "/robots.txt", sitemap: { exclude: true } }];
 }
+
+// ---
 
 function toTokenSegmentRegex(token: Config["indexToken"]): RegExp {
   const source =
@@ -92,17 +59,10 @@ function toTokenSegmentRegex(token: Config["indexToken"]): RegExp {
   return new RegExp(`^(?:${source})$`, flags);
 }
 
-function toSitemapPage(urlOrPath: string): SitemapFilterPage {
-  return {
-    url: urlOrPath,
-    pathname: new URL(urlOrPath, "https://example.com").pathname,
-  };
-}
-
 function routeNodeToSitemapPage(routeNode: {
   filePath?: string;
   routePath?: string;
-}): AppSitemapPage | null {
+}): SitemapPage | null {
   if (
     !routeNode.routePath ||
     routeNode.routePath === "/__root" ||
@@ -111,12 +71,12 @@ function routeNodeToSitemapPage(routeNode: {
     return null;
   }
 
-  const routePath = routeNode.routePath === "/" ? "" : routeNode.routePath.replace(/\/$/, "");
-  const path = `${APP_BASE_PATH}${routePath}` as `/${string}`;
+  const trimmed = routeNode.routePath === "/" ? "/" : routeNode.routePath.replace(/\/$/, "");
+  const routePath = (trimmed === "" ? "/" : trimmed) as `/${string}`;
 
-  if (!shouldIncludeInSitemap(toSitemapPage(path))) {
-    return null;
+  if (!shouldIncludeInSitemap(routePath)) {
+    return { path: routePath, sitemap: { exclude: true } };
   }
 
-  return { path };
+  return { path: routePath };
 }

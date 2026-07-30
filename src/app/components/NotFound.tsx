@@ -1,5 +1,6 @@
+import { Link } from "@tanstack/react-router";
+
 import { brandPageBackground, brandPrimaryButtonClass } from "../lib/brand-theme";
-import { $astroPath } from "../lib/typesafe-paths";
 
 export default function NotFound() {
   return (
@@ -17,12 +18,12 @@ export default function NotFound() {
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-foreground/68 sm:text-xl">
           The address does not point to anything in this app. Head back to the start and try again.
         </p>
-        <a
-          href={$astroPath({ to: "/" })}
+        <Link
+          to="/"
           className={`${brandPrimaryButtonClass} mt-8 inline-flex min-h-12 items-center justify-center rounded-full px-6 no-underline`}
         >
           Return home
-        </a>
+        </Link>
       </section>
     </main>
   );

@@ -11,8 +11,14 @@ const Devtools = import.meta.env.DEV
   : null;
 
 /**
- * Astro mounts this TanStack Start router under `/app` via `src/pages/app/[...slug].ts`.
- * Child route paths are served as `/app` plus their TanStack route path.
+ * The document shell for every route. Also absorbs what the Astro
+ * `src/layouts/BaseLayout.astro` used to provide for the static pages: the head
+ * boilerplate, favicon set and web manifest.
+ *
+ * The iOS `pointerdown` workaround BaseLayout carried is gone with Astro — it
+ * existed because Astro wraps each island in a `display: contents` root, which
+ * stops WebKit delivering pointer events (facebook/react#29890). React owns the
+ * whole document here, so no such root exists.
  */
 export const Route = createRootRoute({
   head: () => ({
@@ -25,7 +31,11 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Omnis Start",
+      },
+      {
+        name: "description",
+        content: "A TanStack Start application shell.",
       },
     ],
     links: [
@@ -36,6 +46,7 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.json" },
     ],
   }),
 

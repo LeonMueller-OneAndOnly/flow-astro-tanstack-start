@@ -1,5 +1,5 @@
 import { createClient } from "@libsql/client/node";
-import { DATABASE_URL } from "astro:env/server";
+import { DATABASE_URL } from "../app/lib/env";
 import { drizzle } from "drizzle-orm/libsql/node";
 
 import { configureLocalSqlite, isLocalSqliteFileUrl } from "./local-sqlite";

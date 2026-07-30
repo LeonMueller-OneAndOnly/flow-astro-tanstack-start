@@ -31,18 +31,14 @@ import {
   SidebarProvider,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { $appPath, $astroPath } from "../lib/typesafe-paths";
 
 /**
- * `app`: rendered inside the TanStack Start shell (`__root.tsx`) where a router
- * context exists, so nav uses client-side `Link`s with active highlighting.
- * `site`: rendered as an Astro island on the static homepage, which has no
- * router context, so nav falls back to plain anchors.
- *
- * Both variants render the real shadcn `Sidebar` (mobile Sheet + desktop
- * slide-in panel) styled with the `--sidebar-*` palette from globals.css.
+ * Renders the real shadcn `Sidebar` (mobile Sheet + desktop slide-in panel)
+ * styled with the `--sidebar-*` palette from globals.css. Every route lives
+ * inside the router, so nav is always client-side `Link`s with active
+ * highlighting — the previous `site` variant existed only for the Astro
+ * homepage, which had no router context.
  */
-type HeaderVariant = "app" | "site";
 
 /** Active-route classes mirroring the sidebar's own `data-[active=true]` look. */
 const NAV_ACTIVE_CLASS = "bg-sidebar-accent font-medium text-sidebar-accent-foreground";
@@ -65,82 +61,55 @@ function MenuBar() {
       >
         <Menu className="size-6" />
       </button>
-      <a
-        href={$astroPath({ to: "/" })}
-        className="ml-1 text-xl font-semibold tracking-tight text-white"
-      >
+      <Link to="/" className="ml-1 text-xl font-semibold tracking-tight text-white">
         Omnis
-      </a>
+      </Link>
     </header>
   );
 }
 
-/**
- * A top-level menu entry. `href` is precomputed via `$appPath` at the literal
- * call site so the route stays type-checked; `to` drives the in-app `Link`.
- */
+/** A top-level menu entry. `to` is type-checked against the generated route tree. */
 function NavButton({
-  variant,
   to,
-  href,
   onNavigate,
   icon,
   label,
 }: {
-  variant: HeaderVariant;
   to: LinkProps["to"];
-  href: string;
   onNavigate: () => void;
   icon: ReactNode;
   label: string;
 }) {
   return (
     <SidebarMenuButton asChild>
-      {variant === "site" ? (
-        <a href={href}>
-          {icon}
-          <span>{label}</span>
-        </a>
-      ) : (
-        <Link to={to} onClick={onNavigate} activeProps={{ className: NAV_ACTIVE_CLASS }}>
-          {icon}
-          <span>{label}</span>
-        </Link>
-      )}
+      <Link to={to} onClick={onNavigate} activeProps={{ className: NAV_ACTIVE_CLASS }}>
+        {icon}
+        <span>{label}</span>
+      </Link>
     </SidebarMenuButton>
   );
 }
 
 /** A nested entry under a collapsible group (e.g. the SSR demos). */
 function NavSubButton({
-  variant,
   to,
-  href,
   onNavigate,
   label,
 }: {
-  variant: HeaderVariant;
   to: LinkProps["to"];
-  href: string;
   onNavigate: () => void;
   label: string;
 }) {
   return (
     <SidebarMenuSubButton asChild>
-      {variant === "site" ? (
-        <a href={href}>
-          <span>{label}</span>
-        </a>
-      ) : (
-        <Link to={to} onClick={onNavigate} activeProps={{ className: NAV_ACTIVE_CLASS }}>
-          <span>{label}</span>
-        </Link>
-      )}
+      <Link to={to} onClick={onNavigate} activeProps={{ className: NAV_ACTIVE_CLASS }}>
+        <span>{label}</span>
+      </Link>
     </SidebarMenuSubButton>
   );
 }
 
-function AppSidebar({ variant }: { variant: HeaderVariant }) {
+function AppSidebar() {
   const { setOpen, setOpenMobile } = useSidebar();
   const [ssrOpen, setSsrOpen] = useState(false);
   const close = () => {
@@ -161,9 +130,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <NavButton
-                  variant={variant}
                   to="/demo"
-                  href={$appPath({ to: "/demo" })}
                   onNavigate={close}
                   icon={<LayoutGrid />}
                   label="All Demos"
@@ -172,9 +139,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
 
               <SidebarMenuItem>
                 <NavButton
-                  variant={variant}
                   to="/demo/start/server-funcs"
-                  href={$appPath({ to: "/demo/start/server-funcs" })}
                   onNavigate={close}
                   icon={<SquareFunction />}
                   label="Server Functions"
@@ -183,9 +148,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
 
               <SidebarMenuItem>
                 <NavButton
-                  variant={variant}
                   to="/demo/start/api-request"
-                  href={$appPath({ to: "/demo/start/api-request" })}
                   onNavigate={close}
                   icon={<Network />}
                   label="API Request"
@@ -194,9 +157,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
 
               <SidebarMenuItem>
                 <NavButton
-                  variant={variant}
                   to="/demo/start/ssr"
-                  href={$appPath({ to: "/demo/start/ssr" })}
                   onNavigate={close}
                   icon={<StickyNote />}
                   label="SSR Demos"
@@ -212,27 +173,21 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
                       <NavSubButton
-                        variant={variant}
                         to="/demo/start/ssr/spa-mode"
-                        href={$appPath({ to: "/demo/start/ssr/spa-mode" })}
                         onNavigate={close}
                         label="SPA Mode"
                       />
                     </SidebarMenuSubItem>
                     <SidebarMenuSubItem>
                       <NavSubButton
-                        variant={variant}
                         to="/demo/start/ssr/full-ssr"
-                        href={$appPath({ to: "/demo/start/ssr/full-ssr" })}
                         onNavigate={close}
                         label="Full SSR"
                       />
                     </SidebarMenuSubItem>
                     <SidebarMenuSubItem>
                       <NavSubButton
-                        variant={variant}
                         to="/demo/start/ssr/data-only"
-                        href={$appPath({ to: "/demo/start/ssr/data-only" })}
                         onNavigate={close}
                         label="Data Only"
                       />
@@ -243,9 +198,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
 
               <SidebarMenuItem>
                 <NavButton
-                  variant={variant}
                   to="/demo/example/guitars"
-                  href={$appPath({ to: "/demo/example/guitars" })}
                   onNavigate={close}
                   icon={<Guitar />}
                   label="Guitar Demo"
@@ -254,9 +207,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
 
               <SidebarMenuItem>
                 <NavButton
-                  variant={variant}
                   to="/demo/store"
-                  href={$appPath({ to: "/demo/store" })}
                   onNavigate={close}
                   icon={<Store />}
                   label="Store"
@@ -276,12 +227,12 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
   );
 }
 
-export default function Header({ variant = "app" }: { variant?: HeaderVariant }) {
+export default function Header() {
   return (
     <SidebarProvider defaultOpen={false} className="min-h-0 flex-col">
       <MenuBar />
       <div aria-hidden="true" className="h-14 shrink-0" />
-      <AppSidebar variant={variant} />
+      <AppSidebar />
     </SidebarProvider>
   );
 }

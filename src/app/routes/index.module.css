@@ -1,0 +1,241 @@
+/* Ported from the scoped <style> block of the former src/pages/index.astro.
+   Astro scoped these automatically; here CSS Modules hash the class names and
+   every bare element selector is nested under one, so nothing leaks globally. */
+
+.pageShell {
+  min-height: 100vh;
+  padding: clamp(18px, 3vw, 40px);
+  /* Background is applied inline from brandPageBackground (src/app/lib/brand-theme.ts),
+     the single source shared with the demo pages. */
+  color: var(--foreground);
+}
+
+.pageShell code {
+  border-radius: 8px;
+  padding: 2px 7px;
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  color: var(--brand-secondary-700);
+  font-size: 0.9em;
+  font-weight: 750;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 6vw, 72px);
+  align-items: center;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 40px) 0 clamp(28px, 5vw, 56px);
+}
+
+/* Two columns when there is room: copy left, robot to the right of the title. */
+@media (min-width: 960px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  }
+}
+
+.heroCopy {
+  min-width: 0;
+}
+
+.heroCopy h1 {
+  max-width: 820px;
+  margin: 0 0 24px;
+  font-size: clamp(3rem, 8vw, 6.4rem);
+  font-weight: 950;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  color: var(--brand-secondary-700);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.lede {
+  max-width: 680px;
+  margin: 0;
+  color: color-mix(in oklch, var(--foreground) 68%, transparent);
+  font-size: clamp(1.08rem, 2vw, 1.3rem);
+  line-height: 1.7;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.omnisVisual {
+  overflow: hidden;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+  border-radius: 32px;
+  background: color-mix(in oklch, var(--card) 70%, transparent);
+  box-shadow: 0 30px 90px color-mix(in oklch, var(--foreground) 18%, transparent);
+}
+
+.omnisImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0 22px;
+  font-weight: 850;
+  text-decoration: none;
+  transition:
+    transform 160ms ease,
+    border-color 180ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btnPrimary {
+  background: var(--foreground);
+  color: var(--background);
+  box-shadow: 0 18px 36px color-mix(in oklch, var(--foreground) 18%, transparent);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  width: min(1100px, 100%);
+  margin-inline: auto;
+  padding-bottom: clamp(32px, 6vw, 72px);
+}
+
+.split h2 {
+  margin: 0 0 12px;
+  font-size: 1.45rem;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.split p {
+  margin: 0;
+  color: color-mix(in oklch, var(--foreground) 60%, transparent);
+  line-height: 1.65;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  border-radius: 24px;
+  padding: 30px;
+  background: color-mix(in oklch, var(--card) 80%, transparent);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklch, var(--brand-secondary-600) 50%, transparent);
+  box-shadow: 0 24px 54px color-mix(in oklch, var(--foreground) 13%, transparent);
+  outline: none;
+}
+
+/* Demos card: brand-filled so the primary destination stands out from the two
+   outline docs cards. */
+.cardFilled {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--brand-primary-600), var(--brand-secondary-600));
+  color: #fff;
+}
+
+.cardFilled:hover,
+.cardFilled:focus-visible {
+  border-color: transparent;
+  box-shadow: 0 28px 64px color-mix(in oklch, var(--brand-primary-600) 42%, transparent);
+}
+
+.cardFilled h2,
+.cardFilled .cardCta {
+  color: #fff;
+}
+
+.cardFilled p {
+  color: color-mix(in oklch, white 88%, transparent);
+}
+
+.cardFilled code {
+  background: color-mix(in oklch, white 22%, transparent);
+  color: #fff;
+}
+
+.cardLabel {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--brand-secondary-700);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cardFilled .cardLabel {
+  color: color-mix(in oklch, white 78%, transparent);
+}
+
+.cardCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 24px;
+  color: var(--brand-secondary-700);
+  font-size: 0.95rem;
+  font-weight: 850;
+}
+
+.cardCta svg {
+  width: 17px;
+  height: 17px;
+  transition: transform 180ms ease;
+}
+
+.card:hover .cardCta svg,
+.card:focus-visible .cardCta svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 820px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .pageShell {
+    padding: 16px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

@@ -1,15 +1,12 @@
 import { defaultStringifySearch, interpolatePath } from "@tanstack/react-router";
 import type { FileRoutesByPath } from "@tanstack/react-router";
 
-import { $path, type RouteId, type RouteOptions } from "astro-typesafe-routes/path";
-
-export function $astroPath<T extends RouteId>(args: RouteOptions<T>) {
-  return $path(args);
-}
-
-const APP_BASE_PATH = "/app";
-
 /**
+ * Builds a URL string for a file-based route, type-checked against the generated
+ * route tree. Use `Link`/`useNavigate` for in-app navigation; this is for the
+ * places that need a plain string — `fetch` targets, Better Auth's `basePath`,
+ * and URLs embedded in API responses.
+ *
  * @example $appPath({ to: "/demo/start/ssr" })
  */
 export function $appPath<const TTo extends AppRouteTo>(
@@ -25,11 +22,10 @@ export function $appPath<const TTo extends AppRouteTo>(
     throw new Error(`Missing params for TanStack Start route: ${options.to}`);
   }
 
-  const path = interpolatedPath === "/" ? "" : interpolatedPath;
   const search = toSearch("search" in options ? options.search : undefined);
   const hash = toHash(options.hash);
 
-  return `${APP_BASE_PATH}${path}${search}${hash}`;
+  return `${interpolatedPath}${search}${hash}`;
 }
 
 type FileRoutePath = Extract<keyof FileRoutesByPath, string>;

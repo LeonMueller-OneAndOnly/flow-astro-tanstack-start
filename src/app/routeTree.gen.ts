@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -25,6 +27,16 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoIndexRoute = DemoIndexRouteImport.update({
   id: '/demo/',
   path: '/demo/',
@@ -103,6 +115,8 @@ const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/': typeof DemoIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -120,6 +134,8 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo': typeof DemoIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -138,6 +154,8 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/': typeof DemoIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -157,6 +175,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
+    | '/robots.txt'
     | '/demo/store'
     | '/demo/'
     | '/api/auth/$'
@@ -174,6 +194,8 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
+    | '/robots.txt'
     | '/demo/store'
     | '/demo'
     | '/api/auth/$'
@@ -191,6 +213,8 @@ export interface FileRouteTypes {
     | '/demo/start/ssr'
   id:
     | '__root__'
+    | '/'
+    | '/robots.txt'
     | '/demo/store'
     | '/demo/'
     | '/api/auth/$'
@@ -209,6 +233,8 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoIndexRoute: typeof DemoIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -228,6 +254,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/': {
       id: '/demo/'
       path: '/demo'
@@ -337,6 +377,8 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoIndexRoute: DemoIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
@@ -358,10 +400,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
