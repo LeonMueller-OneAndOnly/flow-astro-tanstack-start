@@ -2,12 +2,6 @@ import { Result } from "../../app/lib/result.ts";
 
 export const instrumentationPath = "/instrumentation";
 
-// A custom header cannot be set by a cross-origin `no-cors` fetch, and any
-// request that does set it is preflighted — which the endpoint answers with a
-// 404. That keeps a page in a local browser from reaching the endpoint even
-// though it would pass the loopback check.
-export const instrumentationHeader = "x-instrumentation";
-
 const instrumentationTimeoutMs = 30_000;
 const instrumentationRetryDelayMs = 250;
 
@@ -29,9 +23,7 @@ export async function instrument(host: string, port: number): Promise<void> {
   // Retried because callers fire this right after listen(), and because the dev
   // server may still be warming up its module graph.
   while (Date.now() < deadline) {
-    const result = await Result.fromAsync(() =>
-      fetch(url, { method: "POST", headers: { [instrumentationHeader]: "1" } }),
-    );
+    const result = await Result.fromAsync(() => fetch(url, { method: "POST" }));
 
     if (result.success && result.data.ok) return;
 
