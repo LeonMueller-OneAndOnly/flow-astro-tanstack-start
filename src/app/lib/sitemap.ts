@@ -6,20 +6,20 @@ import { isContentPath } from "../../lib/content-paths";
 const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
 const APP_BASE_PATH = "/app";
 
-const shouldIncludeInSitemap: SitemapFilter = (page) => isContentPath(page.pathname);
-
 export async function getUnifiedSitemapOptions(origin: string) {
-  const appPages = await getAppSitemapPages(shouldIncludeInSitemap);
-  const hasAppPages = appPages.length > 0;
+  const tanstackPages = await getAppSitemapPages({
+    filter: (page) => isContentPath(page.pathname),
+  });
+  const hasTanstackPages = tanstackPages.length > 0;
 
   return {
     astro: {
-      customSitemaps: hasAppPages ? [new URL(APP_SITEMAP_OUTPUT_PATH, origin).href] : [],
-      filter: (url: string) => shouldIncludeInSitemap(toSitemapPage(url)),
+      customSitemaps: hasTanstackPages ? [new URL(APP_SITEMAP_OUTPUT_PATH, origin).href] : [],
+      filter: (url: string) => isContentPath(toSitemapPage(url).pathname),
     },
     tanstackStart: {
-      pages: appPages,
-      sitemap: hasAppPages
+      pages: tanstackPages,
+      sitemap: hasTanstackPages
         ? {
             host: origin,
             outputPath: APP_SITEMAP_OUTPUT_PATH,
@@ -59,9 +59,11 @@ type AppSitemapPage = {
   sitemap?: SitemapOptions;
 };
 
-async function getAppSitemapPages(
-  filter: SitemapFilter = shouldIncludeInSitemap,
-): Promise<Array<AppSitemapPage>> {
+async function getAppSitemapPages({
+  filter,
+}: {
+  filter: SitemapFilter;
+}): Promise<Array<AppSitemapPage>> {
   const routesDirectory = path.resolve(process.cwd(), "src/app/routes");
   const config = getConfig({ routesDirectory }, process.cwd());
   const { routeNodes } = await physicalGetRouteNodes(config, process.cwd(), {
@@ -70,7 +72,7 @@ async function getAppSitemapPages(
   });
 
   const pages = routeNodes
-    .map(routeNodeToSitemapPage)
+    .map((routeNode) => routeNodeToSitemapPage({ routeNode, filter }))
     .filter((page): page is AppSitemapPage => page !== null);
 
   return pages.filter((page) => filter(toSitemapPage(page.path)));
@@ -95,9 +97,15 @@ function toSitemapPage(urlOrPath: string): SitemapFilterPage {
   };
 }
 
-function routeNodeToSitemapPage(routeNode: {
-  filePath?: string;
-  routePath?: string;
+function routeNodeToSitemapPage({
+  routeNode,
+  filter,
+}: {
+  routeNode: {
+    filePath?: string;
+    routePath?: string;
+  };
+  filter: SitemapFilter;
 }): AppSitemapPage | null {
   if (
     !routeNode.routePath ||
@@ -110,7 +118,7 @@ function routeNodeToSitemapPage(routeNode: {
   const routePath = routeNode.routePath === "/" ? "" : routeNode.routePath.replace(/\/$/, "");
   const path = `${APP_BASE_PATH}${routePath}` as `/${string}`;
 
-  if (!shouldIncludeInSitemap(toSitemapPage(path))) {
+  if (!filter(toSitemapPage(path))) {
     return null;
   }
 
