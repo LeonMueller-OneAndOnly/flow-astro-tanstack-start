@@ -13,6 +13,7 @@ import { loadConfigEnv } from "./src/app/lib/framework/config-env";
 import { getUnifiedSitemapOptions } from "./src/app/lib/framework/sitemap";
 import { composeAstroTanStackBuild } from "./src/integrations/compose-astro-tanstack-build";
 import { instrumentation } from "./src/integrations/instrumentation/astro-integration";
+import type { AstroIntegration } from "astro";
 
 const configEnv = loadConfigEnv();
 
@@ -77,6 +78,7 @@ export default defineConfig({
     typesafeRoutes(),
     astroGrab({ key: "c", holdDuration: 500 }),
     instrumentation(),
+    isolateViteDependencyCache_betweenBuildAndDev(),
   ],
 
   env: {
@@ -163,3 +165,22 @@ export default defineConfig({
     },
   },
 });
+
+function isolateViteDependencyCache_betweenBuildAndDev(): AstroIntegration {
+  // Every Astro command otherwise shares Vite's dependency cache at node_modules/.vite. `astro build` re-runs the optimizer from its own
+  //  static scan and rewrites that directory, dropping every dependency a running dev server had discovered on demand — which is everything
+  // reachable only through the TanStack route tree, because the scan starts from Astro's pages and never enters it.
+  //
+  // The dev server then answers those requests with `504 Outdated Optimize Dep`, the dynamic import in
+  // `src/app/client.tsx` rejects, `hydrateRoot` never runs, and nothing under /app is interactive until the dev server is restarted.
+  // Nothing is logged, because a rejected import inside an async module is swallowed.
+  return {
+    name: "isolate-build-dep-cache",
+    hooks: {
+      "astro:config:setup": ({ command, updateConfig }) => {
+        if (command === "dev") return;
+        updateConfig({ vite: { cacheDir: "node_modules/.vite-build" } });
+      },
+    },
+  };
+}
