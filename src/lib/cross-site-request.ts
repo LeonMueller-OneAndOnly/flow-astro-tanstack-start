@@ -5,9 +5,11 @@ const safeMethods = new Set(["GET", "HEAD", "OPTIONS"]);
  * strongest available signal first.
  *
  * Astro routes and everything under `/app` both pass through src/middleware.ts,
- * so this is the single CSRF check for the whole app. Better Auth additionally
- * runs its own origin check on `/app/api/auth/*`; that one is internal to the
- * library and validates against `APP_ORIGIN` at runtime
+ * so this is the broadest of the app's CSRF checks.
+ *
+ * Two library checks sit behind it:
+ * - Better Auth validates the origin on `/app/api/auth/*`
+ * - TanStack Start applies its own CSRF middleware to server functions by default.
  */
 export function isCrossSiteRequest(request: Request, appOrigin: string): boolean {
   if (safeMethods.has(request.method)) return false;
