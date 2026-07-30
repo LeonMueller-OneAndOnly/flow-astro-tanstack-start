@@ -1,6 +1,6 @@
 /**
- * THIS FILE NEEDS TO STAY AT src/app/lib/framework/register-config-env
- * It is used by the package.json start script
+ * THIS FILE NEEDS TO STAY AT src/app/lib/framework/register-config-env.ts
+ * It is used as a import by the package.json start script
  */
 
 import { loadConfigEnv } from "./config-env.ts";
