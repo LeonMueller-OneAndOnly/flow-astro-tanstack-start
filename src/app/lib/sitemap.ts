@@ -1,16 +1,12 @@
 import path from "node:path";
 import { getConfig, physicalGetRouteNodes, type Config } from "@tanstack/router-generator";
 
+import { isContentPath } from "../../lib/content-paths";
+
 const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
 const APP_BASE_PATH = "/app";
 
-const shouldIncludeInSitemap: SitemapFilter = (page) => {
-  if (page.pathname.startsWith("/_")) return false;
-  if (page.pathname === "/app/api" || page.pathname.startsWith("/app/api/")) return false;
-  if (page.pathname === "/app/demo" || page.pathname.startsWith("/app/demo/")) return false;
-
-  return true;
-};
+const shouldIncludeInSitemap: SitemapFilter = (page) => isContentPath(page.pathname);
 
 export async function getUnifiedSitemapOptions(origin: string) {
   const appPages = await getAppSitemapPages(shouldIncludeInSitemap);

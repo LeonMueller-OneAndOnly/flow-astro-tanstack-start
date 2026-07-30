@@ -1,4 +1,5 @@
 ---
+import { isContentPath, NOINDEX } from "../lib/content-paths";
 import "../styles/globals.css";
 
 interface Props {
@@ -10,6 +11,8 @@ const {
   title = "Omnis Start",
   description = "A shared Astro and TanStack Start application shell.",
 } = Astro.props;
+
+const robots = isContentPath(Astro.url.pathname) ? undefined : NOINDEX;
 ---
 
 <!doctype html>
@@ -25,6 +28,7 @@ const {
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
