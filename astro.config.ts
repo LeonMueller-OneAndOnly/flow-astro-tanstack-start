@@ -12,6 +12,7 @@ import { astroGrab } from "astro-grab";
 import { loadConfigEnv } from "./src/app/lib/config-env";
 import { getUnifiedSitemapOptions } from "./src/app/lib/sitemap";
 import { composeAstroTanStackBuild } from "./src/integrations/compose-astro-tanstack-build";
+import { instrumentation } from "./src/integrations/instrumentation/astro-integration";
 
 const configEnv = loadConfigEnv();
 
@@ -75,6 +76,7 @@ export default defineConfig({
     sitemap(sitemapOptions.astro),
     typesafeRoutes(),
     astroGrab({ key: "c", holdDuration: 500 }),
+    instrumentation(),
   ],
 
   env: {

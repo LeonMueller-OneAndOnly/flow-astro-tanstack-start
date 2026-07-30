@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "start": "node --import ./src/app/lib/register-config-env.ts ./dist/server/entry.mjs",
+    "start": "node --import ./src/app/lib/register-config-env.ts ./server/prod.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
