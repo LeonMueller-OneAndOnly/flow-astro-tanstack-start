@@ -4,13 +4,13 @@ import type { Plugin, PluginOption, UserConfig, ViteBuilder } from "vite";
 type BuilderOptions = NonNullable<UserConfig["builder"]>;
 type BuildApp = NonNullable<BuilderOptions["buildApp"]>;
 
-export function composeAstroTanStackBuild(
-  tanstackPlugins: PluginOption,
-  clientEntry: string,
-): Array<PluginOption> {
+export function composeAstroTanStackBuild(input: {
+  tanstackPlugins: PluginOption;
+  clientEntry: string;
+}): Array<PluginOption> {
   let astroBuilder: BuilderOptions | undefined;
-  const resolvedClientEntry = path.resolve(clientEntry);
-  const pluginStack = [tanstackPlugins];
+  const resolvedClientEntry = path.resolve(input.clientEntry);
+  const pluginStack = [input.tanstackPlugins];
   let manifestCapturePlugin: Plugin | undefined;
 
   while (pluginStack.length > 0) {
@@ -64,7 +64,7 @@ export function composeAstroTanStackBuild(
         astroBuilder = config.builder;
       },
     } satisfies Plugin,
-    tanstackPlugins,
+    input.tanstackPlugins,
     {
       name: "compose-astro-tanstack-build:compose",
       enforce: "post",

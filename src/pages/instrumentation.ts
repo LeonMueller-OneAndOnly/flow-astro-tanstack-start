@@ -5,7 +5,7 @@ import { startJobQueueWorkerOnce } from "../integrations/job-queue/start-once";
 // Server rendered, so `astro build` never executes it
 export const prerender = false;
 
-export const POST: APIRoute = async ({ clientAddress, request }) => {
+export const POST: APIRoute = async () => {
   const result = await startJobQueueWorkerOnce();
 
   if (!result.success) {

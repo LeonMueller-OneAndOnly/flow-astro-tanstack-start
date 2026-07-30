@@ -53,8 +53,8 @@ export default defineConfig({
     },
     server: { allowedHosts: [new URL(appOrigin).hostname] },
     plugins: [
-      ...composeAstroTanStackBuild(
-        tanstackStart({
+      ...composeAstroTanStackBuild({
+        tanstackPlugins: tanstackStart({
           srcDirectory: "./src/app",
           router: {
             basepath: "app",
@@ -62,8 +62,8 @@ export default defineConfig({
           pages: sitemapOptions.tanstackStart.pages,
           sitemap: sitemapOptions.tanstackStart.sitemap,
         }),
-        path.resolve("src/app/client.tsx"),
-      ),
+        clientEntry: path.resolve("src/app/client.tsx"),
+      }),
       tailwindcss(),
     ],
   },

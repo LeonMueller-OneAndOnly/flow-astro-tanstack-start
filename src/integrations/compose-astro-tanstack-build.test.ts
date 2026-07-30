@@ -13,13 +13,18 @@ describe("composeAstroTanStackBuild", () => {
       generateBundle: capture,
     };
 
-    composeAstroTanStackBuild([manifestPlugin], clientEntry);
+    composeAstroTanStackBuild({ tanstackPlugins: [manifestPlugin], clientEntry });
     const generateBundle = manifestPlugin.generateBundle;
     expect(typeof generateBundle).toBe("function");
 
     if (typeof generateBundle !== "function") return;
 
-    generateBundle.call({} as never, {} as never, bundle("index", "/workspace/src/index.tsx"), true);
+    generateBundle.call(
+      {} as never,
+      {} as never,
+      bundle("index", "/workspace/src/index.tsx"),
+      true,
+    );
     expect(capture).not.toHaveBeenCalled();
 
     generateBundle.call({} as never, {} as never, bundle("app", clientEntry), true);
