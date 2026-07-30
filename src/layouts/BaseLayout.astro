@@ -39,7 +39,6 @@ const preview = image
       format: "jpeg",
     })
   : undefined;
-const previewUrl = new URL(preview?.src ?? SITE.fallbackImage, Astro.site).href;
 
 const metaTags = buildMetaTags({
   title,
@@ -47,7 +46,7 @@ const metaTags = buildMetaTags({
   robots: isContentPath(Astro.url.pathname) ? undefined : NOINDEX,
   social: {
     url: canonical,
-    imageUrl: previewUrl,
+    imageUrl: new URL(preview?.src ?? SITE.fallbackImage, Astro.site).href,
     imageAlt: image?.alt ?? SITE.name,
     type: ogType,
     imageIsSized: preview !== undefined,
