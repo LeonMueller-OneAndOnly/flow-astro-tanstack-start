@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import previewEmail from "preview-email";
 
-import { Result } from "../../app/lib/result";
+import { Result } from "../../app/lib/framework/result";
 import type { TMail } from "./types";
 
 type MailPreviewMode = "auto" | "omnis" | "browser" | "disabled";

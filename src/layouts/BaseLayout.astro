@@ -1,35 +1,80 @@
 ---
-import { isContentPath, NOINDEX } from "../app/lib/content-paths";
+import type { ImageMetadata } from "astro";
+import { getImage } from "astro:assets";
+
+import { isContentPath } from "../app/lib/framework/content-paths";
+import { buildMetaTags, HEAD_LINKS, NOINDEX, SITE } from "../app/lib/framework/site-meta";
 import "../styles/globals.css";
 
 interface Props {
   title?: string;
   description?: string;
+  /** `article` for a single piece of content, `website` for index and utility pages. */
+  ogType?: "website" | "article";
+  /**
+   * Preview image, taken as an imported asset so Astro can process it. Cropped to
+   * the card box here; without one the brand logo is used and the card falls back
+   * to the small square layout.
+   */
+  image?: { src: ImageMetadata; alt: string };
 }
 
 const {
-  title = "Omnis Start",
-  description = "A shared Astro and TanStack Start application shell.",
+  title = SITE.name,
+  description = SITE.description,
+  ogType = "website",
+  image,
 } = Astro.props;
 
+// Scrapers have no document base to resolve against, so every URL in a meta tag
+// has to be absolute. `Astro.site` is APP_ORIGIN (see astro.config.ts).
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+const preview = image
+  ? await getImage({
+      src: image.src,
+      width: SITE.ogImageWidth,
+      height: SITE.ogImageHeight,
+      fit: "cover",
+      format: "jpeg",
+    })
+  : undefined;
+const previewUrl = new URL(preview?.src ?? SITE.fallbackImage, Astro.site).href;
+
+/**
+ * Read from the path rather than taken as a prop, so a page cannot be added to
+ * the sitemap and left indexable, or the reverse, by forgetting to pass anything.
+ * `src/middleware.ts` marks the same paths with a header, but it never runs for a
+ * prerendered page — the node adapter serves those as static files — so for a
+ * mostly prerendered site this tag is the mechanism that does the work, and the
+ * header covers the on-demand routes and the bodies with no head. Both read
+ * `isContentPath`; a path that somehow gets both is no worse for it.
+ */
 const robots = isContentPath(Astro.url.pathname) ? undefined : NOINDEX;
+
+const metaTags = buildMetaTags({
+  title,
+  description,
+  robots,
+  social: {
+    url: canonical,
+    imageUrl: previewUrl,
+    imageAlt: image?.alt ?? SITE.name,
+    type: ogType,
+    imageIsSized: preview !== undefined,
+  },
+});
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={SITE.lang}>
   <head>
-    <meta charset="UTF-8" />
-    {/* MDN's standard boilerplate. `width=device-width` alone behaves the same
-        on current browsers — the orientation-zoom bug initial-scale used to
-        work around was fixed in iOS 6 — so this is convention, not a fix. */}
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="description" content={description} />
-    {robots && <meta name="robots" content={robots} />}
+    {/* First, because the charset tag has to land inside the document's first
+        1024 bytes to be honoured. */}
+    {metaTags.map((tag) => <meta {...tag} />)}
     <meta name="generator" content={Astro.generator} />
+    {HEAD_LINKS.map((link) => <link {...link} />)}
+    <link rel="canonical" href={canonical} />
     <title>{title}</title>
   </head>
   <body>

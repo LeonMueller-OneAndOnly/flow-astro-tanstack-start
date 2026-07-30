@@ -7,7 +7,7 @@ import { DemoExplainer } from "@/components/DemoExplainer";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { brandPageBackground } from "../../lib/brand-theme";
-import { $appPath } from "../../lib/typesafe-paths";
+import { $appPath } from "../../lib/framework/typesafe-paths";
 
 async function getNames(): Promise<Array<string>> {
   return fetch($appPath({ to: "/demo/api/names" })).then((res) => res.json());

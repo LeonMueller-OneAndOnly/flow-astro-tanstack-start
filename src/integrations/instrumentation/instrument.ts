@@ -1,4 +1,4 @@
-import { Result } from "../../app/lib/result.ts";
+import { Result } from "../../app/lib/framework/result.ts";
 
 export const instrumentationPath = "/instrumentation";
 

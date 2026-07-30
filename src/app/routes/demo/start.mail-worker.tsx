@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { brandPageBackground, brandPrimaryButtonClass } from "@/lib/brand-theme";
-import { Result } from "@/lib/result";
+import { Result } from "@/lib/framework/result";
 
 const ZMailWorkerInput = z.object({
   to: z.email(),

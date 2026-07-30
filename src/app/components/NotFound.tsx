@@ -1,5 +1,5 @@
 import { brandPageBackground, brandPrimaryButtonClass } from "../lib/brand-theme";
-import { $astroPath } from "../lib/typesafe-paths";
+import { $astroPath } from "../lib/framework/typesafe-paths";
 
 export default function NotFound() {
   return (

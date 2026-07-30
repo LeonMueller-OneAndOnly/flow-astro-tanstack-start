@@ -7,7 +7,7 @@ import PQueue from "p-queue";
 import { z } from "zod";
 
 import { db } from "../../db/client";
-import { Result } from "../../app/lib/result";
+import { Result } from "../../app/lib/framework/result";
 import { jobQueueCronSchedules, jobQueueJobs } from "../../db/schema";
 import type { TQueueName } from "src/integrations/job-queue/registry";
 

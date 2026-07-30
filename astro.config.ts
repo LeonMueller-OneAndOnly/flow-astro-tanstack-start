@@ -9,8 +9,8 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import typesafeRoutes from "astro-typesafe-routes";
 import { astroGrab } from "astro-grab";
-import { loadConfigEnv } from "./src/app/lib/config-env";
-import { getUnifiedSitemapOptions } from "./src/app/lib/sitemap";
+import { loadConfigEnv } from "./src/app/lib/framework/config-env";
+import { getUnifiedSitemapOptions } from "./src/app/lib/framework/sitemap";
 import { composeAstroTanStackBuild } from "./src/integrations/compose-astro-tanstack-build";
 import { instrumentation } from "./src/integrations/instrumentation/astro-integration";
 

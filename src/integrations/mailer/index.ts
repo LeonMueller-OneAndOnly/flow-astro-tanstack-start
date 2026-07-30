@@ -6,7 +6,7 @@ import { htmlToText } from "nodemailer-html-to-text";
 import { ZMail, type TMail } from "./types";
 import { previewMail } from "./preview";
 
-import { Result } from "../../app/lib/result";
+import { Result } from "../../app/lib/framework/result";
 import { z } from "zod";
 
 export const ZMailOutgoingMailer = z.object({ type: z.literal("internal") });

@@ -27,7 +27,7 @@ Use oxlint for linting, tsc for typechecking and vitest for testing.
 Make Illegal States Unrepresentable.
 Use the type system to prevent invalid states and missing functionality at compile time.
 
-Use type-safe routing for internal links via `$astroPath` and `$appPath` from `src/app/lib/typesafe-paths.ts`.
+Use type-safe routing for internal links via `$astroPath` and `$appPath` from `src/app/lib/framework/typesafe-paths.ts`.
 Use `$appPath` for TanStack API routes too.
 
 ## Error Handling: Result Pattern

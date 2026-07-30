@@ -5,7 +5,7 @@ import { CloudUpload, FileDown, RefreshCw } from "lucide-react";
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
-import { $appPath } from "../../lib/typesafe-paths";
+import { $appPath } from "../../lib/framework/typesafe-paths";
 
 type DemoUpload = {
   id: string;

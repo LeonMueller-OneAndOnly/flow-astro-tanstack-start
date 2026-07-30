@@ -1,4 +1,4 @@
-import { Result } from "../../app/lib/result";
+import { Result } from "../../app/lib/framework/result";
 
 let started = false;
 

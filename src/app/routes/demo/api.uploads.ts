@@ -6,7 +6,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { db } from "../../../db/client";
 import { demoUserUploads } from "../../../db/schema";
 import { UploadDisk, getLocalFilesystemDisk, getUploadDir } from "../../../integrations/storage";
-import { $appPath } from "../../lib/typesafe-paths";
+import { $appPath } from "../../lib/framework/typesafe-paths";
 
 export const MAX_DEMO_UPLOAD_BYTES = 5 * 1024 * 1024;
 export const DEMO_UPLOAD_PREFIX = "demo-uploads";

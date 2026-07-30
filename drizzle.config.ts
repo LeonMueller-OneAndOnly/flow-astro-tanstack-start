@@ -1,4 +1,4 @@
-import { loadConfigEnv } from "@/lib/config-env";
+import { loadConfigEnv } from "@/lib/framework/config-env";
 
 import { defineConfig } from "drizzle-kit";
 

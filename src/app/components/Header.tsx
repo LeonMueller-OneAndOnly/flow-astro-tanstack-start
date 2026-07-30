@@ -31,7 +31,7 @@ import {
   SidebarProvider,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { $appPath, $astroPath } from "../lib/typesafe-paths";
+import { $appPath, $astroPath } from "../lib/framework/typesafe-paths";
 
 /**
  * `app`: rendered inside the TanStack Start shell (`__root.tsx`) where a router

@@ -5,7 +5,7 @@ import { DemoExplainer } from "@/components/DemoExplainer";
 import { Badge } from "@/components/ui/badge";
 import guitars from "../../../lib/demo/data/example-guitars";
 import { brandPageBackground, brandPrimaryButtonClass } from "../../../lib/brand-theme";
-import { $appPath } from "../../../lib/typesafe-paths";
+import { $appPath } from "../../../lib/framework/typesafe-paths";
 import { cn } from "@/lib/utils";
 
 /**

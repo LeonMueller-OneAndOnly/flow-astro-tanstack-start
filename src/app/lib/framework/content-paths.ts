@@ -3,7 +3,7 @@
  *
  * One declaration, because "advertised in the sitemap" and "allowed in the index"
  * are the same question, asked by three callers that would otherwise drift apart
- * silently: `src/app/lib/sitemap.ts` asks it to decide what to advertise,
+ * silently: `src/app/lib/framework/sitemap.ts` asks it to decide what to advertise,
  * `src/middleware.ts` asks it to decide what to mark `noindex`, and
  * `src/layouts/BaseLayout.astro` asks it for the prerendered pages middleware
  * never runs for.
@@ -11,10 +11,11 @@
  * A path advertised in the sitemap but marked `noindex`,
  * or indexable but never advertised, is the kind of bug nobody notices for months.
  *
- * Lives in `src/lib` rather than `src/app/lib` because it governs the whole site,
- * not only the TanStack router under `/app`. Deliberately free of `node:*` and
- * generator imports, unlike `sitemap.ts` — this one runs per request inside the
- * server bundle, not only at config time.
+ * Despite sitting under `src/app`, it governs the whole site rather than only the
+ * TanStack router under `/app` — the Astro layout and the middleware read it too.
+ * Deliberately free of `node:*` and generator imports, unlike its `sitemap.ts`
+ * neighbour: this one runs per request inside the server bundle, not only at
+ * config time.
  *
  * Which of the three callers can act on a given rule depends on that route's
  * `prerender` flag, and the rules are written for both settings on purpose. The
@@ -53,20 +54,3 @@ export function isContentPath(pathname: string): boolean {
 
   return true;
 }
-
-/**
- * The directive every path outside the sitemap carries, as a meta tag in
- * `src/layouts/BaseLayout.astro` and as an `X-Robots-Tag` header in
- * `src/middleware.ts`. A constant rather than a vocabulary, because
- * `isContentPath` answers yes or no: there is no caller left that could pick
- * between variants, and a free string would let a typo fail silently — the
- * directive is ignored and the page gets indexed.
- *
- * `follow` rather than `nofollow`, so a crawler that lands on a 404 or a demo
- * still walks the links back into the real pages. Nothing this marks is worth
- * sealing link equity off from.
- *
- * Only the negative direction exists, because being indexable is the default and
- * needs no tag at all.
- */
-export const NOINDEX = "noindex, follow";

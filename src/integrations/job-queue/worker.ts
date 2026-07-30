@@ -1,5 +1,5 @@
 import "./registry";
-import { Result } from "../../app/lib/result";
+import { Result } from "../../app/lib/framework/result";
 import { createJobQueueWorker, readHotApi } from "./implementation";
 import { jobs } from ".";
 
