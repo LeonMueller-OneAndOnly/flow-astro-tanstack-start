@@ -16,6 +16,8 @@ This project uses TanStack Start for every route, served from `/`.
 Static, content and marketing routes are prerendered at build time: add the path to `staticPaths` in `src/app/lib/sitemap.ts`, which is the prerender allowlist. Everything else is rendered on demand.
 `src/app/server.ts` is the server entry and the place for process-lifetime setup; `src/app/start.ts` holds global request middleware.
 
+Control Hydration with `<Hydrate when={...}>`. Use it deliberately, and aggressively on content-heavy pages.
+
 Use oxlint for linting, tsc for typechecking and vitest for testing.
 
 # Typescript
