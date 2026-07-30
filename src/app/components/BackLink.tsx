@@ -20,7 +20,7 @@ export function BackLink({
     <Link
       to={to}
       className={cn(
-        "mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+        "inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
         className,
       )}
     >

@@ -1,88 +1,70 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
-import { brandPageBackground } from "../../lib/brand-theme";
 
 /** Served at `/app/demo/start/ssr/`; TanStack route paths are mounted under Astro's `/app` catch-all. */
 export const Route = createFileRoute("/demo/start/ssr/")({
   component: RouteComponent,
 });
 
+const modes = [
+  {
+    to: "/demo/start/ssr/spa-mode",
+    title: "SPA mode",
+    option: "ssr: false",
+    body: "Nothing for this route renders on the server. The browser receives an empty shell, then fetches the data and renders the whole list on the client — fastest shell, slowest data.",
+  },
+  {
+    to: "/demo/start/ssr/full-ssr",
+    title: "Full SSR",
+    option: "ssr: true",
+    body: "The default. The loader runs on the server and the component is rendered to HTML there, then hydrated in the browser. Best for SEO and first paint — the list is in the initial response.",
+  },
+  {
+    to: "/demo/start/ssr/data-only",
+    title: "Data only",
+    option: 'ssr: "data-only"',
+    body: "The loader runs on the server and its data is serialized into the page, but the component renders only on the client. You skip the client-side data waterfall without paying to render markup on the server.",
+  },
+] as const;
+
 function RouteComponent() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
-      style={brandPageBackground}
-    >
-      <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
-        <BackLink to="/demo" />
-        <h1 className="bg-linear-to-r from-brand-primary-600 to-brand-secondary-600 bg-clip-text text-center text-4xl font-black tracking-tight text-transparent">
-          SSR Demos
-        </h1>
-        <p className="mx-auto mt-3 mb-6 max-w-md text-center text-sm leading-relaxed text-muted-foreground">
-          The same punk-songs list, rendered three ways. Each route picks a different point on the
-          server-vs-client spectrum — open them and watch where the work happens.
-        </p>
+    <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
+      <BackLink to="/demo" />
+      <h1 className="mt-6 text-3xl font-semibold tracking-tight">SSR modes</h1>
+      <p className="mt-4 leading-relaxed text-muted-foreground">
+        The same punk-songs list, rendered three ways. Each route picks a different point on the
+        server-versus-client spectrum — open them and watch where the work happens.
+      </p>
 
-        <DemoExplainer feature="Per-route ssr option">
-          One <code>ssr</code> field on each route definition decides where rendering happens. Same
-          loader, same component — only the rendering boundary changes.
-        </DemoExplainer>
+      <DemoExplainer feature="Per-route ssr option" className="mt-8">
+        One <code>ssr</code> field on each route definition decides where rendering happens. Same
+        loader, same component — only the rendering boundary changes.
+      </DemoExplainer>
 
-        <div className="flex flex-col gap-4">
-          <Link
-            to="/demo/start/ssr/spa-mode"
-            className="group rounded-xl border border-brand-primary-500/30 bg-card/60 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-primary-500/60 hover:shadow-lg"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xl font-bold text-foreground">SPA Mode</span>
-              <code className="rounded bg-brand-primary-500/10 px-2 py-1 text-xs font-semibold text-brand-primary-700">
-                ssr: false
-              </code>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Nothing for this route renders on the server. The browser receives an empty shell,
-              then fetches the data and renders the whole list on the client — fastest shell,
-              slowest data.
-            </p>
-          </Link>
-
-          <Link
-            to="/demo/start/ssr/full-ssr"
-            className="group rounded-xl border border-brand-secondary-500/30 bg-card/60 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-secondary-500/60 hover:shadow-lg"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xl font-bold text-foreground">Full SSR</span>
-              <code className="rounded bg-brand-secondary-500/10 px-2 py-1 text-xs font-semibold text-brand-secondary-700">
-                ssr: true
-              </code>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              The default. The loader runs on the server and the component is rendered to HTML
-              there, then hydrated in the browser. Best for SEO and first paint — the list is in the
-              initial response.
-            </p>
-          </Link>
-
-          <Link
-            to="/demo/start/ssr/data-only"
-            className="group rounded-xl border border-foreground/10 bg-card/60 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-foreground/25 hover:shadow-lg"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xl font-bold text-foreground">Data Only</span>
-              <code className="rounded bg-foreground/5 px-2 py-1 text-xs font-semibold text-foreground/70">
-                ssr: "data-only"
-              </code>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              The loader runs on the server and its data is serialized into the page, but the
-              component renders only on the client. You skip the client-side data waterfall without
-              paying to render the markup on the server.
-            </p>
-          </Link>
-        </div>
-      </div>
-    </div>
+      <ul className="mt-8 space-y-3">
+        {modes.map((mode) => (
+          <li key={mode.title}>
+            <Link
+              to={mode.to}
+              className="group flex flex-col rounded-lg border border-border bg-card p-6 transition-colors hover:border-foreground/25 hover:bg-accent/40"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-semibold tracking-tight">{mode.title}</span>
+                <code>{mode.option}</code>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{mode.body}</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+                Open
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }

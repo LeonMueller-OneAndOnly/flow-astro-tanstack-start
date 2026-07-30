@@ -56,19 +56,16 @@ function MenuBar() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="fixed inset-x-0 top-0 z-20 flex h-14 items-center gap-2 bg-brand-primary-950 px-4 text-white shadow-lg">
+    <header className="fixed inset-x-0 top-0 z-20 flex h-header items-center gap-1 border-b border-border bg-background/60 px-4 backdrop-blur-xl">
       <button
         type="button"
         aria-label="Toggle menu"
         onClick={toggleSidebar}
-        className="rounded-md p-2 text-white/90 transition-colors hover:bg-white/10 hover:text-white"
+        className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
       >
-        <Menu className="size-6" />
+        <Menu className="size-5" />
       </button>
-      <a
-        href={$astroPath({ to: "/" })}
-        className="ml-1 text-xl font-semibold tracking-tight text-white"
-      >
+      <a href={$astroPath({ to: "/" })} className="px-1 font-semibold tracking-tight">
         Omnis
       </a>
     </header>
@@ -149,7 +146,7 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
   };
 
   return (
-    <Sidebar collapsible="offcanvas" className="pt-14">
+    <Sidebar collapsible="offcanvas" className="pt-header">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">Navigation</div>
       </SidebarHeader>
@@ -280,7 +277,7 @@ export default function Header({ variant = "app" }: { variant?: HeaderVariant })
   return (
     <SidebarProvider defaultOpen={false} className="min-h-0 flex-col">
       <MenuBar />
-      <div aria-hidden="true" className="h-14 shrink-0" />
+      <div aria-hidden="true" className="h-header shrink-0" />
       <AppSidebar variant={variant} />
     </SidebarProvider>
   );

@@ -1,4 +1,3 @@
-import { Lightbulb } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -18,17 +17,9 @@ export function DemoExplainer({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "mb-6 flex gap-3 rounded-xl border border-brand-secondary-500/30 bg-brand-secondary-500/10 p-4",
-        className,
-      )}
-    >
-      <Lightbulb className="mt-0.5 size-5 shrink-0 text-brand-secondary-600" />
-      <div className="space-y-1">
-        <p className="text-sm font-semibold text-foreground">{feature}</p>
-        <p className="text-sm leading-relaxed text-muted-foreground">{children}</p>
-      </div>
+    <div className={cn("border-l-2 border-primary/40 pl-4", className)}>
+      <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">{feature}</p>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{children}</p>
     </div>
   );
 }

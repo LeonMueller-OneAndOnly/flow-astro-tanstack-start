@@ -8,8 +8,9 @@ import { demoTodos } from "../../../db/schema";
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { brandPageBackground, brandPrimaryButtonClass } from "../../lib/brand-theme";
 
 /*
 const loggingMiddleware = createMiddleware().server(
@@ -86,47 +87,37 @@ function Home() {
   };
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground"
-      style={brandPageBackground}
-    >
-      <div className="w-full max-w-2xl rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-sm">
-        <BackLink to="/demo" />
-        <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
-          Server functions
+    <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
+      <BackLink to="/demo" />
+      <div className="mt-6 flex items-center gap-3">
+        <h1 className="text-3xl font-semibold tracking-tight">Todo example</h1>
+        {todos ? <Badge variant="secondary">{todos.length}</Badge> : null}
+      </div>
+      <DemoExplainer feature="TanStack Start server functions" className="mt-6">
+        The route <code>loader</code> calls <code>getTodos</code> on the server to read the list.
+        Adding one runs the <code>addTodo</code> POST server function — typed RPC that writes to the
+        database — then <code>router.invalidate()</code> refetches the loader.
+      </DemoExplainer>
+
+      {todos && todos.length > 0 ? (
+        <ul className="mt-8 divide-y divide-border rounded-lg border border-border bg-card">
+          {todos.map((t) => (
+            <li key={t.id} className="px-5 py-3.5">
+              {t.name}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-8 rounded-lg border border-dashed border-border px-5 py-8 text-center text-sm text-muted-foreground">
+          No todos yet — add the first one below.
         </p>
-        <div className="mb-5 flex items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Todo example</h1>
-          {todos ? <Badge variant="secondary">{todos.length} todos</Badge> : null}
-        </div>
-        <DemoExplainer feature="TanStack Start server functions">
-          The route <code>loader</code> calls <code>getTodos</code> on the server to read the list.
-          Adding one runs the <code>addTodo</code> POST server function — typed RPC that writes to
-          the database — then <code>router.invalidate()</code> refetches the loader.
-        </DemoExplainer>
-        {todos && todos.length > 0 ? (
-          <ul className="mb-4 space-y-2">
-            {todos.map((t) => (
-              <li
-                key={t.id}
-                className="rounded-lg border border-foreground/10 bg-foreground/5 p-3 shadow-sm"
-              >
-                <span className="text-lg text-foreground">{t.name}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mb-4 rounded-lg border border-dashed border-border p-6 text-center text-muted-foreground">
-            No todos yet — add the first one below.
-          </p>
-        )}
-        <div className="flex flex-col gap-2">
-          <Label id="new-todo-label" htmlFor="new-todo">
-            New todo
-          </Label>
-          <input
+      )}
+
+      <div className="mt-6 space-y-2">
+        <Label htmlFor="new-todo">New todo</Label>
+        <div className="flex gap-2">
+          <Input
             id="new-todo"
-            aria-labelledby="new-todo-label"
             type="text"
             value={todo}
             onChange={(e) => setTodo(e.target.value)}
@@ -136,17 +127,12 @@ function Home() {
               }
             }}
             placeholder="Enter a new todo..."
-            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary-500"
           />
-          <button
-            disabled={todo.trim().length === 0}
-            onClick={submitTodo}
-            className={`rounded-lg px-4 py-3 ${brandPrimaryButtonClass}`}
-          >
-            Add todo
-          </button>
+          <Button disabled={todo.trim().length === 0} onClick={submitTodo}>
+            Add
+          </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

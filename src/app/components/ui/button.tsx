@@ -5,23 +5,30 @@ import type * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium outline-none transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  /* `rounded-full` on the base rather than per-size: a pill is the shape of every
+     control in this design, and a square-cornered one reads as a foreign widget.
+     `active:translate-y-px` is the whole press animation — a control that gives
+     slightly under the cursor feels friendlier than one that only changes
+     colour, and it costs a single class. */
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold outline-none transition-[color,background-color,border-color,box-shadow,translate] active:translate-y-px focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20",
-        outline: "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        /* The one primary action on a view: solid brand over the warm paper. */
+        default: "shadow-soft bg-primary text-primary-foreground hover:bg-brand-hover",
+        /* Its partner, for the action beside the primary one. Filled rather than
+           outlined — an outline next to a solid pill reads as disabled. */
+        secondary: "bg-secondary text-secondary-foreground hover:bg-border",
+        outline: "border border-input bg-card hover:bg-secondary",
+        destructive: "shadow-soft bg-destructive text-destructive-foreground hover:brightness-95",
+        ghost: "hover:bg-secondary",
+        link: "text-brand-ink underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-6",
-        icon: "size-9",
+        default: "h-10 px-5",
+        sm: "h-8 px-4 text-xs",
+        lg: "h-12 px-7 text-base",
+        icon: "size-10",
       },
     },
     defaultVariants: {

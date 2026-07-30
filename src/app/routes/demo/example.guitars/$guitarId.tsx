@@ -2,9 +2,8 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import guitars from "../../../lib/demo/data/example-guitars";
-import { brandPageBackground, brandPrimaryButtonClass } from "../../../lib/brand-theme";
 import { $appPath } from "../../../lib/framework/typesafe-paths";
 import { cn } from "@/lib/utils";
 
@@ -38,51 +37,40 @@ function RouteComponent() {
   });
 
   return (
-    <div
-      className="relative flex min-h-screen items-center bg-background p-5 text-foreground"
-      style={brandPageBackground}
-    >
-      <div className="relative z-10 w-[60%] rounded-2xl border border-foreground/10 bg-card/80 p-8 shadow-xl backdrop-blur-md">
-        <BackLink to="/demo/example/guitars" label="Back to all guitars" />
-        <DemoExplainer feature="Route loader resolved this page">
-          The <code>$guitarId</code> from the URL was handed to the route <code>loader</code>, which
-          looked up this guitar before the component rendered — so there's no loading state here.
-        </DemoExplainer>
+    <main className="mx-auto w-full max-w-5xl px-6 pt-10 pb-24">
+      <BackLink to="/demo/example/guitars" label="Back to all guitars" />
 
-        <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-1.5 font-mono text-xs text-muted-foreground">
-          <span className="text-brand-secondary-700">GET</span>
-          {currentPath}
-        </div>
+      <div className="mt-6 grid gap-10 lg:grid-cols-2">
+        <img
+          src={guitar.image}
+          alt={guitar.name}
+          className="aspect-4/3 w-full rounded-lg border border-border object-cover"
+        />
 
-        <h1 className="mb-4 text-3xl font-bold tracking-tight">{guitar.name}</h1>
-        <p className="mb-6 text-muted-foreground">{guitar.description}</p>
-        <div className="mb-8 flex items-center justify-between">
-          <Badge className="bg-brand-primary-600 px-3 py-1 text-base text-white">
-            ${guitar.price}
-          </Badge>
-          <button className={`rounded-lg px-6 py-2 ${brandPrimaryButtonClass}`}>Add to Cart</button>
-        </div>
+        <div>
+          <code className="inline-block">GET {currentPath}</code>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight">{guitar.name}</h1>
+          <p className="mt-2 text-lg font-medium tabular-nums">${guitar.price}</p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">{guitar.description}</p>
 
-        <div className="flex items-stretch justify-between gap-3 border-t border-foreground/10 pt-5">
-          <PagerLink direction="prev" guitar={prev} />
-          <PagerLink direction="next" guitar={next} />
+          <Button className="mt-6">Add to cart</Button>
+
+          <DemoExplainer feature="Route loader resolved this page" className="mt-8">
+            The <code>$guitarId</code> from the URL was handed to the route <code>loader</code>,
+            which looked up this guitar before the component rendered — so there is no loading state
+            here.
+          </DemoExplainer>
         </div>
       </div>
 
-      <div className="absolute top-0 right-0 z-0 h-full w-[55%]">
-        <div className="h-full w-full overflow-hidden rounded-2xl border-4 border-foreground/10 shadow-2xl">
-          <img
-            src={guitar.image}
-            alt={guitar.name}
-            className={cn(
-              // oxlint-disable-next-line better-tailwindcss/no-unknown-classes
-              "guitar-image",
-              "h-full w-full object-cover",
-            )}
-          />
-        </div>
-      </div>
-    </div>
+      <nav
+        aria-label="Guitar pagination"
+        className="mt-12 flex items-stretch justify-between gap-3 border-t border-border pt-6"
+      >
+        <PagerLink direction="prev" guitar={prev} />
+        <PagerLink direction="next" guitar={next} />
+      </nav>
+    </main>
   );
 }
 
@@ -99,20 +87,20 @@ function PagerLink({
       to="/demo/example/guitars/$guitarId"
       params={{ guitarId: guitar.id.toString() }}
       className={cn(
-        "group flex flex-1 items-center gap-2 rounded-xl border border-foreground/10 bg-card/60 p-3 transition-colors hover:border-brand-secondary-500/50 hover:bg-card",
+        "group flex flex-1 items-center gap-2 rounded-lg border border-border bg-card p-4 transition-colors hover:border-foreground/25 hover:bg-accent/40",
         isPrev ? "text-left" : "flex-row-reverse text-right",
       )}
     >
       {isPrev ? (
-        <ChevronLeft className="h-5 w-5 shrink-0 text-brand-secondary-600 transition-transform group-hover:-translate-x-0.5" />
+        <ChevronLeft className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-x-0.5" />
       ) : (
-        <ChevronRight className="h-5 w-5 shrink-0 text-brand-secondary-600 transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
       )}
       <span className="min-w-0">
-        <span className="block text-xs font-medium text-muted-foreground uppercase">
+        <span className="block font-mono text-xs tracking-widest text-muted-foreground uppercase">
           {isPrev ? "Previous" : "Next"}
         </span>
-        <span className="block truncate font-semibold">{guitar.name}</span>
+        <span className="mt-0.5 block truncate font-medium">{guitar.name}</span>
       </span>
     </Link>
   );

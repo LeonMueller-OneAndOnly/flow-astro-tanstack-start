@@ -11,7 +11,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { brandPageBackground, brandPrimaryButtonClass } from "@/lib/brand-theme";
 import { Result } from "@/lib/framework/result";
 
 const ZMailWorkerInput = z.object({
@@ -86,88 +85,75 @@ function MailWorkerTestPage() {
   }
 
   return (
-    <main
-      className="min-h-screen bg-background px-6 py-16 text-foreground"
-      style={brandPageBackground}
-    >
-      <div className="mx-auto max-w-3xl">
-        <BackLink to="/demo" />
-        <div className="mb-8">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-brand-secondary-700">
-            Worker smoke test
-          </p>
-          <h1 className="text-4xl font-black tracking-tight md:text-5xl">Queue a preview email</h1>
-          <p className="mt-4 max-w-2xl text-muted-foreground">
-            Submitting this form inserts a <code>send-mail</code> job. The background worker should
-            pick it up and open the generated email preview.
-          </p>
-          <DemoExplainer
-            feature="Server function → background job queue"
-            className="mt-6 max-w-2xl"
-          >
-            The form calls a POST server function that validates input with Zod and only{" "}
-            <em>enqueues</em> a job — it returns immediately. A separate worker process drains the
-            queue and does the slow work, so the request never blocks on sending mail.
-          </DemoExplainer>
-        </div>
+    <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
+      <BackLink to="/demo" />
+      <h1 className="mt-6 text-3xl font-semibold tracking-tight">Queue a preview email</h1>
+      <p className="mt-4 leading-relaxed text-muted-foreground">
+        Submitting this form inserts a <code>send-mail</code> job. The background worker should pick
+        it up and open the generated email preview.
+      </p>
+      <DemoExplainer feature="Server function → background job queue" className="mt-6">
+        The form calls a POST server function that validates input with Zod and only{" "}
+        <em>enqueues</em> a job — it returns immediately. A separate worker process drains the queue
+        and does the slow work, so the request never blocks on sending mail.
+      </DemoExplainer>
 
-        <Card className="border-foreground/10 bg-card/80 shadow-xl backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Mail job payload</CardTitle>
-            <CardDescription>
-              Uses <code>preview-in-browser</code>; no SMTP configuration is needed. Outside
-              production, no real email is sent — it only opens as a preview.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-5" onSubmit={submitMail}>
-              <div className="space-y-2">
-                <Label htmlFor="mail-to">Recipient</Label>
-                <Input
-                  id="mail-to"
-                  type="email"
-                  value={form.to}
-                  onChange={(event) => setForm({ ...form, to: event.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="mail-subject">Subject</Label>
-                <Input
-                  id="mail-subject"
-                  value={form.subject}
-                  onChange={(event) => setForm({ ...form, subject: event.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="mail-message">Message</Label>
-                <Textarea
-                  id="mail-message"
-                  value={form.message}
-                  onChange={(event) => setForm({ ...form, message: event.target.value })}
-                  className="min-h-36"
-                  required
-                />
-              </div>
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Mail job payload</CardTitle>
+          <CardDescription>
+            Uses <code>preview-in-browser</code>; no SMTP configuration is needed. Outside
+            production, no real email is sent — it only opens as a preview.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-5" onSubmit={submitMail}>
+            <div className="space-y-2">
+              <Label htmlFor="mail-to">Recipient</Label>
+              <Input
+                id="mail-to"
+                type="email"
+                value={form.to}
+                onChange={(event) => setForm({ ...form, to: event.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mail-subject">Subject</Label>
+              <Input
+                id="mail-subject"
+                value={form.subject}
+                onChange={(event) => setForm({ ...form, subject: event.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mail-message">Message</Label>
+              <Textarea
+                id="mail-message"
+                value={form.message}
+                onChange={(event) => setForm({ ...form, message: event.target.value })}
+                className="min-h-36"
+                required
+              />
+            </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button type="submit" disabled={isSubmitting} className={brandPrimaryButtonClass}>
-                  {isSubmitting ? "Queueing..." : "Queue mail job"}
-                </Button>
-                {status?.success ? (
-                  <p className="text-sm font-medium text-emerald-600">
-                    Queued job #{status.jobId} for {status.to}. Watch for the preview window.
-                  </p>
-                ) : null}
-                {status && !status.success ? (
-                  <p className="text-sm text-destructive">{status.error}</p>
-                ) : null}
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Queueing..." : "Queue mail job"}
+              </Button>
+              {status?.success ? (
+                <p className="text-sm font-medium text-success">
+                  Queued job #{status.jobId} for {status.to}. Watch for the preview window.
+                </p>
+              ) : null}
+              {status && !status.success ? (
+                <p className="text-sm text-destructive">{status.error}</p>
+              ) : null}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   );
 }
