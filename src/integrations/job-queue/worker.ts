@@ -10,9 +10,9 @@ const worker = createJobQueueWorker(jobs, {
 export function startJobQueueWorker() {
   void Result.fromAsync(() => worker.start()).then((result) => {
     if (result.success) {
-      console.log("Started job queue worker");
+      console.log("[job-queue]: Started worker");
     } else {
-      console.error("Failed to start job queue worker", result.error);
+      console.error("[job-queue]: Failed to worker", result.error);
     }
   });
 }
