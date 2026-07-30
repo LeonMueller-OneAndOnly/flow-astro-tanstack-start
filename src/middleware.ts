@@ -1,8 +1,8 @@
 import { APP_ORIGIN } from "astro:env/server";
 import { defineMiddleware } from "astro:middleware";
 
-import { isContentPath, NOINDEX } from "./lib/content-paths";
-import { isCrossSiteRequest } from "./lib/cross-site-request";
+import { isContentPath, NOINDEX } from "./app/lib/content-paths";
+import { isCrossSiteRequest } from "./app/lib/cross-site-request";
 import type { APIContext } from "astro";
 
 // Astro inlines `access: "public"` env fields at build time, so this is a build constant

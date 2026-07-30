@@ -1,7 +1,7 @@
 import path from "node:path";
 import { getConfig, physicalGetRouteNodes, type Config } from "@tanstack/router-generator";
 
-import { isContentPath } from "../../lib/content-paths";
+import { isContentPath } from "./content-paths";
 
 const APP_SITEMAP_OUTPUT_PATH = "app-sitemap.xml";
 const APP_BASE_PATH = "/app";
