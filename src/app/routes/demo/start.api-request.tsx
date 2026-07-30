@@ -39,7 +39,7 @@ function Home() {
 
       {names === null ? (
         <ul
-          className="mt-8 divide-y divide-border rounded-lg border border-border bg-card"
+          className="mt-8 shadow-soft divide-y divide-border rounded-xl border border-border bg-card"
           aria-busy="true"
         >
           {Array.from({ length: 3 }).map((_, i) => (
@@ -49,7 +49,7 @@ function Home() {
           ))}
         </ul>
       ) : (
-        <ul className="mt-8 divide-y divide-border rounded-lg border border-border bg-card">
+        <ul className="mt-8 shadow-soft divide-y divide-border rounded-xl border border-border bg-card">
           {names.map((name) => (
             <li key={name} className="px-5 py-3.5">
               {name}

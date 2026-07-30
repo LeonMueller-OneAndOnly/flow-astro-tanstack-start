@@ -44,7 +44,7 @@ function RouteComponent() {
         <img
           src={guitar.image}
           alt={guitar.name}
-          className="aspect-4/3 w-full rounded-lg border border-border object-cover"
+          className="aspect-4/3 w-full rounded-xl border border-border object-cover"
         />
 
         <div>
@@ -87,7 +87,7 @@ function PagerLink({
       to="/demo/example/guitars/$guitarId"
       params={{ guitarId: guitar.id.toString() }}
       className={cn(
-        "group flex flex-1 items-center gap-2 rounded-lg border border-border bg-card p-4 transition-colors hover:border-foreground/25 hover:bg-accent/40",
+        "shadow-soft hover:shadow-lifted group flex flex-1 items-center gap-2 rounded-xl border border-border bg-card p-4 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5",
         isPrev ? "text-left" : "flex-row-reverse text-right",
       )}
     >

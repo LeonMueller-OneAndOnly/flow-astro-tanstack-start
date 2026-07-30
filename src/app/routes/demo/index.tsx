@@ -12,8 +12,6 @@ import {
 import type { LinkProps } from "@tanstack/react-router";
 import type { ComponentType } from "react";
 
-import { buttonVariants } from "@/components/ui/button";
-
 /** Served at `/app/demo`; lists every starter demo. Delete `src/app/routes/demo` to drop them all. */
 export const Route = createFileRoute("/demo/")({
   component: DemoIndex,
@@ -21,6 +19,8 @@ export const Route = createFileRoute("/demo/")({
 
 type Demo = {
   icon: ComponentType<{ className?: string }>;
+  /** Tailwind classes for the pastel icon tile, cycled from the three shared tints. */
+  tint: string;
   title: string;
   /** The framework capability the demo exists to show, not a category. */
   tag: string;
@@ -31,6 +31,7 @@ type Demo = {
 const demos: ReadonlyArray<Demo> = [
   {
     icon: Guitar,
+    tint: "bg-tint-sky text-tint-sky-ink",
     title: "Dynamic routes",
     tag: "Typed params",
     description:
@@ -39,6 +40,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: CloudUpload,
+    tint: "bg-tint-mint text-tint-mint-ink",
     title: "File uploads",
     tag: "Multipart API",
     description:
@@ -47,6 +49,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Mail,
+    tint: "bg-tint-sun text-tint-sun-ink",
     title: "Mail worker",
     tag: "Server fn → queue",
     description:
@@ -55,6 +58,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Server,
+    tint: "bg-tint-sky text-tint-sky-ink",
     title: "Server functions",
     tag: "RPC",
     description:
@@ -63,6 +67,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: RouteIcon,
+    tint: "bg-tint-mint text-tint-mint-ink",
     title: "API endpoint",
     tag: "Route handler",
     description: "A client page that fetches JSON from a colocated TanStack API route.",
@@ -70,13 +75,15 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: FileText,
+    tint: "bg-tint-sun text-tint-sun-ink",
     title: "SSR modes",
     tag: "Rendering",
-    description: "The same list rendered three ways, one per value of the per-route `ssr` option.",
+    description: "The same list rendered three ways, one per value of the per-route ssr option.",
     to: "/demo/start/ssr",
   },
   {
     icon: Database,
+    tint: "bg-tint-sky text-tint-sky-ink",
     title: "Client store",
     tag: "State",
     description: "A TanStack Store example with per-field subscriptions and derived state.",
@@ -86,48 +93,45 @@ const demos: ReadonlyArray<Demo> = [
 
 function DemoIndex() {
   return (
-    <main className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24">
-      <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-        TanStack Start demos
-      </p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight">Starter demo hub</h1>
-      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-        Framework examples for routing, API handlers, server functions, SSR modes, state, and
-        dynamic params. Every one lives under <code>/app/demo</code>.
+    <main className="mx-auto w-full max-w-5xl px-5 pt-16 pb-28 sm:px-8">
+      <p className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-sm font-medium text-brand-ink">
+        <span className="size-2 rounded-full bg-brand" />
+        Demos
       </p>
 
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link to="/demo/example/guitars" className={buttonVariants({ size: "lg" })}>
-          Start with dynamic routes
-        </Link>
-        <a
-          href="https://tanstack.com/start"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: "outline", size: "lg" })}
-        >
-          TanStack Start docs
-        </a>
-      </div>
+      <h1 className="mt-6 max-w-2xl text-4xl leading-[1.12] font-semibold tracking-tight text-balance sm:text-5xl">
+        Have a look at <span className="text-brand">how it all fits together.</span>
+      </h1>
 
-      <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+        One small, working example per pattern — routing, API handlers, server functions, rendering
+        modes, state and dynamic params. Open one, then go and read how it is put together.
+      </p>
+
+      <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {demos.map((demo) => (
           <li key={demo.title} className="flex">
             <Link
               to={demo.to}
-              className="group flex flex-1 flex-col rounded-lg border border-border bg-card p-6 transition-colors hover:border-foreground/25 hover:bg-accent/40"
+              className="shadow-soft hover:shadow-lifted group flex flex-1 flex-col rounded-xl border border-border bg-card p-6 transition-[transform,box-shadow] duration-200 hover:-translate-y-1"
             >
-              <div className="flex items-center justify-between gap-3">
-                <demo.icon className="size-5 text-muted-foreground" />
-                <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+              <div className="flex items-start justify-between gap-3">
+                <span
+                  className={`inline-flex size-9 items-center justify-center rounded-lg ${demo.tint}`}
+                  aria-hidden="true"
+                >
+                  <demo.icon className="size-4.5" />
+                </span>
+                <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground">
                   {demo.tag}
                 </span>
               </div>
+
               <h2 className="mt-4 font-semibold tracking-tight">{demo.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                 {demo.description}
               </p>
-              <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-brand-ink">
                 Open
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </span>
@@ -136,11 +140,13 @@ function DemoIndex() {
         ))}
       </ul>
 
-      <p className="mt-12 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        Keep these around while building — they are a working reference for how this project wires
-        up routing, server functions, uploads, and SSR, so an agent can follow the established
-        conventions. Delete <code>src/app/routes/demo</code> and <code>src/app/lib/demo</code>{" "}
-        before deploying.
+      {/* The start page already explains why these exist and when to delete them. From
+          here — where you are looking at the demos rather than reading about them —
+          only the location is worth repeating. */}
+      <p className="mt-16 max-w-3xl border-t border-border pt-8 text-sm leading-relaxed text-muted-foreground">
+        Every one of these lives in <code>src/app/routes/demo</code>, with its data and helpers in{" "}
+        <code>src/app/lib/demo</code>. Nothing outside those two folders depends on them, so
+        deleting both is all it takes to clear the lot.
       </p>
     </main>
   );

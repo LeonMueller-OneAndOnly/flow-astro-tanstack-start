@@ -26,7 +26,7 @@ function GuitarsIndex() {
             <Link
               to="/demo/example/guitars/$guitarId"
               params={{ guitarId: guitar.id.toString() }}
-              className="group flex flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/25"
+              className="shadow-soft hover:shadow-lifted group flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card transition-[transform,box-shadow] duration-200 hover:-translate-y-1"
             >
               <img
                 src={guitar.image}

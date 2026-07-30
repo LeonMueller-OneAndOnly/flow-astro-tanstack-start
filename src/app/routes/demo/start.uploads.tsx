@@ -96,7 +96,7 @@ function UploadsDemo() {
       </DemoExplainer>
 
       <div className="mt-10 grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-        <section className="rounded-lg border border-border bg-card p-6">
+        <section className="shadow-soft rounded-xl border border-border bg-card p-6">
           <h2 className="font-semibold tracking-tight">Upload</h2>
           <p className="mt-1 text-sm text-muted-foreground">Max 5 MB in this example.</p>
 
@@ -119,7 +119,7 @@ function UploadsDemo() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-border bg-card p-6">
+        <section className="shadow-soft rounded-xl border border-border bg-card p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="font-semibold tracking-tight">Stored files</h2>
@@ -139,7 +139,7 @@ function UploadsDemo() {
           </div>
 
           {files.length === 0 ? (
-            <p className="mt-5 rounded-lg border border-dashed border-border px-5 py-8 text-center text-sm text-muted-foreground">
+            <p className="mt-5 rounded-xl border border-dashed border-border px-5 py-8 text-center text-sm text-muted-foreground">
               No uploaded files yet.
             </p>
           ) : (
@@ -148,7 +148,7 @@ function UploadsDemo() {
                 <li key={file.id}>
                   <a
                     href={file.url}
-                    className="flex items-center justify-between gap-4 py-3 transition-colors hover:text-primary"
+                    className="flex items-center justify-between gap-4 py-3 transition-colors hover:text-brand-ink"
                   >
                     <span className="min-w-0">
                       <span className="block truncate font-medium">{file.name}</span>
@@ -166,7 +166,7 @@ function UploadsDemo() {
         </section>
       </div>
 
-      <section className="mt-4 rounded-lg border border-border p-6">
+      <section className="mt-4 rounded-xl bg-secondary/60 p-6">
         <h2 className="font-semibold tracking-tight">Migration note</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           This example uses a local filesystem driver. To migrate to S3 or R2, swap the driver in{" "}

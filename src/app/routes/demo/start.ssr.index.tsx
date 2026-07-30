@@ -50,14 +50,14 @@ function RouteComponent() {
           <li key={mode.title}>
             <Link
               to={mode.to}
-              className="group flex flex-col rounded-lg border border-border bg-card p-6 transition-colors hover:border-foreground/25 hover:bg-accent/40"
+              className="shadow-soft hover:shadow-lifted group flex flex-col rounded-xl border border-border bg-card p-6 transition-[transform,box-shadow] duration-200 hover:-translate-y-1"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="font-semibold tracking-tight">{mode.title}</span>
                 <code>{mode.option}</code>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{mode.body}</p>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-ink">
                 Open
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </span>

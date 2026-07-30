@@ -20,11 +20,11 @@ export function BackLink({
     <Link
       to={to}
       className={cn(
-        "inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+        "group inline-flex items-center gap-2 rounded-full bg-secondary py-1.5 pr-4 pl-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-border hover:text-foreground",
         className,
       )}
     >
-      <ArrowLeft className="size-4" />
+      <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
       {label}
     </Link>
   );

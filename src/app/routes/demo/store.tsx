@@ -69,7 +69,7 @@ function DemoStore() {
         recomputes automatically whenever either name changes — no manual wiring.
       </DemoExplainer>
 
-      <div className="mt-8 space-y-5 rounded-lg border border-border bg-card p-6">
+      <div className="shadow-soft mt-8 space-y-5 rounded-xl border border-border bg-card p-6">
         <FirstNameField />
         <LastNameField />
         <FullNameField />

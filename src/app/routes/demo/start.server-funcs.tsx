@@ -100,7 +100,7 @@ function Home() {
       </DemoExplainer>
 
       {todos && todos.length > 0 ? (
-        <ul className="mt-8 divide-y divide-border rounded-lg border border-border bg-card">
+        <ul className="mt-8 shadow-soft divide-y divide-border rounded-xl border border-border bg-card">
           {todos.map((t) => (
             <li key={t.id} className="px-5 py-3.5">
               {t.name}
@@ -108,7 +108,7 @@ function Home() {
           ))}
         </ul>
       ) : (
-        <p className="mt-8 rounded-lg border border-dashed border-border px-5 py-8 text-center text-sm text-muted-foreground">
+        <p className="mt-8 rounded-xl border border-dashed border-border px-5 py-8 text-center text-sm text-muted-foreground">
           No todos yet — add the first one below.
         </p>
       )}

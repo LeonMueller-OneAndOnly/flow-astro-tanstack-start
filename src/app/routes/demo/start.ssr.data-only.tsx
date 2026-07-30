@@ -23,7 +23,7 @@ function RouteComponent() {
         to render the markup on the server.
       </DemoExplainer>
 
-      <ul className="mt-8 divide-y divide-border rounded-lg border border-border bg-card">
+      <ul className="mt-8 shadow-soft divide-y divide-border rounded-xl border border-border bg-card">
         {punkSongs.map((song) => (
           <li key={song.id} className="flex flex-wrap gap-x-2 px-5 py-3.5">
             <span className="font-medium">{song.name}</span>
