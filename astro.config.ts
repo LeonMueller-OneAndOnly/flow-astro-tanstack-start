@@ -52,6 +52,9 @@ export default defineConfig({
       tsconfigPaths: true,
     },
     server: { allowedHosts: [new URL(appOrigin).hostname] },
+    define: {
+      "import.meta.env.APP_ENV": JSON.stringify(appEnv),
+    },
     plugins: [
       ...composeAstroTanStackBuild({
         clientEntry: path.resolve("src/app/client.tsx"),
