@@ -22,7 +22,6 @@ describe("getUnifiedSitemapOptions", () => {
     expect(options.astro.filter("https://example.com/404")).toBe(false);
     expect(options.astro.filter("https://example.com/robots.txt")).toBe(false);
     expect(options.astro.filter("https://example.com/_image")).toBe(false);
-    expect(options.astro.filter("https://example.com/demo/responsive-image")).toBe(false);
   });
 
   // Astro emits sitemap URLs with a trailing slash and a prerendering page reads

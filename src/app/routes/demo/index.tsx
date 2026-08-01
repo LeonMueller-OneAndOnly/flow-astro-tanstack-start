@@ -96,7 +96,7 @@ const demos: ReadonlyArray<Demo> = [
     title: "Responsive images",
     tag: "Build-time assets",
     description:
-      "Build-processed images with placeholders, next to the same files run through astro:assets.",
+      "Widths and formats generated at build time, with a low-quality placeholder until each loads.",
     to: "/demo/responsive-image",
   },
 ];

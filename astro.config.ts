@@ -50,10 +50,11 @@ export default defineConfig({
   server: { host, port },
 
   image: {
-    // `<Image layout="constrained">` renders the sizing attributes but no CSS of its
-    // own, so without this the responsive layouts do not actually constrain anything.
-    // Scoped to elements Astro marks with `data-astro-image`, so it cannot reach the
-    // images `@responsive-image/react` renders.
+    // Nothing sets `layout` on an `<Image />` right now — this is here so that the
+    // first one that does is not silently broken. Astro's default is `false`, and with
+    // it the layout props render their sizing attributes but no CSS to act on them,
+    // which fails without an error anywhere. Scoped to elements Astro marks with
+    // `data-astro-image`, so it cannot reach what `<ResponsiveImage>` renders.
     responsiveStyles: true,
   },
 

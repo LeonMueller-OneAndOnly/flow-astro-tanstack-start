@@ -29,7 +29,7 @@ import videoGamesBlurhash from "../../../assets/demo/example-guitar-video-games.
 // Fixed layout needs only the widths it will actually render at: 1x and 2x of 240.
 import racingFixed from "../../../assets/demo/example-guitar-racing.jpg?w=240;480&format=original;webp&responsive";
 
-/** Served at `/app/demo/responsive-image`; the TanStack Start half of the image comparison. */
+/** Served at `/app/demo/responsive-image`. */
 export const Route = createFileRoute("/demo/responsive-image")({
   component: DemoResponsiveImage,
 });
@@ -43,9 +43,9 @@ function DemoResponsiveImage() {
       <DemoExplainer feature="@responsive-image/react + Vite plugin" className="mt-6">
         Images are imported with a <code>?responsive</code> query, resized and re-encoded at build
         time, and rendered as a <code>&lt;picture&gt;</code> with one <code>&lt;source&gt;</code>{" "}
-        per format. The same three files are rendered with Astro&apos;s own{" "}
-        <code>&lt;Image /&gt;</code> on <code>/demo/responsive-image</code> — open both and compare
-        the emitted markup.
+        per format. Nothing here is generated per request — every candidate below is a file that
+        already exists, which is what separates this from Astro&apos;s pipeline on an on-demand
+        page.
       </DemoExplainer>
 
       <Section
