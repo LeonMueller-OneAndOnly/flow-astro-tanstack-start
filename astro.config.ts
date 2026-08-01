@@ -91,6 +91,13 @@ export default defineConfig({
        * TanStack Start ones both have to resolve these imports.
        */
       responsiveImage({
+        // No `w` on purpose: the plugin's own list runs up to 3840, and the right
+        // ceiling follows the source image, not this layout — capping it here would
+        // put the top of the range out of reach of a genuinely large asset that could
+        // fill it. Each import narrows `w` to what its own source can deliver, which
+        // it has to do regardless, since the plugin reports the width that was
+        // requested rather than the one it produced. See
+        // `src/app/components/ResponsiveImage.tsx`.
         format: ["original", "webp", "avif"],
         // Per-image LQIP rules as a style object instead of the default generated `.css` import
         styles: "inline",

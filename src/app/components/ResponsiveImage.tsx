@@ -23,7 +23,9 @@ export type ResponsiveImageData = ResponsiveImageProps["src"];
  * - **Never request a width above the source's own.** The plugin does not enlarge, but
  *   it reports the *requested* width, and that becomes the `w` descriptor: a 1120px
  *   file asked for 1920 advertises a 1920w candidate it cannot deliver, and `srcset`
- *   selection has no way to detect it. Astro's `<Image />` clamps by itself.
+ *   selection has no way to detect it. Astro's `<Image />` clamps by itself. There is
+ *   no global ceiling to fall back on — `astro.config.ts` leaves the plugin's defaults
+ *   alone so large assets can use them, which makes this per-import `w` the only guard.
  * - In `.astro`: `className`, not `class`. `class` is dropped silently — no warning
  *   from Astro, React or the build. Astro's own `<Image />` takes `class`, so the two
  *   differ side by side.
