@@ -1,10 +1,11 @@
+/* 
+ * The three layout classes `<ResponsiveImage>` puts on every image it renders 
+ * ~150 bytes— `src/app/components/ResponsiveImage.tsx`  why the layer matters. 
+ */
+@import "@responsive-image/react/responsive-image.css" layer(base);
+
 @import "tailwindcss";
 @import "tw-animate-css";
-/* The three layout classes `<ResponsiveImage>` puts on every image it renders, ~150
-   bytes. The single origin for them, on purpose — `src/app/components/ResponsiveImage.tsx`
-   says why, and why the layer matters. Both halves load this file: BaseLayout.astro for
-   the Astro pages, __root.tsx for the app shell. */
-@import "@responsive-image/react/responsive-image.css" layer(base);
 
 @source "../app";
 @source "../components";
