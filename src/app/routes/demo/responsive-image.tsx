@@ -29,6 +29,9 @@ import videoGamesBlurhash from "../../../assets/demo/example-guitar-video-games.
 // Fixed layout needs only the widths it will actually render at: 1x and 2x of 240.
 import racingFixed from "../../../assets/demo/example-guitar-racing.jpg?w=240;480&format=original;webp&responsive";
 
+/** The `lqip=` values the plugin accepts. */
+type LqipKind = "color" | "inline" | "blurhash" | "thumbhash";
+
 /** Served at `/app/demo/responsive-image`. */
 export const Route = createFileRoute("/demo/responsive-image")({
   component: DemoResponsiveImage,
@@ -79,36 +82,21 @@ function DemoResponsiveImage() {
         note="Throttle the network in devtools and reload — each tile shows a different placeholder while the full image streams in. The cost is paid in the HTML, not in an extra request."
       >
         <div className="grid gap-5 sm:grid-cols-3">
-          <Lqip kind="color" data={travelingColor}>
-            <ResponsiveImage
-              src={travelingColor}
-              size={33}
-              alt="Guitar with travel stickers, dominant-colour placeholder"
-              className="w-full rounded-xl"
-            />
-          </Lqip>
-          <Lqip kind="inline" data={travelingInline}>
-            <ResponsiveImage
-              src={travelingInline}
-              size={33}
-              alt="Guitar with travel stickers, inline blurred placeholder"
-              className="w-full rounded-xl"
-            />
-          </Lqip>
-          <Lqip kind="blurhash" data={videoGamesBlurhash}>
-            {/* BlurHash decodes through a canvas, so it cannot be server-rendered —
-                see the SSR note in `src/app/components/ResponsiveImage.tsx`. The cost
-                is a blank box until hydration, which is the opposite of what a
-                placeholder is for; on an SSR route, prefer `inline`. */}
-            <ClientOnly fallback={<div className="aspect-square w-full rounded-xl bg-muted" />}>
-              <ResponsiveImage
-                src={videoGamesBlurhash}
-                size={33}
-                alt="Guitar in a video game finish, BlurHash placeholder"
-                className="w-full rounded-xl"
-              />
-            </ClientOnly>
-          </Lqip>
+          <Lqip
+            kind="color"
+            src={travelingColor}
+            alt="Guitar with travel stickers, dominant-colour placeholder"
+          />
+          <Lqip
+            kind="inline"
+            src={travelingInline}
+            alt="Guitar with travel stickers, inline blurred placeholder"
+          />
+          <Lqip
+            kind="blurhash"
+            src={videoGamesBlurhash}
+            alt="Guitar in a video game finish, BlurHash placeholder"
+          />
         </div>
       </Section>
     </main>
@@ -127,24 +115,37 @@ function Section({ title, note, children }: { title: string; note: string; child
   );
 }
 
-function Lqip({
-  kind,
-  data,
-  children,
-}: {
-  kind: string;
-  data: ResponsiveImageData;
-  children: ReactNode;
-}) {
+/**
+ * One placeholder tile: the image, the kind of LQIP it was built with, and whether that
+ * placeholder actually reached the descriptor — which is the only way a misspelled query
+ * param shows up, since the plugin ignores what it does not recognise.
+ *
+ * It renders the image itself rather than taking it as `children`, so `src` exists once.
+ * The earlier shape passed the descriptor twice, to the tile and to the image inside it,
+ * and nothing stopped the two from disagreeing.
+ */
+function Lqip({ kind, src, alt }: { kind: LqipKind; src: ResponsiveImageData; alt: string }) {
+  const image = <ResponsiveImage src={src} size={33} alt={alt} className="w-full rounded-xl" />;
+
   return (
     <div className="space-y-2">
-      {children}
+      {/* Derived from `kind`, not passed in: the hash-based placeholders decode through
+          a canvas during render and take the whole route down if they reach the server —
+          see the SSR note in `src/app/components/ResponsiveImage.tsx`. Deriving it means
+          a tile cannot be given the wrong wrapper. The cost is a blank box until
+          hydration, which is the opposite of what a placeholder is for; on an SSR route,
+          prefer `inline`. */}
+      {kind === "blurhash" || kind === "thumbhash" ? (
+        <ClientOnly fallback={<div className="aspect-square w-full rounded-xl bg-muted" />}>
+          {image}
+        </ClientOnly>
+      ) : (
+        image
+      )}
       <div className="flex items-center gap-2">
         <Badge variant="secondary">{kind}</Badge>
-        {/* Proof the placeholder actually made it into the descriptor rather than
-            silently falling back to nothing when a query param is misspelled. */}
         <span className="text-xs text-muted-foreground">
-          {data.lqip ? "placeholder present" : "no placeholder"}
+          {src.lqip ? "placeholder present" : "no placeholder"}
         </span>
       </div>
     </div>
