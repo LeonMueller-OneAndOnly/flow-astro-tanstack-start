@@ -6,3 +6,18 @@ allowBuilds:
   esbuild: true
   sharp: true
   sqlite3: true
+
+# `@responsive-image/vite-plugin` asks for sharp ^0.35 while astro pins ^0.34, so both
+# get installed and both libvips load into the same `astro build` process — macOS
+# reports the duplicate as `Class GNotificationCenterDelegate is implemented in both`
+# and warns about "spurious casting failures and mysterious crashes".
+#
+# `$sharp` resolves to the version in this package.json's own dependencies, which is
+# there to match what astro resolves to. So the plugin follows astro rather than the
+# other way round: astro is the one with a runtime sharp in the server bundle, the
+# plugin only runs at build time.
+#
+# This is below the plugin's declared range. Verified rather than assumed: the emitted
+# variants are byte-identical to the ones sharp 0.35 produced.
+overrides:
+  sharp: "$sharp"
