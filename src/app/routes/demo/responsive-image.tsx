@@ -1,66 +1,33 @@
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
-// `@responsive-image/react` publishes two builds of this component: the package root
-// carries `import './responsive-image.css'`, this entry does not. Taking the one
-// without leaves `src/styles/globals.css` as the single source of those rules — see
-// the note there. Via the root the stylesheet arrives twice on an Astro page, and the
-// second copy is unlayered, so it outranks both the `layer(base)` copy and every
-// Tailwind utility on the same element.
-import { ResponsiveImage } from "@responsive-image/react/responsive-image.js";
 import type { ReactNode } from "react";
 
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
+import { ResponsiveImage, type ResponsiveImageData } from "@/components/ResponsiveImage";
 import { Badge } from "@/components/ui/badge";
 
 /*
- * Every import below points at the same three JPEGs, and each one is a *different*
- * module to Vite because the query string differs. That is the whole mechanism:
- * `@responsive-image/vite-plugin` (registered in `astro.config.ts`) intercepts any
- * import whose query ends in `responsive`, runs sharp over the file at build time,
- * emits one asset per width × format, and hands back an `ImageData` descriptor
- * instead of a URL string. The component picks a candidate from that descriptor.
+ * Every import below points at the same three JPEGs, and each is a *different* module
+ * to Vite because the query differs. That is the whole mechanism: the plugin claims any
+ * specifier ending in `responsive`, runs sharp over the file at build time, emits one
+ * asset per width x format, and returns a descriptor instead of a URL.
  *
- * The `?responsive` part has to come last — see the note in `src/env.d.ts`.
- */
-
-/*
- * Every import narrows `w` instead of inheriting the global list from
- * `astro.config.ts`, and none of them asks for more than 1120 — the intrinsic width
- * of these three files. That is not tidiness. The plugin does not enlarge an image,
- * but it also does not correct the number it reports: `generateResizedImage` records
- * the width that was *requested*, and that number becomes the `w` descriptor in the
- * `srcset`. Ask for 1920 from a 1120px source and the markup promises a 1920px
- * candidate that is 1120px wide, which is the one input the browser's selection is
- * not allowed to be wrong about — it will pick that file for a 2x display and get
- * fewer pixels than it sized for.
- *
- * So the rule for every `?responsive` import: no width above the source's own.
- * Astro's `<Image />` needs no such care because it clamps to the intrinsic width
- * itself — compare the `srcset` values on `/demo/responsive-image`.
+ * None asks for a width above 1120, the intrinsic width of these files — see
+ * `src/app/components/ResponsiveImage.tsx` for why that is a rule and not tidiness.
  */
 
 // Full content width (max-w-4xl) at 2x would want ~1790px; 1120 is all there is.
 import racing from "../../../assets/demo/example-guitar-racing.jpg?w=640;828;1120&responsive";
 
-// A third of the content width, so ~290 CSS px, ~580 at 2x. LQIP variants: `color`
-// bakes a hex code into the markup and `inline` a ~600 byte data-URL, so both render
-// on the server. `blurhash` ships a 34 byte hash plus a 2 KB decoder, and cannot —
-// see the `ClientOnly` note further down.
+// A third of the content width, so ~290 CSS px, ~580 at 2x. `color` and `inline` bake
+// their placeholder into the markup; `blurhash` decodes through a canvas and cannot be
+// server-rendered, hence the `ClientOnly` below.
 import travelingColor from "../../../assets/demo/example-guitar-traveling.jpg?w=320;640;960&lqip=color&responsive";
 import travelingInline from "../../../assets/demo/example-guitar-traveling.jpg?w=320;640;960&lqip=inline&responsive";
 import videoGamesBlurhash from "../../../assets/demo/example-guitar-video-games.jpg?w=320;640;960&lqip=blurhash&responsive";
 
 // Fixed layout needs only the widths it will actually render at: 1x and 2x of 240.
 import racingFixed from "../../../assets/demo/example-guitar-racing.jpg?w=240;480&format=original;webp&responsive";
-
-/**
- * What a `?responsive` import evaluates to. Derived from one rather than imported as
- * `ImageData` from `@responsive-image/core`, only to avoid shadowing the DOM global of
- * that name — the package is a direct dependency either way, because the module the
- * plugin generates for each image import resolves `@responsive-image/core` from the
- * project root, not from its own tree.
- */
-type ResponsiveImageData = typeof racing;
 
 /** Served at `/app/demo/responsive-image`; the TanStack Start half of the image comparison. */
 export const Route = createFileRoute("/demo/responsive-image")({
@@ -129,18 +96,10 @@ function DemoResponsiveImage() {
             />
           </Lqip>
           <Lqip kind="blurhash" data={videoGamesBlurhash}>
-            {/*
-             * Client-only, and not by preference. The plugin compiles a BlurHash
-             * placeholder into a `background-image` callback that decodes the hash
-             * through a `<canvas>`, and `<ResponsiveImage>` evaluates that callback
-             * during render — so rendering this on the server throws
-             * `ReferenceError: document is not defined` and takes the whole route
-             * with it. `color` and `inline` have no decode step and render fine
-             * on the server.
-             *
-             * The cost is a blank box until hydration, which is the opposite of what
-             * a placeholder is for. On an SSR route, prefer `inline`.
-             */}
+            {/* BlurHash decodes through a canvas, so it cannot be server-rendered —
+                see the SSR note in `src/app/components/ResponsiveImage.tsx`. The cost
+                is a blank box until hydration, which is the opposite of what a
+                placeholder is for; on an SSR route, prefer `inline`. */}
             <ClientOnly fallback={<div className="aspect-square w-full rounded-xl bg-muted" />}>
               <ResponsiveImage
                 src={videoGamesBlurhash}
