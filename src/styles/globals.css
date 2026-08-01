@@ -1,3 +1,9 @@
+/* 
+ * The three layout classes `<ResponsiveImage>` puts on every image it renders 
+ * ~150 bytes— `src/app/components/ResponsiveImage.tsx`  why the layer matters. 
+ */
+@import "@responsive-image/react/responsive-image.css" layer(base);
+
 @import "tailwindcss";
 @import "tw-animate-css";
 

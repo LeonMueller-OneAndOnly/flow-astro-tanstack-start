@@ -5,6 +5,7 @@ import {
   Database,
   FileText,
   Guitar,
+  Image as ImageIcon,
   Mail,
   Route as RouteIcon,
   Server,
@@ -88,6 +89,15 @@ const demos: ReadonlyArray<Demo> = [
     tag: "State",
     description: "A TanStack Store example with per-field subscriptions and derived state.",
     to: "/demo/store",
+  },
+  {
+    icon: ImageIcon,
+    tint: "bg-tint-mint text-tint-mint-ink",
+    title: "Responsive images",
+    tag: "Build-time assets",
+    description:
+      "Widths and formats generated at build time, with a low-quality placeholder until each loads.",
+    to: "/demo/responsive-image",
   },
 ];
 

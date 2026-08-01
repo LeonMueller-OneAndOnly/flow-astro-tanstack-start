@@ -3,6 +3,7 @@ import { defineConfig, envField } from "astro/config";
 import path from "node:path";
 import node from "@astrojs/node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { responsiveImage } from "@responsive-image/vite-plugin";
 
 import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
@@ -48,9 +49,21 @@ export default defineConfig({
 
   server: { host, port },
 
+  image: {
+    // Nothing sets `layout` on an `<Image />` right now — this is here so that the
+    // first one that does is not silently broken. Astro's default is `false`, and with
+    // it the layout props render their sizing attributes but no CSS to act on them,
+    // which fails without an error anywhere. Scoped to elements Astro marks with
+    // `data-astro-image`, so it cannot reach what `<ResponsiveImage>` renders.
+    responsiveStyles: true,
+  },
+
   vite: {
     resolve: {
       tsconfigPaths: true,
+      // Left external, the SSR bundle keeps `@responsive-image/react`'s stylesheet as
+      // a runtime `import "…css"` and Node throws `ERR_UNKNOWN_FILE_EXTENSION` on the first render.
+      noExternal: ["@responsive-image/react"],
     },
     server: { allowedHosts: [new URL(appOrigin).hostname] },
     define: {
@@ -67,6 +80,28 @@ export default defineConfig({
           pages: sitemapOptions.tanstackStart.pages,
           sitemap: sitemapOptions.tanstackStart.sitemap,
         }),
+      }),
+      /**
+       * Build-time resizing for imports whose query ends in `responsive`, behind
+       * `src/app/components/ResponsiveImage.tsx` — which is also where the usage rules
+       * and the comparison against `astro:assets` are written down. Anything imported
+       * without that query falls through to Astro's own pipeline, so the two never
+       * contend for the same module.
+       *
+       * Outside `composeAstroTanStackBuild` on purpose: the Astro environments and the
+       * TanStack Start ones both have to resolve these imports.
+       */
+      responsiveImage({
+        // No `w` on purpose: the plugin's own list runs up to 3840, and the right
+        // ceiling follows the source image, not this layout — capping it here would
+        // put the top of the range out of reach of a genuinely large asset that could
+        // fill it. Each import narrows `w` to what its own source can deliver, which
+        // it has to do regardless, since the plugin reports the width that was
+        // requested rather than the one it produced. See
+        // `src/app/components/ResponsiveImage.tsx`.
+        format: ["original", "webp", "avif"],
+        // Per-image LQIP rules as a style object instead of the default generated `.css` import
+        styles: "inline",
       }),
       tailwindcss(),
     ],

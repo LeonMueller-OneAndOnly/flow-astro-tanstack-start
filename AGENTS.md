@@ -10,25 +10,26 @@ Prefer hardcoded defaults. Add env variables only for secrets or deployment-spec
 Document every env variable in `astro.config.ts`.
 Do not create helper functions unless they are reused or encapsulate complex code.
 
+Use oxlint for linting, astro check for typechecking and vitest for testing.
+
 # Framework
 
 This project uses Astro plus TanStack Start. TanStack Start is mounted under `/app`.
 Default to Astro for static pages, content pages, marketing pages, simple SSR, and low-interactivity routes.
 Use TanStack Start only for app-like experiences under `/app`: complex client interactivity, shared client/server data loading, mutations, authenticated flows, or cases where typed server functions/RPC meaningfully improve the implementation.
 
-## Hydration
+## Performance
 
 Both frameworks support deferred hydration: `client:*` directives in Astro, `<Hydrate when={...}>` from `@tanstack/react-start/hydration` in TanStack Start. Use it deliberately, and aggressively on content-heavy pages.
 
-Use oxlint for linting, tsc for typechecking and vitest for testing.
+For optimizing images on non-prerendered astro sites and tanstack start pages use 'src/app/components/ResponsiveImage.tsx'
 
 # Typescript
 
 Make Illegal States Unrepresentable.
 Use the type system to prevent invalid states and missing functionality at compile time.
 
-Use type-safe routing for internal links via `$astroPath` and `$appPath` from `src/app/lib/framework/typesafe-paths.ts`.
-Use `$appPath` for TanStack API routes too.
+Use type-safe routing for internal links via `$astroPath` and `$appPath` from `src/app/lib/framework/typesafe-paths.ts`. Use `$appPath` for TanStack API routes too.
 
 ## Error Handling: Result Pattern
 

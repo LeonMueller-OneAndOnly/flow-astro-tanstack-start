@@ -6,3 +6,24 @@ allowBuilds:
   esbuild: true
   sharp: true
   sqlite3: true
+
+# `@responsive-image/vite-plugin` asks for sharp ^0.35 while astro pins ^0.34, so both
+# were installed and both libvips loaded into the same `astro build` process — macOS
+# reports the duplicate as `Class GNotificationCenterDelegate is implemented in both`
+# and warns about "spurious casting failures and mysterious crashes".
+#
+# `$sharp` resolves to the version in this package.json's own dependencies, which exists
+# to match what astro resolves to. The plugin follows astro rather than the other way
+# round, because astro is the one with a sharp in the server bundle; the plugin only runs
+# at build time.
+#
+# This is below the plugin's declared range, so it was measured rather than assumed.
+# JPEG and WebP come out byte-identical. AVIF does not: libvips 8.17 encodes it ~13%
+# larger than 8.18 (159 kB -> 179 kB over the 11 AVIF variants in this repo), because the
+# older libaom is less efficient. That is the price of the override, and it is worth
+# knowing it is reversible — drop these two lines and `pnpm install` puts 0.35 back.
+#
+# The counterweight: before this, the two halves of the site shipped AVIF from two
+# different encoders. Astro's pages were already on 0.34 and always will be.
+overrides:
+  sharp: "$sharp"
