@@ -1,0 +1,161 @@
+---
+import { Image, Picture, getImage } from "astro:assets";
+
+import Header from "../../app/components/Header";
+import { ResponsiveImageIsland } from "../../app/components/demo/ResponsiveImageIsland";
+import { $appPath } from "../../app/lib/framework/typesafe-paths";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+import racing from "../../assets/demo/example-guitar-racing.jpg";
+import traveling from "../../assets/demo/example-guitar-traveling.jpg";
+import videoGames from "../../assets/demo/example-guitar-video-games.jpg";
+
+export const prerender = true;
+
+/*
+ * The Astro half of the image comparison. Same three source files as
+ * `src/app/routes/demo/responsive-image.tsx`, run through `astro:assets` instead of
+ * `@responsive-image/vite-plugin`, so the two pipelines can be diffed on identical
+ * input. Note the imports here carry *no* query — that is what keeps the two apart:
+ * the Vite plugin only claims specifiers ending in `responsive`, everything else
+ * falls through to Astro's own asset handling.
+ */
+
+const appDemoHref = $appPath({ to: "/demo/responsive-image" });
+
+// `getImage` is the same pipeline the components use, called directly. Reading its
+// result is the only way to see the emitted URL and dimensions without opening the
+// network panel — the equivalent of the descriptor table on the TanStack page.
+const inspected = await getImage({ src: racing, width: 1280, format: "webp" });
+---
+
+<BaseLayout
+  title="Responsive images — Astro | Omnis"
+  description="The same images processed by astro:assets and by @responsive-image, side by side."
+>
+  <Header variant="site" client:load />
+
+  <main class="mx-auto w-full max-w-4xl px-6 pt-10 pb-24">
+    <a
+      href={appDemoHref}
+      class="inline-flex items-center gap-2 rounded-full bg-secondary py-1.5 pr-4 pl-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-border hover:text-foreground"
+    >
+      → Same page built on TanStack Start
+    </a>
+
+    <h1 class="mt-6 text-3xl font-semibold tracking-tight">Responsive images — Astro</h1>
+    <p class="mt-3 max-w-2xl leading-relaxed text-foreground/70">
+      Three JPEGs, 1120&nbsp;px square, processed by <code>astro:assets</code>. The
+      <a class="underline underline-offset-4" href={appDemoHref}>TanStack Start page</a> renders the
+      same files through <code>@responsive-image/react</code>. Both pipelines are active in this
+      build; they never touch the same import because only one of them claims the
+      <code>?responsive</code> query.
+    </p>
+
+    <section class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">Constrained layout</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-foreground/70">
+        <code>layout="constrained"</code> is Astro's equivalent of the responsive layout: it emits a
+        <code>srcset</code> across the configured breakpoints plus a <code>sizes</code> attribute, and
+        the image scales down but never past its intrinsic width.
+      </p>
+      <div class="shadow-soft mt-5 rounded-xl border border-border bg-card p-6">
+        <Image src={racing} layout="constrained" alt="A guitar finished in a racing livery" />
+      </div>
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">Fixed layout</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-foreground/70">
+        <code>layout="fixed"</code> with an explicit width renders 1x and 2x candidates only — the
+        counterpart to passing <code>width</code> instead of <code>size</code> to
+        <code>&lt;ResponsiveImage&gt;</code>.
+      </p>
+      <div class="shadow-soft mt-5 rounded-xl border border-border bg-card p-6">
+        <Image
+          src={racing}
+          layout="fixed"
+          width={240}
+          alt="The same guitar at a fixed 240px"
+          class="rounded-xl"
+        />
+      </div>
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">Multiple formats</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-foreground/70">
+        <code>&lt;Picture&gt;</code> is where Astro matches what <code>&lt;ResponsiveImage&gt;</code>
+        does by default: one <code>&lt;source&gt;</code> per format, in the order listed, with the
+        <code>fallbackFormat</code> on the <code>&lt;img&gt;</code>. What Astro has no equivalent for
+        is LQIP — there is no built-in placeholder, which is the one capability the extra dependency
+        buys.
+      </p>
+      <div class="shadow-soft mt-5 grid gap-5 rounded-xl border border-border bg-card p-6 sm:grid-cols-2">
+        <Picture
+          src={traveling}
+          formats={["avif", "webp"]}
+          fallbackFormat="jpeg"
+          layout="constrained"
+          width={480}
+          alt="Guitar with travel stickers"
+          class="rounded-xl"
+        />
+        <Picture
+          src={videoGames}
+          formats={["avif", "webp"]}
+          fallbackFormat="jpeg"
+          layout="constrained"
+          width={480}
+          alt="Guitar in a video game finish"
+          class="rounded-xl"
+        />
+      </div>
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">Both, on one page</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-foreground/70">
+        Left is <code>astro:assets</code>, right is <code>&lt;ResponsiveImage&gt;</code> hydrated as
+        an island — the same source file, in the same document. If the plugin were only registered
+        for the TanStack Start build, the right-hand import would fail to resolve here.
+      </p>
+      <div class="shadow-soft mt-5 grid gap-5 rounded-xl border border-border bg-card p-6 sm:grid-cols-2">
+        <div class="space-y-2">
+          <Image
+            src={racing}
+            layout="constrained"
+            width={480}
+            alt="A guitar finished in a racing livery"
+            class="rounded-xl"
+          />
+          <p class="text-xs text-muted-foreground">astro:assets — no JavaScript, no placeholder</p>
+        </div>
+        <div class="space-y-2">
+          <ResponsiveImageIsland client:visible />
+          <p class="text-xs text-muted-foreground">
+            @responsive-image/react — inline LQIP, hydrated on view
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">What the build emitted</h2>
+      <div class="shadow-soft mt-5 rounded-xl border border-border bg-card p-6">
+        <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+          <dt class="text-muted-foreground">source</dt>
+          <dd class="font-mono text-xs">
+            {racing.width}×{racing.height} {racing.format}
+          </dd>
+          <dt class="text-muted-foreground">getImage url</dt>
+          <dd class="font-mono text-xs break-all">{inspected.src}</dd>
+          <dt class="text-muted-foreground">requested</dt>
+          <dd class="font-mono text-xs">
+            {inspected.attributes.width ?? 1280}px webp
+          </dd>
+        </dl>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

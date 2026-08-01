@@ -52,5 +52,10 @@ export function isContentPath(pathname: string): boolean {
   // nothing, which is the intended end state for a real project.
   if (path === "/app/demo" || path.startsWith("/app/demo/")) return false;
 
+  // The Astro-side half of the same scaffolding, under `src/pages/demo`. Separate
+  // rule rather than a `/demo` suffix match, because the two trees are mounted at
+  // unrelated prefixes and either can be deleted without the other.
+  if (path === "/demo" || path.startsWith("/demo/")) return false;
+
   return true;
 }

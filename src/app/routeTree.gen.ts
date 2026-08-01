@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DemoIndexRouteImport } from './routes/demo/index'
+import { Route as DemoResponsiveImageRouteImport } from './routes/demo/responsive-image'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
@@ -28,6 +29,11 @@ import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr
 const DemoIndexRoute = DemoIndexRouteImport.update({
   id: '/demo/',
   path: '/demo/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoResponsiveImageRoute = DemoResponsiveImageRouteImport.update({
+  id: '/demo/responsive-image',
+  path: '/demo/responsive-image',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStoreRoute = DemoStoreRouteImport.update({
@@ -103,6 +109,7 @@ const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/demo/responsive-image': typeof DemoResponsiveImageRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/': typeof DemoIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
+  '/demo/responsive-image': typeof DemoResponsiveImageRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo': typeof DemoIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -138,6 +146,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/demo/responsive-image': typeof DemoResponsiveImageRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/': typeof DemoIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -157,6 +166,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/demo/responsive-image'
     | '/demo/store'
     | '/demo/'
     | '/api/auth/$'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/demo/responsive-image'
     | '/demo/store'
     | '/demo'
     | '/api/auth/$'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr'
   id:
     | '__root__'
+    | '/demo/responsive-image'
     | '/demo/store'
     | '/demo/'
     | '/api/auth/$'
@@ -209,6 +221,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  DemoResponsiveImageRoute: typeof DemoResponsiveImageRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoIndexRoute: typeof DemoIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -233,6 +246,13 @@ declare module '@tanstack/react-router' {
       path: '/demo'
       fullPath: '/demo/'
       preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/responsive-image': {
+      id: '/demo/responsive-image'
+      path: '/demo/responsive-image'
+      fullPath: '/demo/responsive-image'
+      preLoaderRoute: typeof DemoResponsiveImageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/store': {
@@ -337,6 +357,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  DemoResponsiveImageRoute: DemoResponsiveImageRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoIndexRoute: DemoIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

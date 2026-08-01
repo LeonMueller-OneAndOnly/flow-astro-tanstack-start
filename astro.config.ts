@@ -3,6 +3,7 @@ import { defineConfig, envField } from "astro/config";
 import path from "node:path";
 import node from "@astrojs/node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { responsiveImage } from "@responsive-image/vite-plugin";
 
 import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
@@ -48,9 +49,23 @@ export default defineConfig({
 
   server: { host, port },
 
+  image: {
+    // `<Image layout="constrained">` renders the sizing attributes but no CSS of its
+    // own, so without this the responsive layouts do not actually constrain anything.
+    // Scoped to elements Astro marks with `data-astro-image`, so it cannot reach the
+    // images `@responsive-image/react` renders.
+    responsiveStyles: true,
+  },
+
   vite: {
     resolve: {
       tsconfigPaths: true,
+      // `@responsive-image/react` imports its own stylesheet as a side effect. Left
+      // external, the SSR bundle keeps that as a runtime `import "…css"` and Node
+      // throws `ERR_UNKNOWN_FILE_EXTENSION` on the first render. Bundling it lets
+      // Vite extract the CSS instead. Set on `resolve` rather than `ssr`, which
+      // Vite 8 no longer reads for this.
+      noExternal: ["@responsive-image/react"],
     },
     server: { allowedHosts: [new URL(appOrigin).hostname] },
     define: {
@@ -67,6 +82,36 @@ export default defineConfig({
           pages: sitemapOptions.tanstackStart.pages,
           sitemap: sitemapOptions.tanstackStart.sitemap,
         }),
+      }),
+      /**
+       * Resizes and re-encodes images imported with a `?responsive` query, for the
+       * `<ResponsiveImage>` component from `@responsive-image/react`. Anything imported
+       * without that query is untouched, so Astro's own `astro:assets` pipeline keeps
+       * handling `.astro` pages — the two coexist rather than compete.
+       *
+       * Registered outside `composeAstroTanStackBuild` on purpose: both the Astro
+       * environments and the TanStack Start ones need to resolve the same import.
+       */
+      responsiveImage({
+        // Sensible ceiling for this layout — the widest content column is `max-w-5xl`,
+        // so 1920 covers it at 2x. The default list reaches 3840, which no asset here
+        // can fill.
+        //
+        // These are only defaults. Every import must narrow `w` to widths its own
+        // source can actually deliver, because the plugin does not enlarge an image
+        // but does report the width that was *requested* — asking a 1120px file for
+        // 1920 emits a `1920w` descriptor on a 1120px candidate, and the browser
+        // picks from those numbers. See the note in
+        // `src/app/routes/demo/responsive-image.tsx`.
+        w: [640, 828, 1080, 1280, 1920],
+        format: ["original", "webp", "avif"],
+        // The per-image LQIP rules default to `external`, which makes the image
+        // module import a generated `.css` file. A CSS import inside a TanStack
+        // Start route chunk is not emitted as an asset by this composed build, so
+        // the placeholder would be defined only on the Astro side. `inline` compiles
+        // the same rules to a style object the component applies directly, which
+        // works in both halves and in SSR.
+        styles: "inline",
       }),
       tailwindcss(),
     ],
