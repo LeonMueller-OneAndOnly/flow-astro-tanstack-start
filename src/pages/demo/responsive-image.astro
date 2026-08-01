@@ -2,13 +2,17 @@
 import { Image, Picture, getImage } from "astro:assets";
 
 import Header from "../../app/components/Header";
-import { ResponsiveImageIsland } from "../../app/components/demo/ResponsiveImageIsland";
+import { ResponsiveImage } from "../../app/components/ResponsiveImage";
 import { $appPath } from "../../app/lib/framework/typesafe-paths";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 import racing from "../../assets/demo/example-guitar-racing.jpg";
 import traveling from "../../assets/demo/example-guitar-traveling.jpg";
 import videoGames from "../../assets/demo/example-guitar-video-games.jpg";
+
+// The same file once more, this time claimed by the Vite plugin. Half the content
+// width, so ~450 CSS px, ~900 at 2x — and never above the source's own 1120.
+import racingResponsive from "../../assets/demo/example-guitar-racing.jpg?w=480;960;1120&lqip=inline&responsive";
 
 export const prerender = true;
 
@@ -116,9 +120,11 @@ const inspected = await getImage({ src: racing, width: 1280, format: "webp" });
     <section class="mt-10">
       <h2 class="text-xl font-semibold tracking-tight">Both, on one page</h2>
       <p class="mt-2 max-w-2xl text-sm leading-relaxed text-foreground/70">
-        Left is <code>astro:assets</code>, right is <code>&lt;ResponsiveImage&gt;</code> hydrated as
-        an island — the same source file, in the same document. If the plugin were only registered
-        for the TanStack Start build, the right-hand import would fail to resolve here.
+        Left is <code>astro:assets</code>, right is <code>&lt;ResponsiveImage&gt;</code> — the same
+        source file, in the same document, through two pipelines. The React component needs no
+        island wrapper and no <code>client:*</code> directive: it renders to complete markup here,
+        placeholder included, and ships no JavaScript. Note <code>className</code> rather than
+        <code>class</code> on it, which is the one thing that differs from its neighbour.
       </p>
       <div class="shadow-soft mt-5 grid gap-5 rounded-xl border border-border bg-card p-6 sm:grid-cols-2">
         <div class="space-y-2">
@@ -132,9 +138,14 @@ const inspected = await getImage({ src: racing, width: 1280, format: "webp" });
           <p class="text-xs text-muted-foreground">astro:assets — no JavaScript, no placeholder</p>
         </div>
         <div class="space-y-2">
-          <ResponsiveImageIsland client:visible />
+          <ResponsiveImage
+            src={racingResponsive}
+            size={50}
+            alt="A guitar finished in a racing livery"
+            className="w-full rounded-xl"
+          />
           <p class="text-xs text-muted-foreground">
-            @responsive-image/react — inline LQIP, hydrated on view
+            @responsive-image — inline LQIP, no JavaScript
           </p>
         </div>
       </div>

@@ -58,7 +58,7 @@ function DemoResponsiveImage() {
           alt="A guitar finished in a racing livery"
           className="w-full rounded-xl"
         />
-        <ImageDataTable label="racing.jpg?responsive" data={racing} />
+        <ImageDataTable label="racing.jpg?w=640;828;1120" data={racing} />
       </Section>
 
       <Section

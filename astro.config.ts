@@ -61,8 +61,7 @@ export default defineConfig({
     resolve: {
       tsconfigPaths: true,
       // Left external, the SSR bundle keeps `@responsive-image/react`'s stylesheet as
-      // a runtime `import "…css"` and Node throws `ERR_UNKNOWN_FILE_EXTENSION` on the
-      // first render. On `resolve` rather than `ssr`, which Vite 8 no longer reads.
+      // a runtime `import "…css"` and Node throws `ERR_UNKNOWN_FILE_EXTENSION` on the first render.
       noExternal: ["@responsive-image/react"],
     },
     server: { allowedHosts: [new URL(appOrigin).hostname] },
@@ -92,15 +91,8 @@ export default defineConfig({
        * TanStack Start ones both have to resolve these imports.
        */
       responsiveImage({
-        // Defaults only, and a ceiling rather than a promise: 1920 covers the widest
-        // content column (`max-w-5xl`) at 2x, where the plugin's own default reaches
-        // 3840. Each import still has to narrow `w` to what its source can deliver.
-        w: [640, 828, 1080, 1280, 1920],
         format: ["original", "webp", "avif"],
-        // Per-image LQIP rules as a style object instead of the default generated
-        // `.css` import: a CSS import inside a TanStack Start route chunk is not
-        // emitted as an asset by this composed build, so the placeholder would exist
-        // on the Astro side only.
+        // Per-image LQIP rules as a style object instead of the default generated `.css` import
         styles: "inline",
       }),
       tailwindcss(),
