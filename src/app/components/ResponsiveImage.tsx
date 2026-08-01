@@ -1,5 +1,10 @@
 export type { ResponsiveImageProps } from "@responsive-image/react/responsive-image.js";
 import type { ResponsiveImageProps } from "@responsive-image/react/responsive-image.js";
+/**
+ * What a `?responsive` import evaluates to. The package calls it `ImageData`, which
+ * collides with the DOM global of that name, so it is re-derived rather than re-exported.
+ */
+export type ResponsiveImageData = ResponsiveImageProps["src"];
 
 /**
  * The image component for everything React renders — the whole app under `/app`, and
@@ -90,9 +95,3 @@ import type { ResponsiveImageProps } from "@responsive-image/react/responsive-im
  * `<ClientOnly>` or, on an SSR route, prefer `inline`.
  */
 export { ResponsiveImage } from "@responsive-image/react/responsive-image.js";
-
-/**
- * What a `?responsive` import evaluates to. The package calls it `ImageData`, which
- * collides with the DOM global of that name, so it is re-derived rather than re-exported.
- */
-export type ResponsiveImageData = ResponsiveImageProps["src"];
