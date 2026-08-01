@@ -18,9 +18,11 @@ This project uses Astro plus TanStack Start. TanStack Start is mounted under `/a
 Default to Astro for static pages, content pages, marketing pages, simple SSR, and low-interactivity routes.
 Use TanStack Start only for app-like experiences under `/app`: complex client interactivity, shared client/server data loading, mutations, authenticated flows, or cases where typed server functions/RPC meaningfully improve the implementation.
 
-## Hydration
+## Performance
 
 Both frameworks support deferred hydration: `client:*` directives in Astro, `<Hydrate when={...}>` from `@tanstack/react-start/hydration` in TanStack Start. Use it deliberately, and aggressively on content-heavy pages.
+
+For optimizing images on non-prerendered astro sites and tanstack start pages use 'src/app/components/ResponsiveImage.tsx'
 
 # Typescript
 
