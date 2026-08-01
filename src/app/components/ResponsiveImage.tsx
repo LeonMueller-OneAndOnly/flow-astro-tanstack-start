@@ -31,8 +31,7 @@ export type ResponsiveImageData = ResponsiveImageProps["src"];
  *
  * ## Versus Astro's `<Image />`
  *
- * Same encoder, same output bytes. The difference is *when*: Astro's pipeline is
- * conditional, this one is not.
+ * Same encoder, same output bytes. The difference is *when*: Astro's pipeline is conditional, this one is not.
  *
  *   prerender = true   → files on disk, like here
  *   prerender = false  → `/_image?href=…&w=640&f=webp`, encoded per request
