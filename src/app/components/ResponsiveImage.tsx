@@ -8,9 +8,8 @@ import type { ResponsiveImageProps } from "@responsive-image/react/responsive-im
 export type ResponsiveImageData = ResponsiveImageProps["src"];
 
 /**
- * Build-time processed images, via `@responsive-image/vite-plugin` (see
- * `astro.config.ts`). Usable anywhere React renders: routes under `/app`, and `.astro`
- * templates directly — no island wrapper, no `client:*` directive needed.
+ * Build-time processed images, via `@responsive-image/vite-plugin` (see `astro.config.ts`).
+ * Usable anywhere React renders: routes under `/app`, and `.astro` templates directly.
  *
  * ## Usage
  *
@@ -29,20 +28,6 @@ export type ResponsiveImageData = ResponsiveImageProps["src"];
  * - In `.astro`: `className`, not `class`. `class` is dropped silently — no warning
  *   from Astro, React or the build. Astro's own `<Image />` takes `class`, so the two
  *   differ side by side.
- *
- * ## Why the odd specifier
- *
- * The package ships two builds of this component; the root carries
- * `import './responsive-image.css'`, the entry re-exported here does not. The
- * stylesheet comes from `src/styles/globals.css` alone, in `layer(base)`.
- *
- * Via the root it arrives twice on Astro pages — tree-shaken out of the TanStack Start
- * build by `"sideEffects": false`, but inlined into a `<style>` tag by the island
- * build. That copy is unlayered and would outrank every Tailwind utility on the same
- * element.
- *
- * The `.js` is the literal key in the package's `exports` map, not a file path. Do not
- * "correct" it.
  *
  * ## Versus Astro's `<Image />`
  *
@@ -72,5 +57,17 @@ export type ResponsiveImageData = ResponsiveImageProps["src"];
  *
  * Without hydration the placeholder is never removed (`onLoad` is what drops it), so it
  * stays behind the image: invisible under an opaque photo, visible through transparency.
+ *
+ * ## Why the odd specifier
+ *
+ * The package ships two builds of this component; the root carries
+ * `import './responsive-image.css'`, the entry re-exported here does not. The
+ * stylesheet comes from `src/styles/globals.css` alone, in `layer(base)`.
+ *
+ * Via the root it arrives twice on Astro pages — tree-shaken out of the TanStack Start
+ * build by `"sideEffects": false`, but inlined into a `<style>` tag by the island
+ * build. That copy is unlayered and would outrank every Tailwind utility on the same
+ * element. The `.js` is the literal key in the package's `exports` map, not a file path. Do not
+ * "correct" it.
  */
 export { ResponsiveImage } from "@responsive-image/react/responsive-image.js";
