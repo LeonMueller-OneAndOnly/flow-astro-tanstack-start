@@ -1,15 +1,9 @@
-import { setDefaultResultOrder } from "node:dns";
-
 import { Result } from "../../app/lib/framework/result.ts";
 
 export const instrumentationPath = "/instrumentation";
 
 const instrumentationTimeoutMs = 30_000;
 const instrumentationRetryDelayMs = 250;
-
-// Keep localhost as the public local address while avoiding an IPv6-only bind on
-// systems whose resolver lists ::1 before the IPv4 loopback address.
-setDefaultResultOrder("ipv4first");
 
 /**
  * Calls the instrumentation endpoint over loopback. Shared by the dev
