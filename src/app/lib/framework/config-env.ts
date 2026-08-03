@@ -31,7 +31,7 @@ function loadEnvFiles(envFiles: Array<string>) {
 }
 
 function loadOmnisEnv(mode: ConfigMode) {
-  const result = spawnSync("omnisd", ["env", "export", "--purpose", mode, "--format", "json"], {
+  const result = spawnSync("omnis", ["env", "export", "--purpose", mode, "--format", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
   });
