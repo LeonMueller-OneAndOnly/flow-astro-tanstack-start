@@ -17,7 +17,7 @@ export const ZMailTransport = z.enum(["send-via-smtp", "preview-in-browser", "ig
 
 export type TMailTransport = z.infer<typeof ZMailTransport>;
 
-export const isTestEnv = [process.env.APP_ENV, process.env.NODE_ENV].includes("test");
+const isTestEnv = process.env.APP_ENV === "test";
 
 export async function sendMail(input: {
   mail: TMail;
@@ -28,16 +28,23 @@ export async function sendMail(input: {
 
   const transport = getMailTransport();
 
-  if (
-    process.env["send-out-mail-without-job-queue-usage_DEV_ONLY"] &&
-    process.env.APP_ENV !== "production"
-  ) {
-    return handleJob_sendMail({ mail, reason: input.reason, transport });
+  if (transport === "ignore") {
+    return;
   }
 
-  if (isTestEnv) return;
-
   await sendMailJob.enqueue({ mail, reason: input.reason, transport }, { maxAttempts: 3 });
+}
+
+function getMailTransport(): TMailTransport {
+  if (process.env["open-preview-for-all-mails_DEV_ONLY"] && process.env.APP_ENV !== "production") {
+    return "preview-in-browser";
+  }
+
+  if (isTestEnv) return "ignore";
+
+  if (process.env.APP_ENV === "production") return "send-via-smtp";
+
+  return "preview-in-browser";
 }
 
 export async function handleJob_sendMail(input: {
@@ -47,30 +54,19 @@ export async function handleJob_sendMail(input: {
 }) {
   if (input.transport === "send-via-smtp") {
     await sendMailViaSmtp(input.mail, input.reason);
+    return;
   }
 
   if (input.transport === "preview-in-browser") {
     await previewMail({ mail: input.mail, reason: input.reason });
-  }
-}
-
-function getMailTransport(): TMailTransport {
-  if (process.env["open-preview-for-all-mails_DEV_ONLY"] && process.env.APP_ENV !== "production") {
-    return "preview-in-browser";
+    return;
   }
 
-  if (
-    process.env["send-out-mail-without-job-queue-usage_DEV_ONLY"] &&
-    process.env.APP_ENV !== "production"
-  ) {
-    return "send-via-smtp";
+  if (input.transport === "ignore") {
+    return;
   }
 
-  if (process.env.APP_ENV === "production") return "send-via-smtp";
-
-  if (isTestEnv) return "ignore";
-
-  return "preview-in-browser";
+  const never: never = input.transport;
 }
 
 async function sendMailViaSmtp(mail: TMail, reason: string) {
