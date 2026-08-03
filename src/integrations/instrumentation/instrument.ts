@@ -1,9 +1,15 @@
+import { setDefaultResultOrder } from "node:dns";
+
 import { Result } from "../../app/lib/framework/result.ts";
 
 export const instrumentationPath = "/instrumentation";
 
 const instrumentationTimeoutMs = 30_000;
 const instrumentationRetryDelayMs = 250;
+
+// Keep localhost as the public local address while avoiding an IPv6-only bind on
+// systems whose resolver lists ::1 before the IPv4 loopback address.
+setDefaultResultOrder("ipv4first");
 
 /**
  * Calls the instrumentation endpoint over loopback. Shared by the dev
@@ -40,11 +46,11 @@ export async function instrument(host: string, port: number): Promise<void> {
 }
 
 /**
- * Wildcard binds are not connectable addresses, so reach the server on loopback
- * instead. IPv6 literals need brackets to be valid in a URL.
+ * Wildcard binds are not connectable addresses, so reach the server through
+ * localhost instead. IPv6 literals need brackets to be valid in a URL.
  */
 function toRequestHost(host: string): string {
-  if (host === "0.0.0.0" || host === "::" || host === "") return "127.0.0.1";
+  if (host === "0.0.0.0" || host === "::" || host === "") return "localhost";
 
   return host.includes(":") ? `[${host}]` : host;
 }

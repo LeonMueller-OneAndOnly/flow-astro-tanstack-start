@@ -25,9 +25,9 @@ const isProduction = appEnv === "production";
 const defaultPort = "4321";
 const configuredPort = process.env.PORT ?? configEnv.PORT ?? defaultPort;
 const port = configuredPort ? Number(configuredPort) : undefined;
-const defaultHost = "127.0.0.1";
-const host = process.env.HOST ?? defaultHost;
-const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN ?? `http://${host}:${port}`;
+const defaultBindHost = "localhost";
+const bindHost = process.env.SERVER_BIND_HOST ?? configEnv.SERVER_BIND_HOST ?? defaultBindHost;
+const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN ?? `http://${bindHost}:${port}`;
 
 const sitemapOptions = await getUnifiedSitemapOptions(appOrigin);
 
@@ -47,7 +47,7 @@ export default defineConfig({
     mode: "standalone",
   }),
 
-  server: { host, port },
+  server: { host: bindHost, port },
 
   image: {
     // Nothing sets `layout` on an `<Image />` right now — this is here so that the
@@ -140,12 +140,13 @@ export default defineConfig({
         optional: false,
         default: defaultPort,
       }),
-      // Dev Server bind address. Defaults to IPv4 loopback rather than Astro's localhost resolution.
-      HOST: envField.string({
+      // Dev/server bind address. Defaults to localhost; set SERVER_BIND_HOST to a
+      // wildcard when a reverse proxy needs to reach the process from another network namespace.
+      SERVER_BIND_HOST: envField.string({
         context: "server",
         access: "public",
         optional: false,
-        default: defaultHost,
+        default: defaultBindHost,
       }),
       // SQLite/libSQL database connection URL. Defaults to a local SQLite file under ./data.
       DATABASE_URL: envField.string({
