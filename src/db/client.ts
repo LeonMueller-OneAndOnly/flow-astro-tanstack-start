@@ -2,12 +2,18 @@ import { createClient } from "@libsql/client/node";
 import { DATABASE_URL } from "astro:env/server";
 import { drizzle } from "drizzle-orm/libsql/node";
 
-import { configureLocalSqlite, isLocalSqliteFileUrl } from "./local-sqlite";
+import {
+  configureForeignKeys,
+  configureLocalSqlite,
+  isLocalSqliteFileUrl,
+} from "./local-sqlite";
 import * as schema from "./schema";
 
 const libsql = createClient({
   url: DATABASE_URL,
 });
+
+await configureForeignKeys(libsql);
 
 if (isLocalSqliteFileUrl(DATABASE_URL)) {
   await configureLocalSqlite(libsql);

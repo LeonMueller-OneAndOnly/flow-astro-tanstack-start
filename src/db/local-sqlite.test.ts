@@ -7,7 +7,11 @@ import { drizzle } from "drizzle-orm/libsql/node";
 import { sql } from "drizzle-orm";
 import { afterEach, describe, expect, test } from "vitest";
 
-import { configureLocalSqlite, isLocalSqliteFileUrl } from "./local-sqlite";
+import {
+  configureForeignKeys,
+  configureLocalSqlite,
+  isLocalSqliteFileUrl,
+} from "./local-sqlite";
 
 const directories: string[] = [];
 
@@ -23,6 +27,7 @@ describe("configureLocalSqlite", () => {
     directories.push(directory);
     const client = createClient({ url: `file:${join(directory, "db.sqlite3")}` });
 
+    await configureForeignKeys(client);
     await configureLocalSqlite(client);
 
     const journalMode = await client.execute("PRAGMA journal_mode");
@@ -39,9 +44,39 @@ describe("configureLocalSqlite", () => {
     await db.run(sql`CREATE TABLE queue_test (id INTEGER PRIMARY KEY, name TEXT NOT NULL)`);
     await db.run(sql`INSERT INTO queue_test (name) VALUES ('ready')`);
 
+    await db.run(sql`CREATE TABLE fk_parent (id INTEGER PRIMARY KEY)`);
+    await db.run(
+      sql`CREATE TABLE fk_child (
+        id INTEGER PRIMARY KEY,
+        parent_id INTEGER NOT NULL REFERENCES fk_parent(id) ON DELETE CASCADE
+      )`,
+    );
+    await db.run(sql`INSERT INTO fk_parent (id) VALUES (1)`);
+    await db.run(sql`INSERT INTO fk_child (id, parent_id) VALUES (1, 1)`);
+
+    await expect(
+      db.run(sql`INSERT INTO fk_child (id, parent_id) VALUES (2, 999)`),
+    ).rejects.toMatchObject({
+      cause: { message: expect.stringContaining("FOREIGN KEY constraint failed") },
+    });
+
+    await db.run(sql`DELETE FROM fk_parent WHERE id = 1`);
+    expect(await db.all(sql`SELECT id FROM fk_child`)).toEqual([]);
+
     expect(
       (await db.all<{ name: string }>(sql`SELECT name FROM queue_test`)).map((row) => row.name),
     ).toEqual(["ready"]);
+
+    client.close();
+  });
+
+  test("enables foreign keys for in-memory SQLite databases", async () => {
+    const client = createClient({ url: "file::memory:?cache=shared" });
+
+    await client.execute("PRAGMA foreign_keys = OFF");
+    await configureForeignKeys(client);
+
+    expect((await client.execute("PRAGMA foreign_keys")).rows).toEqual([{ foreign_keys: 1 }]);
 
     client.close();
   });
