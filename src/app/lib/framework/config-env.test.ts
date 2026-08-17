@@ -26,7 +26,7 @@ describe("loadConfigEnv", () => {
     writeFileSync(join(workspace, ".env.local"), "DATABASE_URL=file:dotenv.db\n");
     writeFileSync(
       join(binDirectory, "omnis"),
-      '#!/bin/sh\n[ "$1 $2 $3 $4 $5 $6" = "env export --purpose local --format json" ] || exit 3\nprintf \'%s\\n\' \'{"DATABASE_URL":"file:omnis.db","FROM_OMNIS":"yes"}\'\n',
+      '#!/bin/sh\n[ "$1 $2 $3 $4 $5" = "env export --local --format json" ] || exit 3\nprintf \'%s\\n\' \'{"DATABASE_URL":"file:omnis.db","FROM_OMNIS":"yes"}\'\n',
     );
     chmodSync(join(binDirectory, "omnis"), 0o755);
     process.chdir(workspace);
@@ -43,7 +43,7 @@ describe("loadConfigEnv", () => {
     mkdirSync(binDirectory);
     writeFileSync(
       join(binDirectory, "omnis"),
-      '#!/bin/sh\n[ "$1 $2 $3 $4 $5 $6" = "env export --purpose test --format json" ] || exit 3\nprintf \'%s\\n\' \'{"DATABASE_URL":"file:omnis-test.db"}\'\n',
+      '#!/bin/sh\n[ "$1 $2 $3 $4 $5" = "env export --test --format json" ] || exit 3\nprintf \'%s\\n\' \'{"DATABASE_URL":"file:omnis-test.db"}\'\n',
     );
     chmodSync(join(binDirectory, "omnis"), 0o755);
     process.chdir(workspace);
