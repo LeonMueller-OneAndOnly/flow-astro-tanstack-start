@@ -43,3 +43,15 @@ The upload API route is `src/app/routes/demo/api.uploads.ts`. `GET` lists upload
 Local storage is configured in `src/integrations/storage.ts` using [Flydrive](https://flydrive.dev/docs/introduction) with the local filesystem driver. `UPLOADS_DIR` may be set to an absolute path or a path relative to the project root; when unset, it defaults to `data/user-uploads`. `UPLOADS_DIR` is defined in the Astro env schema in `astro.config.ts`.
 
 The demo stores metadata in the `demo_user_uploads` table via the `demoUserUploads` schema export in `src/db/schema.ts`. Stored object keys use the `demo-uploads/<uuid>/<safe-name>` shape, and downloads verify both the database record and local file exist. For production, attach ownership/authorization and persist stable storage keys, not generated URLs or local paths. To migrate to S3, R2, or another S3-compatible provider, swap the Flydrive driver in `src/integrations/storage.ts` and keep the route code using storage keys.
+
+## Database Migrations and Environment
+
+The environment loader reads existing process variables, `.env` files, and the Omnis export. For local mode it invokes `omnis env export --local --format json`; test and production modes use `--test` and `--production`. Existing process variables remain authoritative, and dotenv files are the fallback when Omnis is unavailable.
+
+Use `pnpm db:generate` after changing `src/db/schema.ts` to create a migration file. Use `pnpm db:migrate` to apply the committed migrations; `db:migrate` does not generate new migrations.
+
+When running a migration directly on an Omnis project server, provide the project context explicitly:
+
+```bash
+omnisd env run --local --project-slot <project-slot> pnpm db:migrate
+```
