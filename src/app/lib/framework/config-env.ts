@@ -69,6 +69,12 @@ function getModeEnvFiles(mode: ConfigMode) {
   return [`.env.${mode}`, `.env.${mode}.local`];
 }
 
+function toConfigMode(mode: string): ConfigMode {
+  if (mode === "test" || mode === "production") return mode;
+
+  return "local";
+}
+
 function getConfigMode() {
   const modeFlag = process.argv.find((arg) => arg.startsWith("--mode="));
 
@@ -86,11 +92,9 @@ function getConfigMode() {
     return "production";
   }
 
+  if (process.argv.includes("dev")) {
+    return "development";
+  }
+
   return "development";
-}
-
-function toConfigMode(mode: string): ConfigMode {
-  if (mode === "test" || mode === "production") return mode;
-
-  return "local";
 }
