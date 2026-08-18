@@ -18,6 +18,16 @@ export function loadConfigEnv() {
   };
 }
 
+export function registerConfigEnv() {
+  const configEnv = loadConfigEnv();
+
+  for (const [key, value] of Object.entries(configEnv)) {
+    process.env[key] ??= value;
+  }
+
+  return configEnv;
+}
+
 function loadEnvFiles(envFiles: Array<string>) {
   return envFiles.reduce<Record<string, string>>((env, envFile) => {
     const path = join(process.cwd(), envFile);
