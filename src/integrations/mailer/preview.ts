@@ -14,6 +14,7 @@ import {
   ZMailPreviewMetadata,
   type TMailPreviewMetadata,
 } from "./preview-files";
+import { getMailSender } from "./sender";
 import type { TMail } from "./types";
 
 /**
@@ -66,10 +67,22 @@ export async function writeMailPreviewFiles(input: { mail: TMail; reason: string
   const jsonPath = path.join(directory, `${stem}.json`);
   const temporaryJsonPath = `${jsonPath}.tmp`;
 
+  const sender = getMailSender();
+
+  // Reihenfolge der Felder wie im Vertrag: die Kopfzeilen in Lesereihenfolge.
   const metadata: TMailPreviewMetadata = {
     formatVersion: mailPreviewFormatVersion,
     createdAt: createdAt.toISOString(),
-    to: Array.isArray(input.mail.to) ? input.mail.to.join(", ") : input.mail.to,
+    from:
+      sender === null
+        ? null
+        : sender.name === null
+          ? sender.address
+          : `${sender.name} <${sender.address}>`,
+    to: joinMailAddresses(input.mail.to),
+    cc: input.mail.cc === undefined ? null : joinMailAddresses(input.mail.cc),
+    bcc: input.mail.bcc === undefined ? null : joinMailAddresses(input.mail.bcc),
+    replyTo: input.mail.replyTo === undefined ? null : joinMailAddresses(input.mail.replyTo),
     subject: input.mail.subject ?? "(kein Betreff)",
     reason: input.reason,
     text: input.mail.text ?? null,
@@ -78,6 +91,11 @@ export async function writeMailPreviewFiles(input: { mail: TMail; reason: string
       contentType: attachment.contentType ?? "application/octet-stream",
       size: attachment.content.length,
     })),
+    // Bewusst ohne `content`: die Vorschau trägt Kopfzeilen, nicht den Termin selbst.
+    icalEvent:
+      input.mail.icalEvent === undefined
+        ? null
+        : { filename: input.mail.icalEvent.filename, method: input.mail.icalEvent.method },
   };
 
   const written = await Result.fromAsync(async () => {
@@ -138,6 +156,11 @@ function buildPreviewDocument(mail: TMail) {
   </body>
 </html>
 `;
+}
+
+/** `to`, `cc`, `bcc` und `replyTo` werden gleich dargestellt: mehrere Adressen mit ", " verbunden. */
+function joinMailAddresses(addresses: string | Array<string>) {
+  return Array.isArray(addresses) ? addresses.join(", ") : addresses;
 }
 
 function parseMailPreviewMode(value: string | undefined): TMailPreviewMode {

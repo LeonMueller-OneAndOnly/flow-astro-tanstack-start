@@ -16,6 +16,8 @@ vi.mock("preview-email", () => ({
 
 const originalWorkingDirectory = process.cwd();
 const originalPreviewMode = process.env.MAIL_PREVIEW_MODE;
+const originalSenderAddress = process.env.SMTP_USERNAME;
+const originalSenderName = process.env.SMTP_FROM_NAME;
 
 let workspace = "";
 
@@ -23,18 +25,38 @@ beforeEach(() => {
   workspace = mkdtempSync(join(tmpdir(), "omnis-mail-preview-workspace-"));
   process.chdir(workspace);
   vi.mocked(previewEmail).mockClear();
+
+  // Der Absender kommt aus der SMTP-Konfiguration; die Tests setzen ihn selbst, statt der Umgebung zu vertrauen.
+  Reflect.deleteProperty(process.env, "SMTP_USERNAME");
+  Reflect.deleteProperty(process.env, "SMTP_FROM_NAME");
 });
 
 afterEach(() => {
   process.chdir(originalWorkingDirectory);
   rmSync(workspace, { force: true, recursive: true });
 
-  if (originalPreviewMode === undefined) {
-    Reflect.deleteProperty(process.env, "MAIL_PREVIEW_MODE");
-  } else {
-    process.env.MAIL_PREVIEW_MODE = originalPreviewMode;
-  }
+  restoreEnvironmentVariable("MAIL_PREVIEW_MODE", originalPreviewMode);
+  restoreEnvironmentVariable("SMTP_USERNAME", originalSenderAddress);
+  restoreEnvironmentVariable("SMTP_FROM_NAME", originalSenderName);
 });
+
+function restoreEnvironmentVariable(name: string, value: string | undefined) {
+  if (value === undefined) {
+    Reflect.deleteProperty(process.env, name);
+    return;
+  }
+
+  Reflect.set(process.env, name, value);
+}
+
+function readWrittenMetadata() {
+  const { directory, fileNames } = readPreviewDirectory();
+  const jsonFileName = fileNames.find((fileName) => fileName.endsWith(".json")) ?? "";
+
+  return ZMailPreviewMetadata.parse(
+    JSON.parse(readFileSync(join(directory, jsonFileName), "utf8")),
+  );
+}
 
 function readPreviewDirectory() {
   const directory = join(workspace, "data", "mail-preview");
@@ -68,13 +90,18 @@ describe("writeMailPreviewFiles", () => {
       JSON.parse(readFileSync(join(directory, jsonFileName), "utf8")),
     );
     expect(metadata).toEqual({
-      formatVersion: 1,
+      formatVersion: 2,
       createdAt: metadata.createdAt,
+      from: null,
       to: "empfaenger@example.com, zweiter@example.com",
+      cc: null,
+      bcc: null,
+      replyTo: null,
       subject: "Passwort zurücksetzen",
       reason: "password-reset",
       text: null,
       attachments: [],
+      icalEvent: null,
     });
 
     expect(readFileSync(join(directory, `${stem}.html`), "utf8")).toBe("<p>Hallo Welt</p>");
@@ -143,6 +170,108 @@ describe("writeMailPreviewFiles", () => {
       { filename: "rechnung.pdf", contentType: "application/pdf", size: 5 },
       { filename: "attachment", contentType: "application/octet-stream", size: 2 },
     ]);
+  });
+
+  test("verbindet cc, bcc und replyTo genau wie die Empfänger", async () => {
+    await writeMailPreviewFiles({
+      mail: {
+        to: "empfaenger@example.com",
+        cc: ["kopie@example.com", "zweite.kopie@example.com"],
+        bcc: ["blind@example.com"],
+        replyTo: "antwort@example.com",
+        subject: "Alle Kopfzeilen",
+        html: "<p>x</p>",
+      },
+      reason: "headers",
+    });
+
+    const metadata = readWrittenMetadata();
+
+    expect(metadata.cc).toBe("kopie@example.com, zweite.kopie@example.com");
+    expect(metadata.bcc).toBe("blind@example.com");
+    expect(metadata.replyTo).toBe("antwort@example.com");
+  });
+
+  test("schreibt fehlende Kopfzeilen als null, nicht als fehlendes Feld", async () => {
+    await writeMailPreviewFiles({
+      mail: { to: "empfaenger@example.com", subject: "Ohne Kopfzeilen", html: "<p>x</p>" },
+      reason: "headers-missing",
+    });
+
+    const { directory, fileNames } = readPreviewDirectory();
+    const jsonFileName = fileNames.find((fileName) => fileName.endsWith(".json")) ?? "";
+    const rawMetadata: unknown = JSON.parse(readFileSync(join(directory, jsonFileName), "utf8"));
+
+    expect(rawMetadata).toMatchObject({
+      from: null,
+      cc: null,
+      bcc: null,
+      replyTo: null,
+      icalEvent: null,
+    });
+    expect(Object.keys(rawMetadata as Record<string, unknown>)).toEqual([
+      "formatVersion",
+      "createdAt",
+      "from",
+      "to",
+      "cc",
+      "bcc",
+      "replyTo",
+      "subject",
+      "reason",
+      "text",
+      "attachments",
+      "icalEvent",
+    ]);
+  });
+
+  test("nimmt den Absender aus der SMTP-Konfiguration des Versandpfads", async () => {
+    process.env.SMTP_USERNAME = "no-reply@example.com";
+    process.env.SMTP_FROM_NAME = "FlowOffice";
+
+    await writeMailPreviewFiles({
+      mail: { to: "empfaenger@example.com", subject: "Mit Absender", html: "<p>x</p>" },
+      reason: "sender",
+    });
+
+    expect(readWrittenMetadata().from).toBe("FlowOffice <no-reply@example.com>");
+  });
+
+  test("schreibt ohne Anzeigenamen nur die Absenderadresse", async () => {
+    process.env.SMTP_USERNAME = "no-reply@example.com";
+
+    await writeMailPreviewFiles({
+      mail: { to: "empfaenger@example.com", subject: "Ohne Anzeigename", html: "<p>x</p>" },
+      reason: "sender",
+    });
+
+    expect(readWrittenMetadata().from).toBe("no-reply@example.com");
+  });
+
+  test("schreibt einen Termin als Metadaten ohne seinen iCal-Inhalt", async () => {
+    await writeMailPreviewFiles({
+      mail: {
+        to: "empfaenger@example.com",
+        subject: "Termin",
+        html: "<p>x</p>",
+        icalEvent: {
+          filename: "termin.ics",
+          method: "REQUEST",
+          content: "BEGIN:VCALENDAR\nEND:VCALENDAR",
+        },
+      },
+      reason: "calendar",
+    });
+
+    const { directory, fileNames } = readPreviewDirectory();
+    const jsonFileName = fileNames.find((fileName) => fileName.endsWith(".json")) ?? "";
+    const rawJson = readFileSync(join(directory, jsonFileName), "utf8");
+
+    expect(ZMailPreviewMetadata.parse(JSON.parse(rawJson)).icalEvent).toEqual({
+      filename: "termin.ics",
+      method: "REQUEST",
+    });
+    expect(rawJson).not.toContain("BEGIN:VCALENDAR");
   });
 
   test("räumt nach dem Schreiben auf 100 Paare zurück", async () => {

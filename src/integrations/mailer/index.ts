@@ -5,6 +5,7 @@ import { htmlToText } from "nodemailer-html-to-text";
 
 import { ZMail, type TMail } from "./types";
 import { previewMail } from "./preview";
+import { getMailSender } from "./sender";
 
 import { Result } from "../../app/lib/framework/result";
 import { z } from "zod";
@@ -71,6 +72,7 @@ export async function handleJob_sendMail(input: {
 
 async function sendMailViaSmtp(mail: TMail, reason: string) {
   const transporter = getDefaultMailTransporter();
+  const sender = getMailSender();
   const result = await Result.fromAsync(
     () =>
       new Promise<unknown>((resolve, reject) => {
@@ -78,16 +80,17 @@ async function sendMailViaSmtp(mail: TMail, reason: string) {
           {
             ...mail,
 
-            from: {
-              name: process.env.SMTP_FROM_NAME,
-              address: process.env.SMTP_USERNAME, // listed in rfc822 message header
-            },
+            // listed in rfc822 message header; dieselbe Quelle speist den Absender der Mail-Vorschau
+            from:
+              sender === null
+                ? undefined
+                : { name: sender.name ?? undefined, address: sender.address },
             /**
              * Difference between "envelope from" and "header from":
              * https://www.xeams.com/difference-envelope-header.htm
              */
             envelope: {
-              from: process.env.SMTP_USERNAME, // used as MAIL FROM: address for SMTP
+              from: sender?.address, // used as MAIL FROM: address for SMTP
               to: mail.to, // used as RCPT TO: address for SMTP
               // bcc: theMail.bcc,
               // cc: theMail.cc,

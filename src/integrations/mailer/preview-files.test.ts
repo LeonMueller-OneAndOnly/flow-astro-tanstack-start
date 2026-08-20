@@ -13,21 +13,26 @@ import {
   ZMailPreviewMetadata,
 } from "./preview-files";
 
-/** Das Beispiel aus Abschnitt 3 des Plans, wörtlich. */
+/** Das Beispiel aus dem Vertrag mit FlowOffice/Omnis, wörtlich. */
 const exampleMetadata = {
-  formatVersion: 1,
+  formatVersion: 2,
   createdAt: "2026-08-20T14:12:33.123Z",
+  from: "FlowOffice <no-reply@example.com>",
   to: "empfaenger@example.com, zweiter@example.com",
+  cc: null,
+  bcc: null,
+  replyTo: null,
   subject: "Passwort zurücksetzen",
   reason: "password-reset",
   text: null,
   attachments: [{ filename: "rechnung.pdf", contentType: "application/pdf", size: 51234 }],
+  icalEvent: null,
 };
 
 describe("Format-Konstanten", () => {
   test("liegen auf den vereinbarten Werten", () => {
     expect(mailPreviewsDirectory).toBe("data/mail-preview");
-    expect(mailPreviewFormatVersion).toBe(1);
+    expect(mailPreviewFormatVersion).toBe(2);
     expect(mailPreviewsKeep).toBe(100);
   });
 });
@@ -80,11 +85,47 @@ describe("ZMailPreviewMetadata", () => {
     expect(ZMailPreviewMetadata.safeParse(withoutFormatVersion).success).toBe(false);
   });
 
-  test("lehnt eine fremde Formatversion ab", () => {
-    expect(ZMailPreviewMetadata.safeParse({ ...exampleMetadata, formatVersion: 2 }).success).toBe(
+  test("lehnt die abgelöste Formatversion 1 ab", () => {
+    expect(ZMailPreviewMetadata.safeParse({ ...exampleMetadata, formatVersion: 1 }).success).toBe(
       false,
     );
   });
+
+  test("lehnt eine fremde Formatversion ab", () => {
+    expect(ZMailPreviewMetadata.safeParse({ ...exampleMetadata, formatVersion: 3 }).success).toBe(
+      false,
+    );
+  });
+
+  test("akzeptiert gesetzte Kopfzeilen und Termin-Metadaten", () => {
+    const withHeaders = {
+      ...exampleMetadata,
+      cc: "kopie@example.com, zweite.kopie@example.com",
+      bcc: "blind@example.com",
+      replyTo: "antwort@example.com",
+      icalEvent: { filename: "termin.ics", method: "REQUEST" },
+    };
+
+    expect(ZMailPreviewMetadata.parse(withHeaders)).toEqual(withHeaders);
+  });
+
+  test("lehnt den iCal-Inhalt im Termin ab, es sind reine Metadaten", () => {
+    expect(
+      ZMailPreviewMetadata.safeParse({
+        ...exampleMetadata,
+        icalEvent: { filename: "termin.ics", method: "REQUEST", content: "BEGIN:VCALENDAR" },
+      }).success,
+    ).toBe(false);
+  });
+
+  test.each(["from", "cc", "bcc", "replyTo", "icalEvent"] as const)(
+    "lehnt fehlendes %s ab, weil die neuen Felder nullable und nicht optional sind",
+    (fieldName) => {
+      const { [fieldName]: _removed, ...withoutField } = exampleMetadata;
+
+      expect(ZMailPreviewMetadata.safeParse(withoutField).success).toBe(false);
+    },
+  );
 
   test("lehnt fehlendes attachments ab", () => {
     const { attachments: _attachments, ...withoutAttachments } = exampleMetadata;

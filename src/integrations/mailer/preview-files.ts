@@ -11,17 +11,26 @@ import { Result } from "../../app/lib/framework/result";
  */
 export const mailPreviewsDirectory = "data/mail-preview";
 
-export const mailPreviewFormatVersion = 1;
+export const mailPreviewFormatVersion = 2;
 
 /** Anzahl der Vorschau-Paare, die im Verzeichnis verbleiben. Bewusst ohne Env-Variable. */
 export const mailPreviewsKeep = 100;
 
+/**
+ * Die Kopfzeilen stehen in Lesereihenfolge, damit auch die rohe Datei wie ein Mailkopf zu lesen ist.
+ * Alle Felder sind immer vorhanden: fehlt der Wert in der Mail, steht dort `null`.
+ */
 export const ZMailPreviewMetadata = z
   .object({
     formatVersion: z.literal(mailPreviewFormatVersion),
     createdAt: z.iso.datetime(),
-    /** Mehrere Empfänger werden mit ", " verbunden. */
+    /** `Name <adresse>` oder die nackte Adresse; `null`, wenn kein Absender konfiguriert ist. */
+    from: z.string().nullable(),
+    /** Mehrere Empfänger werden mit ", " verbunden, ebenso in cc, bcc und replyTo. */
     to: z.string(),
+    cc: z.string().nullable(),
+    bcc: z.string().nullable(),
+    replyTo: z.string().nullable(),
     subject: z.string(),
     reason: z.string(),
     text: z.string().nullable(),
@@ -32,6 +41,14 @@ export const ZMailPreviewMetadata = z
         size: z.number().int().nonnegative(),
       }),
     ),
+    /** Nur die Metadaten des Termins, nie der iCal-Inhalt. */
+    icalEvent: z
+      .object({
+        filename: z.string(),
+        method: z.string(),
+      })
+      .strict()
+      .nullable(),
   })
   .strict();
 
