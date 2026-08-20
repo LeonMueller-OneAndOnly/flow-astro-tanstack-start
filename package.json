@@ -8,7 +8,7 @@
     "build": "astro build",
     "start": "node --import ./src/app/lib/framework/register-config-env.ts ./server/prod.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "node ./scripts/log-database-url.ts && drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "typecheck": "astro check",
     "lint": "oxlint .",

@@ -14,6 +14,7 @@ import { registerConfigEnv } from "./src/app/lib/framework/config-env";
 import { getUnifiedSitemapOptions } from "./src/app/lib/framework/sitemap";
 import { composeAstroTanStackBuild } from "./src/integrations/compose-astro-tanstack-build";
 import { instrumentation } from "./src/integrations/instrumentation/astro-integration";
+import { defaultDatabaseUrl } from "./src/db/database-url";
 import type { AstroIntegration } from "astro";
 
 const configEnv = registerConfigEnv();
@@ -31,7 +32,6 @@ const appOrigin = process.env.APP_ORIGIN ?? configEnv.APP_ORIGIN ?? `http://${bi
 
 const sitemapOptions = await getUnifiedSitemapOptions(appOrigin);
 
-const defaultDatabaseUrl = "file:./data/db.sqlite3";
 const defaultUploadsDir = "data/user-uploads";
 
 // https://astro.build/config
