@@ -1,115 +1,154 @@
-import { spawn } from "node:child_process";
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import { randomBytes } from "node:crypto";
+import { mkdir, rename, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 import previewEmail from "preview-email";
 
 import { Result } from "../../app/lib/framework/result";
+import {
+  buildMailPreviewStem,
+  mailPreviewFormatVersion,
+  mailPreviewsDirectory,
+  mailPreviewsKeep,
+  pruneMailPreviews,
+  ZMailPreviewMetadata,
+  type TMailPreviewMetadata,
+} from "./preview-files";
 import type { TMail } from "./types";
 
-type MailPreviewMode = "auto" | "omnis" | "browser" | "disabled";
-
-type OmnisMailPreviewPayload = {
-  to: string;
-  subject: string;
-  reason: string;
-  html: string;
-  text?: string;
-  attachments: Array<{
-    filename: string;
-    contentType?: string;
-    size?: number;
-  }>;
-  source: "preview-email";
-};
+/**
+ * `files` legt die Vorschau im Workspace ab (Omnis liest sie dort), `browser` öffnet sie lokal,
+ * `both` macht beides, `disabled` nichts. Kein Auto-Erkennen und kein Fallback: ein Schreibvorgang
+ * im eigenen Repo scheitert praktisch nicht, ein stiller Ersatzpfad würde nur Fehler verdecken.
+ */
+type TMailPreviewMode = "files" | "browser" | "both" | "disabled";
 
 export async function previewMail(input: { mail: TMail; reason: string }) {
   const mode = parseMailPreviewMode(process.env.MAIL_PREVIEW_MODE);
 
   if (mode === "disabled") return;
+
+  if (mode === "files") {
+    await writeMailPreviewFilesOrThrow(input);
+    return;
+  }
+
   if (mode === "browser") {
     await previewEmail(input.mail);
     return;
   }
 
-  const omnisPreview = await Result.fromAsync(async () => {
-    const previewUrl = await previewEmail(input.mail, { open: false });
-    const html = await readPreviewHtml(previewUrl);
-    await submitPreviewToOmnis({ mail: input.mail, reason: input.reason, html });
+  if (mode === "both") {
+    await writeMailPreviewFilesOrThrow(input);
+    await previewEmail(input.mail);
+    return;
+  }
+
+  const never: never = mode;
+  throw new Error(`Unbehandelter MAIL_PREVIEW_MODE: ${String(never)}`);
+}
+
+/**
+ * Schreibt das Vorschau-Paar nach `<cwd>/data/mail-preview`: erst die `.html`, dann die `.json`
+ * atomar über `<stem>.json.tmp` + `rename`. Omnis führt seine Liste ausschließlich über die `.json`;
+ * ein abgebrochener Schreibvorgang hinterlässt damit höchstens ein verwaistes HTML, nie einen
+ * Listeneintrag ohne Inhalt.
+ */
+export async function writeMailPreviewFiles(input: { mail: TMail; reason: string }) {
+  const directory = path.join(process.cwd(), mailPreviewsDirectory);
+  const createdAt = new Date();
+  const stem = buildMailPreviewStem({
+    createdAt,
+    randomHex: randomBytes(4).toString("hex"),
   });
 
-  if (omnisPreview.success) return;
+  const htmlPath = path.join(directory, `${stem}.html`);
+  const jsonPath = path.join(directory, `${stem}.json`);
+  const temporaryJsonPath = `${jsonPath}.tmp`;
 
-  if (mode === "omnis") {
-    throw new Error(`Omnis mail preview failed: ${omnisPreview.error.message}`);
-  }
-
-  await previewEmail(input.mail);
-}
-
-function parseMailPreviewMode(value: string | undefined): MailPreviewMode {
-  if (value === "omnis" || value === "browser" || value === "disabled") return value;
-  return "auto";
-}
-
-async function readPreviewHtml(previewUrl: string) {
-  if (!previewUrl.startsWith("file://")) {
-    throw new Error(`Unsupported preview URL: ${previewUrl}`);
-  }
-  return readFile(fileURLToPath(previewUrl), "utf8");
-}
-
-async function submitPreviewToOmnis(input: { mail: TMail; reason: string; html: string }) {
-  const payload: OmnisMailPreviewPayload = {
-    to: formatAddress(input.mail.to),
-    subject: input.mail.subject ?? "(no subject)",
+  const metadata: TMailPreviewMetadata = {
+    formatVersion: mailPreviewFormatVersion,
+    createdAt: createdAt.toISOString(),
+    to: Array.isArray(input.mail.to) ? input.mail.to.join(", ") : input.mail.to,
+    subject: input.mail.subject ?? "(kein Betreff)",
     reason: input.reason,
-    html: input.html,
-    text: input.mail.text,
+    text: input.mail.text ?? null,
     attachments: (input.mail.attachments ?? []).map((attachment) => ({
       filename: attachment.filename ?? "attachment",
-      contentType: attachment.contentType,
+      contentType: attachment.contentType ?? "application/octet-stream",
       size: attachment.content.length,
     })),
-    source: "preview-email",
   };
 
-  const result = await spawnWithStdin({
-    command: "omnisd",
-    args: ["mail-preview", "submit", "--json-stdin"],
-    stdin: JSON.stringify(payload),
+  const written = await Result.fromAsync(async () => {
+    const validated = ZMailPreviewMetadata.parse(metadata);
+
+    await mkdir(directory, { recursive: true });
+    await writeFile(htmlPath, buildPreviewDocument(input.mail), "utf8");
+    await writeFile(temporaryJsonPath, `${JSON.stringify(validated, null, 2)}\n`, "utf8");
+    await rename(temporaryJsonPath, jsonPath);
   });
 
-  if (!result.success) throw result.error;
-  if (result.data.exitCode !== 0) {
-    throw new Error(result.data.stderr || `omnisd exited with code ${result.data.exitCode}`);
+  if (!written.success) return written;
+
+  console.info(`Mail-Vorschau geschrieben: ${htmlPath}`);
+
+  const pruned = await pruneMailPreviews({ directory, keep: mailPreviewsKeep });
+  if (!pruned.success) {
+    // Aufräumen ist Nebensache: der Schreibvorgang war erfolgreich und bleibt es auch.
+    console.warn("Mail-Vorschauen konnten nicht aufgeräumt werden", pruned.error);
+  }
+
+  return Result.ok({ htmlPath, jsonPath, stem });
+}
+
+async function writeMailPreviewFilesOrThrow(input: { mail: TMail; reason: string }) {
+  const written = await writeMailPreviewFiles(input);
+
+  // Der Aufrufer ist ein Job mit Wiederholungen. Eine still verschluckte Vorschau wäre eine
+  // spurlos verschwundene Mail, deshalb schlägt der Job hier bewusst fehl.
+  if (!written.success) {
+    throw new Error(`Mail-Vorschau konnte nicht geschrieben werden: ${written.error.message}`, {
+      cause: written.error,
+    });
   }
 }
 
-function formatAddress(value: TMail["to"]) {
-  return Array.isArray(value) ? value.join(", ") : value;
+/**
+ * Der Mailkörper, falls vorhanden. Sonst der Textkörper in einem minimalen Dokument.
+ * Bewusst nicht `preview-email`: dessen Kopfzeilen-Tabelle ist überflüssig, weil der Omnis-Viewer
+ * Empfänger, Grund und Zeitpunkt selbst aus der `.json` darstellt.
+ */
+function buildPreviewDocument(mail: TMail) {
+  if (mail.html) return mail.html;
+
+  const escapedText = (mail.text ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+
+  return `<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <pre style="white-space: pre-wrap; font-family: ui-monospace, monospace">${escapedText}</pre>
+  </body>
+</html>
+`;
 }
 
-function spawnWithStdin(input: { command: string; args: string[]; stdin: string }) {
-  return Result.fromAsync(
-    () =>
-      new Promise<{ exitCode: number; stdout: string; stderr: string }>((resolve, reject) => {
-        const child = spawn(input.command, input.args, { stdio: ["pipe", "pipe", "pipe"] });
-        const stdoutChunks: Buffer[] = [];
-        const stderrChunks: Buffer[] = [];
+function parseMailPreviewMode(value: string | undefined): TMailPreviewMode {
+  if (value === undefined || value === "") return "files";
 
-        child.stdout.on("data", (chunk: Buffer) => stdoutChunks.push(chunk));
-        child.stderr.on("data", (chunk: Buffer) => stderrChunks.push(chunk));
-        child.on("error", reject);
-        child.on("close", (code) => {
-          resolve({
-            exitCode: code ?? 1,
-            stdout: Buffer.concat(stdoutChunks).toString("utf8").trim(),
-            stderr: Buffer.concat(stderrChunks).toString("utf8").trim(),
-          });
-        });
+  if (value === "browser" || value === "both" || value === "disabled" || value === "files") {
+    return value;
+  }
 
-        child.stdin.end(input.stdin);
-      }),
+  // Ein Tippfehler in der Konfiguration darf nicht stillschweigend zu einem anderen Verhalten führen.
+  throw new Error(
+    `Unbekannter MAIL_PREVIEW_MODE: "${value}". Erlaubt sind: files, browser, both, disabled.`,
   );
 }

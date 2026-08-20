@@ -191,12 +191,16 @@ export default defineConfig({
         access: "public",
         optional: true,
       }),
-      // Local/test mail preview behavior. "auto" stores previews through omnisd when available and falls back to browser preview.
+      // Local/test mail preview behavior. Mails outside production are never delivered, they are captured instead.
+      // "files"    (default) writes an .html/.json pair to data/mail-preview/ in the workspace, where Omnis lists them.
+      // "browser"  opens the preview in a local browser window and writes nothing.
+      // "both"     does both.
+      // "disabled" drops the preview entirely.
       MAIL_PREVIEW_MODE: envField.enum({
         context: "server",
         access: "secret",
-        values: ["auto", "omnis", "browser", "disabled"],
-        default: "auto",
+        values: ["files", "browser", "both", "disabled"],
+        default: "files",
       }),
     },
   },
