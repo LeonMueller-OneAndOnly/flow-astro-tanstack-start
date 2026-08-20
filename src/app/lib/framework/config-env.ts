@@ -15,6 +15,7 @@ export function loadConfigEnv() {
     ...baseEnv,
     ...loadEnvFiles(getModeEnvFiles(mode)),
     ...loadOmnisEnv(mode),
+    ...currentProcessEnv(),
   };
 }
 
@@ -26,6 +27,17 @@ export function registerConfigEnv() {
   }
 
   return configEnv;
+}
+
+// The environment the process was actually started with is the last layer: a
+// deployment that exports DATABASE_URL must win over every file and over the Omnis
+// export, which returns nothing when it cannot reach the daemon.
+function currentProcessEnv(): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(process.env).filter(
+      (entry): entry is [string, string] => entry[1] !== undefined,
+    ),
+  );
 }
 
 function loadEnvFiles(envFiles: Array<string>) {
