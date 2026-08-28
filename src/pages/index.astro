@@ -1,178 +1,121 @@
 ---
 import Header from "../app/components/Header";
-import { buttonVariants } from "../app/components/ui/button";
 import { $appPath } from "../app/lib/framework/typesafe-paths";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 export const prerender = true;
 
+/**
+ * HINWEIS FÜR AGENTEN
+ *
+ * Diese Seite ist ein Platzhalter — die Begrüßung, die ein Kunde sieht, wenn
+ * sein frisch angelegtes Omnis-Projekt zum ersten Mal ausgeliefert wird. Sie
+ * gehört nicht zum Produkt, sie überbrückt nur die Zeit bis zum ersten Auftrag.
+ *
+ * Solange diese Datei seit dem Anlegen des Projekts durch keinen Commit
+ * verändert wurde, darf sie beim ersten Auftrag des Nutzers vollständig
+ * überschrieben werden — und soll es auch. Nichts hier ist erhaltenswert: kein
+ * Text, kein Layout, keine Struktur. Erst wenn ein Commit die Seite angefasst
+ * hat, steckt darin eine Entscheidung des Nutzers, die zu respektieren ist.
+ *
+ * Prüfen mit: `git log --oneline -- src/pages/index.astro`
+ */
+
 const demoHubHref = $appPath({ to: "/demo" });
 
 /**
- * What is already wired up, so nobody has to go spelunking to find out. Six, so
- * the grid fills exactly at every breakpoint — two rows of three, three of two,
- * six of one — and no card is ever left stranded on a row of its own.
- *
- * The tints cycle rather than being unique per card: these are one set of equal
- * things, unlike the three cards below, where a different colour marks a
- * genuinely different destination.
+ * Drei Schritte statt eines Fließtextes, weil die eigentliche Botschaft ein
+ * Ablauf ist: sagen, warten, sehen. Die Tints laufen durch, damit die Schritte
+ * als Abfolge lesbar bleiben und nicht als drei gleichwertige Kacheln.
  */
-const features = [
+const steps = [
   {
     tint: "bg-tint-sky text-tint-sky-ink",
-    icon: ["M6 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M18 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M9 16h5a3 3 0 0 0 3-3V9"],
-    name: "Type-safe routing",
-    detail: "Every internal link checked when you build, not when a visitor clicks it.",
+    title: "Du sagst, was du willst",
+    detail: "In normalen Sätzen. „Oben soll unser Logo hin, darunter die Öffnungszeiten.“",
   },
   {
     tint: "bg-tint-mint text-tint-mint-ink",
-    icon: [
-      "M12 8c4.42 0 8-1.34 8-3s-3.58-3-8-3-8 1.34-8 3 3.58 3 8 3z",
-      "M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5",
-      "M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3",
-    ],
-    name: "Drizzle + SQLite",
-    detail: "Schema, migrations and fully typed queries, ready to point at Postgres later.",
+    title: "Dein Agent baut es",
+    detail: "Er schreibt den Code, prüft ihn und stellt die Seite neu bereit.",
   },
   {
     tint: "bg-tint-sun text-tint-sun-ink",
-    icon: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "M12 6v6l4 2"],
-    name: "Background jobs",
-    detail: "A queue, a worker and retries — so slow work never blocks a request.",
-  },
-  {
-    tint: "bg-tint-sky text-tint-sky-ink",
-    icon: ["M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", "m17 8-5-5-5 5", "M12 3v12"],
-    name: "File uploads",
-    detail: "Multipart in, Flydrive out, with the metadata landing in the database.",
-  },
-  {
-    tint: "bg-tint-mint text-tint-mint-ink",
-    icon: ["m4 17 6-6-6-6", "M12 19h8"],
-    name: "Server functions",
-    detail: "Call the server like a function. No API layer to write or keep in sync.",
-  },
-  {
-    tint: "bg-tint-sun text-tint-sun-ink",
-    icon: [
-      "M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7z",
-    ],
-    name: "Deferred hydration",
-    detail: "Ship JavaScript only where it earns its place on the page.",
+    title: "Du siehst es hier",
+    detail: "Diese Seite aktualisiert sich, sobald die Änderung fertig ist. Live, ohne Neustart.",
   },
 ];
 ---
 
 <BaseLayout
-  title="Omnis — a foundation for fast pages and complex apps"
-  description="An Astro and TanStack Start starter with routing, database, background jobs and uploads already wired up."
+  title="Willkommen — hier entsteht deine Website"
+  description="Die Live-Vorschau deines Omnis-Projekts. Sag deinem Agenten, was sich ändern soll, und sieh direkt hier zu."
 >
   <Header variant="site" client:load />
 
-  <main class="mx-auto w-full max-w-5xl px-5 pt-16 pb-28 sm:px-8">
-    <section class="max-w-2xl">
+  <main class="mx-auto w-full max-w-3xl px-5 pt-16 pb-28 sm:px-8">
+    <section>
       <p
         class="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-sm font-medium text-brand-ink"
       >
         <span class="size-2 rounded-full bg-brand"></span>
-        Astro + TanStack Start
+        Live-Vorschau
       </p>
 
       <h1 class="mt-6 text-4xl leading-[1.12] font-semibold tracking-tight text-balance sm:text-5xl">
-        A solid foundation for fast pages <span class="text-brand">and complex apps.</span>
+        Schön, dass du da bist. <span class="text-brand">Hier entsteht dein Projekt.</span>
       </h1>
 
       <p class="mt-6 text-lg leading-relaxed text-muted-foreground">
-        Astro serves the quiet pages. TanStack Start, mounted at <code>/app</code>, handles the ones
-        that have to do something. Routing, database, jobs and uploads all come wired up already —
-        so you start building rather than plumbing, and none of it needs unpicking as the project
-        grows up.
+        Der Entwicklungs-Server ist angelegt und läuft. Was du gerade siehst, ist noch nichts von dir — es ist
+        die Vorschau, die jedes neue Projekt am Anfang zeigt. Ab jetzt bestimmst du, was hier steht.
       </p>
-
-      {/* One CTA, not two: the docs links now live in the button row further down,
-          so a second hero button would point at a URL already on the page. */}
-      <a class={`${buttonVariants({ size: "lg" })} mt-8`} href={demoHubHref}>
-        Show me the demos
-        <span aria-hidden="true">→</span>
-      </a>
     </section>
 
-    <section
-      class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      aria-label="What is already wired up"
-    >
+    <section class="mt-12 grid gap-4 sm:grid-cols-3" aria-label="So geht es weiter">
       {
-        features.map((feature) => (
+        steps.map((step, index) => (
           <div class="shadow-soft rounded-xl border border-border bg-card p-6">
             <span
-              class={`inline-flex size-9 items-center justify-center rounded-lg ${feature.tint}`}
+              class={`inline-flex size-9 items-center justify-center rounded-lg text-sm font-semibold ${step.tint}`}
               aria-hidden="true"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="size-4.5"
-              >
-                {feature.icon.map((d) => (
-                  <path d={d} />
-                ))}
-              </svg>
+              {index + 1}
             </span>
-            <h2 class="mt-4 font-semibold tracking-tight">{feature.name}</h2>
-            <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{feature.detail}</p>
+            <h2 class="mt-4 font-semibold tracking-tight">{step.title}</h2>
+            <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.detail}</p>
           </div>
         ))
       }
     </section>
 
-    <section class="mt-10 flex flex-wrap gap-3" aria-label="Where to go next">
-      <a class={buttonVariants({ size: "sm" })} href={demoHubHref}>
-        Explore demos
-        <span aria-hidden="true">→</span>
-      </a>
-      <a
-        class={buttonVariants({ variant: "outline", size: "sm" })}
-        href="https://docs.astro.build"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View Astro docs
-        <span aria-hidden="true">↗</span>
-      </a>
-      <a
-        class={buttonVariants({ variant: "outline", size: "sm" })}
-        href="https://tanstack.com/start"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View TanStack Start docs
-        <span aria-hidden="true">↗</span>
-      </a>
+    {/* Ein konkreter Satz zum Abschreiben nimmt mehr Hemmung als jede Erklärung,
+        wie man mit einem Agenten redet. */}
+    <section class="mt-10 rounded-xl border border-border bg-secondary/60 p-6">
+      <p class="text-sm font-medium">Zum Ausprobieren, einfach so gesagt:</p>
+      <p class="mt-2 text-lg leading-relaxed text-balance">
+        „Mach aus der Startseite eine Begrüßung für meine Kunden, mit unserem Namen, einem kurzen
+        Satz dazu, was wir machen, und unseren Kontaktdaten.“
+      </p>
+      <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+        Lass diese Seite dabei ruhig verschwinden. Sie ist nur der Anfang, nichts, was erhalten
+        bleiben muss.
+      </p>
     </section>
 
-    {/* The two things worth knowing that nothing else on the page says: where to
-        change the look, and that the demos are reference material with a shelf
-        life. Deliberately set as a quiet footnote rather than a panel — it is the
-        last thing you need, not the first. */}
     <section
-      class="mt-16 max-w-3xl border-t border-border pt-8 text-sm leading-relaxed text-muted-foreground"
-      aria-label="Before you ship"
+      class="mt-16 border-t border-border pt-8 text-sm leading-relaxed text-muted-foreground"
+      aria-label="Hinweise"
     >
       <p>
-        <strong class="font-medium text-foreground">Make it yours.</strong> The brand color and the three
-        pastels sit at the top of <code>src/styles/globals.css</code>. Overwrite them and every page,
-        button and card here follows — nothing hard-codes a color of its own.
+        Diese Adresse ist deine Vorschau — sie zeigt immer den aktuellen Stand, auch mitten in der
+        Arbeit. Es kann also sein, dass sich hier etwas ändert, während du zusiehst.
       </p>
       <p class="mt-3">
-        <strong class="font-medium text-foreground">About the demos.</strong> Keep them around while you
-        build: they are a working reference for how this project wires up routing, server functions,
-        uploads and SSR, so an agent can follow the established conventions. Delete <code
-          >src/app/routes/demo</code
-        > and <code>src/app/lib/demo</code> before deploying.
+        Für Entwickler: die mitgelieferten Beispiele liegen unter <a
+          class="font-medium text-foreground underline underline-offset-4"
+          href={demoHubHref}>/app/demo</a
+        >.
       </p>
     </section>
   </main>
