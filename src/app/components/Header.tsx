@@ -266,7 +266,8 @@ function AppSidebar({ variant }: { variant: HeaderVariant }) {
 
       <SidebarFooter className="border-t border-sidebar-border">
         <p className="px-2 py-1 text-xs text-sidebar-foreground/60">
-          Placeholder starter content. Replace these demos with the real app when ready.
+          Diese Navigation ist noch ein Platzhalter. Sag deinem Agenten, welche Punkte hier stehen
+          sollen — er baut sie um.
         </p>
       </SidebarFooter>
     </Sidebar>
