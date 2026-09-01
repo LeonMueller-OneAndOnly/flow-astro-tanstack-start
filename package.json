@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node ./scripts/check-dev-port.ts && astro dev",
     "build": "astro build",
     "start": "node --import ./src/app/lib/framework/register-config-env.ts ./server/prod.ts",
     "db:generate": "drizzle-kit generate",

@@ -65,7 +65,13 @@ export default defineConfig({
       // a runtime `import "…css"` and Node throws `ERR_UNKNOWN_FILE_EXTENSION` on the first render.
       noExternal: ["@responsive-image/react"],
     },
-    server: { allowedHosts: [new URL(appOrigin).hostname] },
+    server: {
+      allowedHosts: [new URL(appOrigin).hostname],
+      // A changed port also changes the app's origin and can hide a stale dev
+      // server. The dev command reports the owning PID first; this is the final
+      // guard against a process claiming the port between that check and Vite binding it.
+      strictPort: true,
+    },
     define: {
       "import.meta.env.APP_ENV": JSON.stringify(appEnv),
     },
