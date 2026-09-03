@@ -1,3 +1,157 @@
+diff --git a/dist/client/auto.js b/dist/client/auto.js
+index 90feeab38a4f381f007d3c0fc7ad1b687fb25d22..91b51d7fb431fd656eeb40ddb14829219d5d125f 100644
+--- a/dist/client/auto.js
++++ b/dist/client/auto.js
+@@ -458,15 +458,45 @@ var Overlay = class {
+ };
+ 
+ // src/shared/types.ts
+-var DEFAULT_TEMPLATE = `Source: {{file}}:{{targetLine}}
++var DEFAULT_TEMPLATE = `Source: {{trace}}
+ 
+ \`\`\`{{language}}
+ {{snippet}}
+ \`\`\``;
+ 
++// src/client/trace.ts
++var DEFAULT_TRACE_LIMIT = 4;
++var parseTraceEntry = (encoded) => {
++  const columnSeparator = encoded.lastIndexOf(":");
++  const lineSeparator = encoded.lastIndexOf(":", columnSeparator - 1);
++  if (columnSeparator < 1 || lineSeparator < 1) {
++    return null;
++  }
++  return {
++    file: encoded.slice(0, lineSeparator),
++    line: encoded.slice(lineSeparator + 1, columnSeparator)
++  };
++};
++var buildComponentTrace = (element, limit = DEFAULT_TRACE_LIMIT) => {
++  const entries = [];
++  let current = element;
++  while (current && entries.length < limit) {
++    const encoded = current.getAttribute("data-astro-grab");
++    const entry = encoded ? parseTraceEntry(encoded) : null;
++    // Consecutive elements from one file are one component, so only its
++    // innermost element is kept: the run collapses to the element that was
++    // actually targeted, and each further entry is the file that renders it.
++    if (entry && entry.file !== entries[entries.length - 1]?.file) {
++      entries.push(entry);
++    }
++    current = current.parentElement;
++  }
++  return entries.map((entry) => `${entry.file}:${entry.line}`).join(" \u2192 ");
++};
++
+ // src/client/clipboard.ts
+ var formatSnippet = (data, template = DEFAULT_TEMPLATE) => {
+-  return template.replace(/\{\{file\}\}/g, data.file).replace(/\{\{snippet\}\}/g, data.snippet).replace(/\{\{startLine\}\}/g, String(data.startLine)).replace(/\{\{endLine\}\}/g, String(data.endLine)).replace(/\{\{targetLine\}\}/g, String(data.targetLine)).replace(/\{\{language\}\}/g, data.language);
++  return template.replace(/\{\{file\}\}/g, data.file).replace(/\{\{snippet\}\}/g, data.snippet).replace(/\{\{startLine\}\}/g, String(data.startLine)).replace(/\{\{endLine\}\}/g, String(data.endLine)).replace(/\{\{targetLine\}\}/g, String(data.targetLine)).replace(/\{\{language\}\}/g, data.language).replace(/\{\{trace\}\}/g, data.trace || `${data.file}:${data.targetLine}`);
+ };
+ var copyToClipboard = async (text) => {
+   try {
+@@ -628,12 +658,13 @@ var TargetingHandler = class {
+       const src = this.currentTarget.getAttribute("data-astro-grab");
+       if (src) {
+         const rect = this.currentTarget.getBoundingClientRect();
+-        await this.fetchAndCopySnippet(src, rect);
++        await this.fetchAndCopySnippet(src, rect, this.currentTarget);
+       }
+     }
+     this.stateMachine.reset();
+   };
+-  async fetchAndCopySnippet(src, rect) {
++  async fetchAndCopySnippet(src, rect, element) {
++    const trace = element ? buildComponentTrace(element) : "";
+     const primaryEndpoint = this.apiBaseUrl ? `${this.apiBaseUrl}/snippet` : "/__astro_grab/snippet";
+     const fallbackEndpoint = "/__astro_grab/snippet";
+     const tryEndpoint = async (endpoint) => {
+@@ -649,7 +680,7 @@ var TargetingHandler = class {
+           return false;
+         }
+         const data = await response.json();
+-        const formatted = formatSnippet(data, this.template);
++        const formatted = formatSnippet({ ...data, trace }, this.template);
+         await copyToClipboard(formatted);
+         console.log(
+           `[astro-grab] Copied snippet from ${data.file}:${data.targetLine}`
+diff --git a/dist/client/index.js b/dist/client/index.js
+index d34965fcfd63147ab1e7c72a0b0e20c073f4fc61..ba83ab1768d44c9738cc2562de73bab29fd1457d 100644
+--- a/dist/client/index.js
++++ b/dist/client/index.js
+@@ -458,15 +458,45 @@ var Overlay = class {
+ };
+ 
+ // src/shared/types.ts
+-var DEFAULT_TEMPLATE = `Source: {{file}}:{{targetLine}}
++var DEFAULT_TEMPLATE = `Source: {{trace}}
+ 
+ \`\`\`{{language}}
+ {{snippet}}
+ \`\`\``;
+ 
++// src/client/trace.ts
++var DEFAULT_TRACE_LIMIT = 4;
++var parseTraceEntry = (encoded) => {
++  const columnSeparator = encoded.lastIndexOf(":");
++  const lineSeparator = encoded.lastIndexOf(":", columnSeparator - 1);
++  if (columnSeparator < 1 || lineSeparator < 1) {
++    return null;
++  }
++  return {
++    file: encoded.slice(0, lineSeparator),
++    line: encoded.slice(lineSeparator + 1, columnSeparator)
++  };
++};
++var buildComponentTrace = (element, limit = DEFAULT_TRACE_LIMIT) => {
++  const entries = [];
++  let current = element;
++  while (current && entries.length < limit) {
++    const encoded = current.getAttribute("data-astro-grab");
++    const entry = encoded ? parseTraceEntry(encoded) : null;
++    // Consecutive elements from one file are one component, so only its
++    // innermost element is kept: the run collapses to the element that was
++    // actually targeted, and each further entry is the file that renders it.
++    if (entry && entry.file !== entries[entries.length - 1]?.file) {
++      entries.push(entry);
++    }
++    current = current.parentElement;
++  }
++  return entries.map((entry) => `${entry.file}:${entry.line}`).join(" \u2192 ");
++};
++
+ // src/client/clipboard.ts
+ var formatSnippet = (data, template = DEFAULT_TEMPLATE) => {
+-  return template.replace(/\{\{file\}\}/g, data.file).replace(/\{\{snippet\}\}/g, data.snippet).replace(/\{\{startLine\}\}/g, String(data.startLine)).replace(/\{\{endLine\}\}/g, String(data.endLine)).replace(/\{\{targetLine\}\}/g, String(data.targetLine)).replace(/\{\{language\}\}/g, data.language);
++  return template.replace(/\{\{file\}\}/g, data.file).replace(/\{\{snippet\}\}/g, data.snippet).replace(/\{\{startLine\}\}/g, String(data.startLine)).replace(/\{\{endLine\}\}/g, String(data.endLine)).replace(/\{\{targetLine\}\}/g, String(data.targetLine)).replace(/\{\{language\}\}/g, data.language).replace(/\{\{trace\}\}/g, data.trace || `${data.file}:${data.targetLine}`);
+ };
+ var copyToClipboard = async (text) => {
+   try {
+@@ -628,12 +658,13 @@ var TargetingHandler = class {
+       const src = this.currentTarget.getAttribute("data-astro-grab");
+       if (src) {
+         const rect = this.currentTarget.getBoundingClientRect();
+-        await this.fetchAndCopySnippet(src, rect);
++        await this.fetchAndCopySnippet(src, rect, this.currentTarget);
+       }
+     }
+     this.stateMachine.reset();
+   };
+-  async fetchAndCopySnippet(src, rect) {
++  async fetchAndCopySnippet(src, rect, element) {
++    const trace = element ? buildComponentTrace(element) : "";
+     const primaryEndpoint = this.apiBaseUrl ? `${this.apiBaseUrl}/snippet` : "/__astro_grab/snippet";
+     const fallbackEndpoint = "/__astro_grab/snippet";
+     const tryEndpoint = async (endpoint) => {
+@@ -649,7 +680,7 @@ var TargetingHandler = class {
+           return false;
+         }
+         const data = await response.json();
+-        const formatted = formatSnippet(data, this.template);
++        const formatted = formatSnippet({ ...data, trace }, this.template);
+         await copyToClipboard(formatted);
+         console.log(
+           `[astro-grab] Copied snippet from ${data.file}:${data.targetLine}`
 diff --git a/dist/index.js b/dist/index.js
 index cda638c656d28b34c2fc093064d63c8dbb9b9243..ca9a4b3e7b5fd633199c6d84d5256c171ec8943c 100644
 --- a/dist/index.js
@@ -288,6 +442,36 @@ index cda638c656d28b34c2fc093064d63c8dbb9b9243..ca9a4b3e7b5fd633199c6d84d5256c17
    const { snippet, startLine, endLine } = extractSnippet(
      content,
      loc.line,
+diff --git a/dist/types-C9qZXkxT.d.ts b/dist/types-C9qZXkxT.d.ts
+index 677989cdd3be3d74521e86c75f833c5b47e77060..ef4cc4537830634c0e2952dc33001e81ec64fbde 100644
+--- a/dist/types-C9qZXkxT.d.ts
++++ b/dist/types-C9qZXkxT.d.ts
+@@ -27,7 +27,11 @@ interface ClientConfig {
+     debug?: boolean;
+     /** Base URL path for API endpoints (e.g., '/api/astro-grab') */
+     apiBaseUrl?: string;
+-    /** Template for clipboard output using {{variable}} interpolation */
++    /**
++     * Template for clipboard output using {{variable}} interpolation.
++     * Placeholders: file, snippet, startLine, endLine, targetLine, language,
++     * trace (component chain from the targeted element outwards, max 4 entries).
++     */
+     template?: string;
+ }
+ /**
+@@ -50,7 +54,11 @@ interface AstroGrabOptions {
+     debug?: boolean;
+     /** Enable/disable the dev toolbar app (default: true) */
+     toolbar?: boolean;
+-    /** Template for clipboard output using {{variable}} interpolation */
++    /**
++     * Template for clipboard output using {{variable}} interpolation.
++     * Placeholders: file, snippet, startLine, endLine, targetLine, language,
++     * trace (component chain from the targeted element outwards, max 4 entries).
++     */
+     template?: string;
+ }
+ 
 diff --git a/package.json b/package.json
 index ec169068e861464783739260d7ecf0f669c4d499..18ab00949953703a7771e54aa1cb2abbadb0cc71 100644
 --- a/package.json
