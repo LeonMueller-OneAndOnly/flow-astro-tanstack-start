@@ -1,44 +1,222 @@
 diff --git a/dist/index.js b/dist/index.js
-index cda638c656d28b34c2fc093064d63c8dbb9b9243..cdbea61ea524c260f763ddea3e41d7e6858687b6 100644
+index cda638c656d28b34c2fc093064d63c8dbb9b9243..022b23a2d979b18390a5ced09fb0a3c86240653d 100644
 --- a/dist/index.js
 +++ b/dist/index.js
-@@ -98,6 +98,22 @@ var instrumentAstroFile = async (code, filePath, root) => {
+@@ -90,129 +90,111 @@ var extractSnippet = (content, targetLine, contextLines = 4) => {
+ 
+ // src/server/parser.ts
+ var instrumentAstroFile = async (code, filePath, root) => {
+-  let ast;
+   try {
+-    ast = await parse(code, { position: true });
++    const ast = await parse(code, { position: true });
++    return instrumentAst(ast.ast, code, filePath, root);
+   } catch (error) {
+     console.error(`[astro-grab] Failed to parse ${filePath}:`, error);
      return { code };
    }
-   const lines = code.split("\n");
-+  // @astrojs/compiler reports UTF-8 BYTE offsets; JS string indices are UTF-16
-+  // code units. Without this map every non-ASCII char earlier in the file shifts
-+  // all following offsets, so line numbers and tag lookups drift.
-+  const byteToChar = (() => {
-+    const map = new Int32Array(Buffer.byteLength(code, "utf8") + 1);
-+    let bi = 0;
-+    let ci = 0;
-+    for (const ch of code) {
-+      const len = Buffer.byteLength(ch, "utf8");
-+      for (let k = 0; k < len; k++) map[bi + k] = ci;
-+      bi += len;
-+      ci += ch.length;
-+    }
-+    map[bi] = ci;
-+    return (byteOffset) => map[Math.max(0, Math.min(byteOffset, bi))];
-+  })();
-   const getLineAndColumn = (offset) => {
-     let currentOffset = 0;
-     for (let i = 0; i < lines.length; i++) {
-@@ -152,14 +168,14 @@ var instrumentAstroFile = async (code, filePath, root) => {
-       if (node.name === "body") {
-         return;
-       }
+-  const lines = code.split("\n");
+-  const getLineAndColumn = (offset) => {
+-    let currentOffset = 0;
+-    for (let i = 0; i < lines.length; i++) {
+-      const lineLength = lines[i].length + 1;
+-      const lineEnd = currentOffset + lineLength;
+-      if (offset < lineEnd || i === lines.length - 1) {
+-        const column = offset - currentOffset + 1;
+-        return {
+-          line: i + 1,
+-          // 1-based
+-          column
+-        };
+-      }
+-      currentOffset += lineLength;
+-    }
+-    return { line: lines.length, column: 1 };
+-  };
++};
++var instrumentAst = (ast, code, filePath, root) => {
++  const lineStartOffsets = getLineStartOffsets(code);
+   const injections = [];
+-  let normalizedPath = normalizePath(filePath);
+-  if (root) {
+-    const normalizedRoot = normalizePath(root);
+-    if (normalizedPath.startsWith(normalizedRoot)) {
+-      normalizedPath = normalizedPath.slice(normalizedRoot.length);
+-      if (normalizedPath.startsWith("/")) {
+-        normalizedPath = normalizedPath.slice(1);
+-      }
++  const injectionOffsets = /* @__PURE__ */ new Set();
++  const normalizedPath = getRelativeFilePath(filePath, root);
++  const bodyNode = findBody(ast);
++  const rootToWalk = bodyNode ?? ast;
++  walkAst(rootToWalk, (node) => {
++    const isInspectableElement = node.type === "element" || node.type === "custom-element";
++    if (!isInspectableElement || !node.position) {
++      return;
+     }
+-  }
+-  let bodyNode = null;
+-  const findBody = (node) => {
+-    if (node.type === "element" && node.name === "body") {
+-      return node;
++    if (/^[A-Z]/.test(node.name)) {
++      return;
+     }
+-    if (node.children && Array.isArray(node.children)) {
+-      for (const child of node.children) {
+-        const found = findBody(child);
+-        if (found) return found;
+-      }
++    if (node.type === "element" && ["body", "script", "style"].includes(node.name)) {
++      return;
+     }
+-    return null;
+-  };
+-  bodyNode = findBody(ast.ast);
+-  const rootToWalk = bodyNode || ast.ast;
+-  walkAst(rootToWalk, (node) => {
+-    if (node.type === "element" && node.position) {
+-      if (node.name && /^[A-Z]/.test(node.name)) {
+-        return;
+-      }
+-      if (node.name === "script" || node.name === "style") {
+-        return;
+-      }
+-      if (node.name === "body") {
+-        return;
+-      }
 -      const { line, column } = getLineAndColumn(node.position.start.offset);
-+      const { line, column } = getLineAndColumn(byteToChar(node.position.start.offset));
-       const loc = {
-         file: normalizedPath,
-         line,
-         column
-       };
-       const encoded = encodeSourceLocation(loc);
+-      const loc = {
+-        file: normalizedPath,
+-        line,
+-        column
+-      };
+-      const encoded = encodeSourceLocation(loc);
 -      let tagStart = node.position.start.offset;
-+      let tagStart = byteToChar(node.position.start.offset);
-       const tagPrefix = `<${node.name}`;
-       while (tagStart > 0 && code.slice(tagStart, tagStart + tagPrefix.length) !== tagPrefix) {
-         tagStart--;
+-      const tagPrefix = `<${node.name}`;
+-      while (tagStart > 0 && code.slice(tagStart, tagStart + tagPrefix.length) !== tagPrefix) {
+-        tagStart--;
+-      }
+-      if (tagStart === 0 && code.slice(0, tagPrefix.length) !== tagPrefix) {
+-        return;
+-      }
+-      let searchEnd = tagStart;
+-      let depth = 0;
+-      for (let i = tagStart; i < code.length; i++) {
+-        if (code[i] === "<") depth++;
+-        if (code[i] === ">") {
+-          depth--;
+-          if (depth === 0) {
+-            searchEnd = i;
+-            break;
+-          }
+-        }
+-      }
+-      const openingTagContent = code.slice(tagStart, searchEnd + 1);
+-      const tagPattern = new RegExp(`^<${node.name}([\\s>])`);
+-      const match = openingTagContent.match(tagPattern);
+-      if (match) {
+-        const insertOffset = tagStart + match[0].length - 1;
+-        injections.push({
+-          offset: insertOffset,
+-          attribute: ` data-astro-grab="${encoded}"`
+-        });
+-      }
++    const { line, column } = node.position.start;
++    const tagStart = getCharacterOffset(lineStartOffsets, line, column);
++    const tagPrefix = `<${node.name}`;
++    if (code.slice(tagStart, tagStart + tagPrefix.length) !== tagPrefix) {
++      return;
+     }
++    const insertOffset = tagStart + tagPrefix.length;
++    if (injectionOffsets.has(insertOffset)) {
++      return;
++    }
++    const encoded = encodeSourceLocation({
++      file: normalizedPath,
++      line,
++      column
++    });
++    injectionOffsets.add(insertOffset);
++    injections.push({
++      offset: insertOffset,
++      attribute: ` data-astro-grab="${encoded}"`
++    });
+   });
+-  injections.sort((a, b) => b.offset - a.offset);
+-  let instrumentedCode = code;
+-  for (const { offset, attribute } of injections) {
+-    instrumentedCode = instrumentedCode.slice(0, offset) + attribute + instrumentedCode.slice(offset);
+-  }
++  injections.sort(
++    (firstInjection, secondInjection) => secondInjection.offset - firstInjection.offset
++  );
++  const instrumentedCode = injections.reduce(
++    (currentCode, injection) => currentCode.slice(0, injection.offset) + injection.attribute + currentCode.slice(injection.offset),
++    code
++  );
+   return { code: instrumentedCode };
+ };
+-var walkAst = (node, callback) => {
+-  if (!node || typeof node !== "object") {
+-    return;
+-  }
+-  callback(node);
+-  if (node.children && Array.isArray(node.children)) {
+-    for (const child of node.children) {
+-      walkAst(child, callback);
++var getLineStartOffsets = (code) => {
++  const lineStartOffsets = [0];
++  for (let characterIndex = 0; characterIndex < code.length; characterIndex++) {
++    if (code[characterIndex] === "\n") {
++      lineStartOffsets.push(characterIndex + 1);
+     }
+   }
+-  if (node.attributes && Array.isArray(node.attributes)) {
+-    for (const attr of node.attributes) {
+-      walkAst(attr, callback);
++  return lineStartOffsets;
++};
++var getCharacterOffset = (lineStartOffsets, line, column) => {
++  const lineStartOffset = lineStartOffsets[line - 1];
++  if (lineStartOffset === void 0) {
++    return -1;
++  }
++  return lineStartOffset + column - 1;
++};
++var getRelativeFilePath = (filePath, root) => {
++  let normalizedPath = normalizePath(filePath);
++  if (!root) {
++    return normalizedPath;
++  }
++  const normalizedRoot = normalizePath(root);
++  if (!normalizedPath.startsWith(normalizedRoot)) {
++    return normalizedPath;
++  }
++  normalizedPath = normalizedPath.slice(normalizedRoot.length);
++  return normalizedPath.startsWith("/") ? normalizedPath.slice(1) : normalizedPath;
++};
++var findBody = (node) => {
++  if (node.type === "element" && node.name === "body") {
++    return node;
++  }
++  if (!("children" in node)) {
++    return null;
++  }
++  for (const childNode of node.children) {
++    const bodyNode = findBody(childNode);
++    if (bodyNode) {
++      return bodyNode;
+     }
+   }
++  return null;
++};
++var walkAst = (node, callback) => {
++  callback(node);
++  if (!("children" in node)) {
++    return;
++  }
++  node.children.forEach((childNode) => walkAst(childNode, callback));
+ };
+ 
+ // src/server/transform.ts
