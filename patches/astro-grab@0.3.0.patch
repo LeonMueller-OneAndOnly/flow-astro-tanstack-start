@@ -1,0 +1,44 @@
+diff --git a/dist/index.js b/dist/index.js
+index cda638c656d28b34c2fc093064d63c8dbb9b9243..cdbea61ea524c260f763ddea3e41d7e6858687b6 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -98,6 +98,22 @@ var instrumentAstroFile = async (code, filePath, root) => {
+     return { code };
+   }
+   const lines = code.split("\n");
++  // @astrojs/compiler reports UTF-8 BYTE offsets; JS string indices are UTF-16
++  // code units. Without this map every non-ASCII char earlier in the file shifts
++  // all following offsets, so line numbers and tag lookups drift.
++  const byteToChar = (() => {
++    const map = new Int32Array(Buffer.byteLength(code, "utf8") + 1);
++    let bi = 0;
++    let ci = 0;
++    for (const ch of code) {
++      const len = Buffer.byteLength(ch, "utf8");
++      for (let k = 0; k < len; k++) map[bi + k] = ci;
++      bi += len;
++      ci += ch.length;
++    }
++    map[bi] = ci;
++    return (byteOffset) => map[Math.max(0, Math.min(byteOffset, bi))];
++  })();
+   const getLineAndColumn = (offset) => {
+     let currentOffset = 0;
+     for (let i = 0; i < lines.length; i++) {
+@@ -152,14 +168,14 @@ var instrumentAstroFile = async (code, filePath, root) => {
+       if (node.name === "body") {
+         return;
+       }
+-      const { line, column } = getLineAndColumn(node.position.start.offset);
++      const { line, column } = getLineAndColumn(byteToChar(node.position.start.offset));
+       const loc = {
+         file: normalizedPath,
+         line,
+         column
+       };
+       const encoded = encodeSourceLocation(loc);
+-      let tagStart = node.position.start.offset;
++      let tagStart = byteToChar(node.position.start.offset);
+       const tagPrefix = `<${node.name}`;
+       while (tagStart > 0 && code.slice(tagStart, tagStart + tagPrefix.length) !== tagPrefix) {
+         tagStart--;
