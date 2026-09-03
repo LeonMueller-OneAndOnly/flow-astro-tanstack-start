@@ -1,7 +1,16 @@
 diff --git a/dist/index.js b/dist/index.js
-index cda638c656d28b34c2fc093064d63c8dbb9b9243..022b23a2d979b18390a5ced09fb0a3c86240653d 100644
+index cda638c656d28b34c2fc093064d63c8dbb9b9243..ca9a4b3e7b5fd633199c6d84d5256c171ec8943c 100644
 --- a/dist/index.js
 +++ b/dist/index.js
+@@ -1,6 +1,6 @@
+-import { readFile } from 'fs/promises';
++import { readFile, realpath } from 'fs/promises';
+ import { fileURLToPath } from 'url';
+-import { resolve, dirname, join } from 'path';
++import { isAbsolute, relative, resolve, sep, dirname, join } from 'path';
+ import { parse } from '@astrojs/compiler';
+ 
+ // src/server/vite-plugin.ts
 @@ -90,129 +90,111 @@ var extractSnippet = (content, targetLine, contextLines = 4) => {
  
  // src/server/parser.ts
@@ -220,3 +229,75 @@ index cda638c656d28b34c2fc093064d63c8dbb9b9243..022b23a2d979b18390a5ced09fb0a3c8
  };
  
  // src/server/transform.ts
+@@ -230,21 +212,47 @@ var transformAstroFile = async (code, id, root) => {
+     return { code };
+   }
+ };
++var SourceOutsideRootError = class extends Error {
++  constructor(file) {
++    super(`Source file must be inside project root: "${file}"`);
++    this.name = "SourceOutsideRootError";
++  }
++};
++var isPathInsideRoot = (root, file) => {
++  const relativePath = relative(root, file);
++  return relativePath !== ".." && !relativePath.startsWith(`..${sep}`) && !isAbsolute(relativePath);
++};
++var resolveSourceFile = async (root, sourceFile) => {
++  const resolvedRoot = await realpath(root);
++  const candidatePath = resolve(resolvedRoot, sourceFile);
++  if (!isPathInsideRoot(resolvedRoot, candidatePath)) {
++    throw new SourceOutsideRootError(sourceFile);
++  }
++  const resolvedFile = await realpath(candidatePath);
++  if (!isPathInsideRoot(resolvedRoot, resolvedFile)) {
++    throw new SourceOutsideRootError(sourceFile);
++  }
++  return resolvedFile;
++};
+ var handleSnippetRequest = async (src, options) => {
+   const { root, contextLines = 4 } = options;
+   let loc;
+   try {
+-    loc = decodeSourceLocation(decodeURIComponent(src));
++    loc = decodeSourceLocation(src);
+   } catch (error) {
+     throw new Error(
+       `Invalid source location: ${error instanceof Error ? error.message : String(error)}`
+     );
+   }
+-  const filePath = resolve(root, loc.file);
++  let filePath;
+   let content;
+   try {
++    filePath = await resolveSourceFile(root, loc.file);
+     content = await readFile(filePath, "utf-8");
+   } catch (error) {
++    if (error instanceof SourceOutsideRootError) {
++      throw error;
++    }
+     throw new Error(
+       `Failed to read file "${loc.file}": ${error instanceof Error ? error.message : String(error)}`
+     );
+@@ -365,7 +373,7 @@ var astroGrabVitePlugin = (options = {}) => {
+ // src/server/snippet-handler-content.ts
+ async function handleSnippetRequestFromContent(src, content, options = {}) {
+   const { contextLines = 4 } = options;
+-  const loc = decodeSourceLocation(decodeURIComponent(src));
++  const loc = decodeSourceLocation(src);
+   const { snippet, startLine, endLine } = extractSnippet(
+     content,
+     loc.line,
+diff --git a/package.json b/package.json
+index ec169068e861464783739260d7ecf0f669c4d499..18ab00949953703a7771e54aa1cb2abbadb0cc71 100644
+--- a/package.json
++++ b/package.json
+@@ -51,7 +51,7 @@
+     "vitest": "^2.1.0"
+   },
+   "peerDependencies": {
+-    "astro": "^5.0.0"
++    "astro": "^5.0.0 || ^6.0.0 || ^7.0.0"
+   },
+   "publishConfig": {
+     "access": "public"
