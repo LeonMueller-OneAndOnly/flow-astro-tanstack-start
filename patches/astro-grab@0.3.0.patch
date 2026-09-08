@@ -1,8 +1,54 @@
 diff --git a/dist/client/auto.js b/dist/client/auto.js
-index 90feeab38a4f381f007d3c0fc7ad1b687fb25d22..91b51d7fb431fd656eeb40ddb14829219d5d125f 100644
+index 90feeab38a4f381f007d3c0fc7ad1b687fb25d22..032d5750d916fbefb7838e8ff765078f208099b1 100644
 --- a/dist/client/auto.js
 +++ b/dist/client/auto.js
-@@ -458,15 +458,45 @@ var Overlay = class {
+@@ -67,7 +67,6 @@ var KeybindHandler = class {
+   holdDuration;
+   triggerKey;
+   stateMachine;
+-  hasActivatedOnce = false;
+   currentMouseX = 0;
+   currentMouseY = 0;
+   constructor(stateMachine, holdDuration = 1e3, triggerKey = DEFAULT_TRIGGER_KEY) {
+@@ -94,23 +93,26 @@ var KeybindHandler = class {
+     if (!isTriggerKey) {
+       return;
+     }
+-    e.preventDefault();
++    // Auto-repeat only happens while the key is already down, so the first
++    // press has run whatever default action it deserved.
+     if (e.repeat) {
++      e.preventDefault();
+       return;
+     }
+-    const currentState = this.stateMachine.getState();
+-    if (currentState !== "idle") {
++    if (this.stateMachine.getState() !== "idle") {
++      // Holding or targeting: the shortcut belongs to astro-grab.
++      e.preventDefault();
+       return;
+     }
+-    if (this.hasActivatedOnce) {
++    // The default action is left intact: whether this press is a hold is only
++    // known once holdDuration elapses, long after the browser would have run
++    // its copy. Suppressing it here would break Cmd/Ctrl+C for every short
++    // press, so a hold copies the selection first and overwrites the clipboard
++    // with the snippet on grab.
++    this.stateMachine.transition("holding");
++    this.holdTimer = window.setTimeout(() => {
+       this.stateMachine.transition("targeting");
+-    } else {
+-      this.stateMachine.transition("holding");
+-      this.holdTimer = window.setTimeout(() => {
+-        this.stateMachine.transition("targeting");
+-        this.hasActivatedOnce = true;
+-      }, this.holdDuration);
+-    }
++    }, this.holdDuration);
+   };
+   handleKeyUp = (e) => {
+     const pressedKey = parseTriggerKey(e.key);
+@@ -458,15 +460,45 @@ var Overlay = class {
  };
  
  // src/shared/types.ts
@@ -50,7 +96,7 @@ index 90feeab38a4f381f007d3c0fc7ad1b687fb25d22..91b51d7fb431fd656eeb40ddb1482921
  };
  var copyToClipboard = async (text) => {
    try {
-@@ -628,12 +658,13 @@ var TargetingHandler = class {
+@@ -628,12 +660,13 @@ var TargetingHandler = class {
        const src = this.currentTarget.getAttribute("data-astro-grab");
        if (src) {
          const rect = this.currentTarget.getBoundingClientRect();
@@ -66,7 +112,7 @@ index 90feeab38a4f381f007d3c0fc7ad1b687fb25d22..91b51d7fb431fd656eeb40ddb1482921
      const primaryEndpoint = this.apiBaseUrl ? `${this.apiBaseUrl}/snippet` : "/__astro_grab/snippet";
      const fallbackEndpoint = "/__astro_grab/snippet";
      const tryEndpoint = async (endpoint) => {
-@@ -649,7 +680,7 @@ var TargetingHandler = class {
+@@ -649,7 +682,7 @@ var TargetingHandler = class {
            return false;
          }
          const data = await response.json();
@@ -76,10 +122,56 @@ index 90feeab38a4f381f007d3c0fc7ad1b687fb25d22..91b51d7fb431fd656eeb40ddb1482921
          console.log(
            `[astro-grab] Copied snippet from ${data.file}:${data.targetLine}`
 diff --git a/dist/client/index.js b/dist/client/index.js
-index d34965fcfd63147ab1e7c72a0b0e20c073f4fc61..ba83ab1768d44c9738cc2562de73bab29fd1457d 100644
+index d34965fcfd63147ab1e7c72a0b0e20c073f4fc61..891d6c04a7b9bfcf870b582a08156522792d4199 100644
 --- a/dist/client/index.js
 +++ b/dist/client/index.js
-@@ -458,15 +458,45 @@ var Overlay = class {
+@@ -67,7 +67,6 @@ var KeybindHandler = class {
+   holdDuration;
+   triggerKey;
+   stateMachine;
+-  hasActivatedOnce = false;
+   currentMouseX = 0;
+   currentMouseY = 0;
+   constructor(stateMachine, holdDuration = 1e3, triggerKey = DEFAULT_TRIGGER_KEY) {
+@@ -94,23 +93,26 @@ var KeybindHandler = class {
+     if (!isTriggerKey) {
+       return;
+     }
+-    e.preventDefault();
++    // Auto-repeat only happens while the key is already down, so the first
++    // press has run whatever default action it deserved.
+     if (e.repeat) {
++      e.preventDefault();
+       return;
+     }
+-    const currentState = this.stateMachine.getState();
+-    if (currentState !== "idle") {
++    if (this.stateMachine.getState() !== "idle") {
++      // Holding or targeting: the shortcut belongs to astro-grab.
++      e.preventDefault();
+       return;
+     }
+-    if (this.hasActivatedOnce) {
++    // The default action is left intact: whether this press is a hold is only
++    // known once holdDuration elapses, long after the browser would have run
++    // its copy. Suppressing it here would break Cmd/Ctrl+C for every short
++    // press, so a hold copies the selection first and overwrites the clipboard
++    // with the snippet on grab.
++    this.stateMachine.transition("holding");
++    this.holdTimer = window.setTimeout(() => {
+       this.stateMachine.transition("targeting");
+-    } else {
+-      this.stateMachine.transition("holding");
+-      this.holdTimer = window.setTimeout(() => {
+-        this.stateMachine.transition("targeting");
+-        this.hasActivatedOnce = true;
+-      }, this.holdDuration);
+-    }
++    }, this.holdDuration);
+   };
+   handleKeyUp = (e) => {
+     const pressedKey = parseTriggerKey(e.key);
+@@ -458,15 +460,45 @@ var Overlay = class {
  };
  
  // src/shared/types.ts
@@ -127,7 +219,7 @@ index d34965fcfd63147ab1e7c72a0b0e20c073f4fc61..ba83ab1768d44c9738cc2562de73bab2
  };
  var copyToClipboard = async (text) => {
    try {
-@@ -628,12 +658,13 @@ var TargetingHandler = class {
+@@ -628,12 +660,13 @@ var TargetingHandler = class {
        const src = this.currentTarget.getAttribute("data-astro-grab");
        if (src) {
          const rect = this.currentTarget.getBoundingClientRect();
@@ -143,7 +235,7 @@ index d34965fcfd63147ab1e7c72a0b0e20c073f4fc61..ba83ab1768d44c9738cc2562de73bab2
      const primaryEndpoint = this.apiBaseUrl ? `${this.apiBaseUrl}/snippet` : "/__astro_grab/snippet";
      const fallbackEndpoint = "/__astro_grab/snippet";
      const tryEndpoint = async (endpoint) => {
-@@ -649,7 +680,7 @@ var TargetingHandler = class {
+@@ -649,7 +682,7 @@ var TargetingHandler = class {
            return false;
          }
          const data = await response.json();
