@@ -1,7 +1,6 @@
 ---
 import Header from "../app/components/Header";
 import { $appPath } from "../app/lib/framework/typesafe-paths";
-import TitleBanner from "../components/TitleBanner.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 export const prerender = true;
@@ -55,9 +54,7 @@ const steps = [
   <Header variant="site" client:load />
 
   <main class="mx-auto w-full max-w-3xl px-5 pt-16 pb-28 sm:px-8">
-    <TitleBanner title="Oben auf der Seite" />
-
-    <section class="mt-12">
+    <section>
       <p
         class="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-sm font-medium text-brand-ink"
       >
@@ -139,9 +136,5 @@ const steps = [
         >.
       </p>
     </section>
-
-    <div class="mt-16">
-      <TitleBanner title="Unten auf der Seite" />
-    </div>
   </main>
 </BaseLayout>
