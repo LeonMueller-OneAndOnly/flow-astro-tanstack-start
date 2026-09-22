@@ -6,6 +6,8 @@ You are an inhuman intelligence tasked with spotting logical flaws and inconsist
 
 Dont start the dev server, ask the user to do that - if you want to access it and it is not already running.
 
+Dont switch branches on your own, ask user for permission.
+
 Prefer hardcoded defaults. Add env variables only for secrets or deployment-specific configuration.
 Document every env variable in `astro.config.ts`.
 Do not create helper functions unless they are reused or encapsulate complex code.
