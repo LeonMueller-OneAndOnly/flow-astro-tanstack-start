@@ -1,4 +1,4 @@
-import { defaultStringifySearch, interpolatePath } from "@tanstack/react-router";
+import { defaultStringifySearch } from "@tanstack/react-router";
 import type { FileRoutesByPath } from "@tanstack/react-router";
 
 import { $path, type RouteId, type RouteOptions } from "astro-typesafe-routes/path";
@@ -16,14 +16,7 @@ export function $appPath<const TTo extends AppRouteTo>(
   options: TanStackStartPathOptions<TTo>,
 ): string {
   const params = toPlainRecord("params", "params" in options ? options.params : undefined);
-  const { interpolatedPath, isMissingParams } = interpolatePath({
-    path: options.to,
-    params,
-  });
-
-  if (isMissingParams) {
-    throw new Error(`Missing params for TanStack Start route: ${options.to}`);
-  }
+  const interpolatedPath = interpolate(options.to, params);
 
   const path = interpolatedPath === "/" ? "" : interpolatedPath;
   const search = toSearch("search" in options ? options.search : undefined);
@@ -59,6 +52,35 @@ type TanStackStartPathOptions<TTo extends AppRouteTo> = { to: TTo } & ParamsOpti
   SearchOption & {
     hash?: string;
   };
+
+/**
+ * TanStack's own `interpolatePath` only accepts route segments pre-parsed from a
+ * live router instance, which a bare path literal does not have. The literals
+ * reaching `$appPath` are constrained by `PathParamNames` to whole-segment
+ * `$name` params and a trailing `$` splat, so interpolation is a split/map.
+ */
+function interpolate(to: string, params: Record<string, unknown>): string {
+  return to
+    .split("/")
+    .map((segment) => {
+      if (!segment.startsWith("$")) {
+        return segment;
+      }
+
+      const name = segment === "$" ? "_splat" : segment.slice(1);
+      const value = params[name];
+
+      if (value == null || value === "") {
+        throw new Error(`Missing param "${name}" for TanStack Start route: ${to}`);
+      }
+
+      // A splat stands for several segments, so its slashes must survive encoding.
+      return name === "_splat"
+        ? String(value).split("/").map(encodeURIComponent).join("/")
+        : encodeURIComponent(String(value));
+    })
+    .join("/");
+}
 
 function toPlainRecord(name: string, value: unknown): Record<string, unknown> {
   if (value == null) {
