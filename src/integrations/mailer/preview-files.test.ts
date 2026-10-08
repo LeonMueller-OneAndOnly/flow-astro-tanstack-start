@@ -13,7 +13,7 @@ import {
   ZMailPreviewMetadata,
 } from "./preview-files";
 
-/** Das Beispiel aus dem Vertrag mit FlowOffice/Omnis, wörtlich. */
+/** Das Beispiel aus dem Vertrag mit FlowOffice/Omvin, wörtlich. */
 const exampleMetadata = {
   formatVersion: 2,
   createdAt: "2026-08-20T14:12:33.123Z",

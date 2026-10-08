@@ -1,11 +1,11 @@
 ---
-name: omnis-urls
-description: Use for FlowOffice/Omnis workspace, browser, preview, production, and reachable URL questions.
+name: omvin-urls
+description: Use for FlowOffice/Omvin workspace, browser, preview, production, and reachable URL questions.
 ---
 
-# omnis-urls
+# omvin-urls
 
-Use `omnisd urls` for FlowOffice/Omnis URLs. Do not guess localhost ports, framework defaults, public domains, access rules, or production targets.
+Use `omnisd urls` for FlowOffice/Omvin URLs. Do not guess localhost ports, framework defaults, public domains, access rules, or production targets.
 
 ```bash
 omnisd urls

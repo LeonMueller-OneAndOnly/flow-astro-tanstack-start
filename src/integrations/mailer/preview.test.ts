@@ -22,7 +22,7 @@ const originalSenderName = process.env.SMTP_FROM_NAME;
 let workspace = "";
 
 beforeEach(() => {
-  workspace = mkdtempSync(join(tmpdir(), "omnis-mail-preview-workspace-"));
+  workspace = mkdtempSync(join(tmpdir(), "omvin-mail-preview-workspace-"));
   process.chdir(workspace);
   vi.mocked(previewEmail).mockClear();
 
@@ -348,9 +348,9 @@ describe("previewMail", () => {
   });
 
   test("weist einen unbekannten Modus zurück, statt still etwas anderes zu tun", async () => {
-    // Über Reflect gesetzt: der abgelegte Modus "omnis" ist im Typ der Env-Variablen nicht mehr enthalten,
+    // Über Reflect gesetzt: der abgelegte Modus "omvin" ist im Typ der Env-Variablen nicht mehr enthalten,
     // kann eine reale Umgebung aber weiterhin liefern.
-    Reflect.set(process.env, "MAIL_PREVIEW_MODE", "omnis");
+    Reflect.set(process.env, "MAIL_PREVIEW_MODE", "omvin");
 
     await expect(
       previewMail({

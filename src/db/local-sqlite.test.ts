@@ -23,7 +23,7 @@ afterEach(async () => {
 
 describe("configureLocalSqlite", () => {
   test("enables WAL concurrency settings for a real local database used through Drizzle", async () => {
-    const directory = await mkdtemp(join(tmpdir(), "omnis-local-sqlite-"));
+    const directory = await mkdtemp(join(tmpdir(), "omvin-local-sqlite-"));
     directories.push(directory);
     const client = createClient({ url: `file:${join(directory, "db.sqlite3")}` });
 

@@ -8,14 +8,14 @@ describe("redactDatabaseUrl", () => {
   });
 
   test("keeps an absolute local SQLite path", () => {
-    expect(redactDatabaseUrl("file:/srv/omnis/data/db.sqlite3")).toBe(
-      "file:/srv/omnis/data/db.sqlite3",
+    expect(redactDatabaseUrl("file:/srv/omvin/data/db.sqlite3")).toBe(
+      "file:/srv/omvin/data/db.sqlite3",
     );
   });
 
   test("drops the libSQL auth token but keeps the host", () => {
-    expect(redactDatabaseUrl("libsql://omnis-org.turso.io?authToken=ey.super.secret")).toBe(
-      "libsql://omnis-org.turso.io?authToken=***",
+    expect(redactDatabaseUrl("libsql://omvin-org.turso.io?authToken=ey.super.secret")).toBe(
+      "libsql://omvin-org.turso.io?authToken=***",
     );
   });
 
@@ -30,14 +30,14 @@ describe("redactDatabaseUrl", () => {
   });
 
   test("drops the password but keeps user, host, port and database", () => {
-    expect(redactDatabaseUrl("postgres://omnis:hunter2@db.internal:5432/omnis")).toBe(
-      "postgres://omnis:***@db.internal:5432/omnis",
+    expect(redactDatabaseUrl("postgres://omvin:hunter2@db.internal:5432/omvin")).toBe(
+      "postgres://omvin:***@db.internal:5432/omvin",
     );
   });
 
   test("leaves a URL without user info untouched", () => {
-    expect(redactDatabaseUrl("libsql://db.internal:8080/omnis")).toBe(
-      "libsql://db.internal:8080/omnis",
+    expect(redactDatabaseUrl("libsql://db.internal:8080/omvin")).toBe(
+      "libsql://db.internal:8080/omvin",
     );
   });
 

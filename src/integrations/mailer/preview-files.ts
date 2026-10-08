@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Result } from "../../app/lib/framework/result";
 
 /**
- * Verbindlicher Vertrag mit FlowOffice/Omnis: Verzeichnis, Dateinamen und JSON-Aufbau der Mail-Vorschauen.
+ * Verbindlicher Vertrag mit FlowOffice/Omvin: Verzeichnis, Dateinamen und JSON-Aufbau der Mail-Vorschauen.
  * Änderungen hier sind Änderungen an beiden Repositories.
  */
 export const mailPreviewsDirectory = "data/mail-preview";

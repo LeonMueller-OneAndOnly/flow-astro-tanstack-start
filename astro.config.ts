@@ -198,7 +198,7 @@ export default defineConfig({
         optional: true,
       }),
       // Local/test mail preview behavior. Mails outside production are never delivered, they are captured instead.
-      // "files"    (default) writes an .html/.json pair to data/mail-preview/ in the workspace, where Omnis lists them.
+      // "files"    (default) writes an .html/.json pair to data/mail-preview/ in the workspace, where Omvin lists them.
       // "browser"  opens the preview in a local browser window and writes nothing.
       // "both"     does both.
       // "disabled" drops the preview entirely.

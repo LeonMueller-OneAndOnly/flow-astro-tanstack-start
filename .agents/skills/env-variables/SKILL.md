@@ -1,6 +1,6 @@
 ---
 name: env-variables
-description: Use for environment variables and secret handling in Omnis project workspaces.
+description: Use for environment variables and secret handling in Omvin project workspaces.
 ---
 
 # env-variables

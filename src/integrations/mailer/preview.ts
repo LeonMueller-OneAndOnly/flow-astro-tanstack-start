@@ -18,7 +18,7 @@ import { getMailSender } from "./sender";
 import type { TMail } from "./types";
 
 /**
- * `files` legt die Vorschau im Workspace ab (Omnis liest sie dort), `browser` öffnet sie lokal,
+ * `files` legt die Vorschau im Workspace ab (Omvin liest sie dort), `browser` öffnet sie lokal,
  * `both` macht beides, `disabled` nichts. Kein Auto-Erkennen und kein Fallback: ein Schreibvorgang
  * im eigenen Repo scheitert praktisch nicht, ein stiller Ersatzpfad würde nur Fehler verdecken.
  */
@@ -51,7 +51,7 @@ export async function previewMail(input: { mail: TMail; reason: string }) {
 
 /**
  * Schreibt das Vorschau-Paar nach `<cwd>/data/mail-preview`: erst die `.html`, dann die `.json`
- * atomar über `<stem>.json.tmp` + `rename`. Omnis führt seine Liste ausschließlich über die `.json`;
+ * atomar über `<stem>.json.tmp` + `rename`. Omvin führt seine Liste ausschließlich über die `.json`;
  * ein abgebrochener Schreibvorgang hinterlässt damit höchstens ein verwaistes HTML, nie einen
  * Listeneintrag ohne Inhalt.
  */
@@ -134,7 +134,7 @@ async function writeMailPreviewFilesOrThrow(input: { mail: TMail; reason: string
 
 /**
  * Der Mailkörper, falls vorhanden. Sonst der Textkörper in einem minimalen Dokument.
- * Bewusst nicht `preview-email`: dessen Kopfzeilen-Tabelle ist überflüssig, weil der Omnis-Viewer
+ * Bewusst nicht `preview-email`: dessen Kopfzeilen-Tabelle ist überflüssig, weil der Omvin-Viewer
  * Empfänger, Grund und Zeitpunkt selbst aus der `.json` darstellt.
  */
 function buildPreviewDocument(mail: TMail) {
