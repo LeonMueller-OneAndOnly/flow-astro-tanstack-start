@@ -66,7 +66,7 @@ function MenuBar() {
         <Menu className="size-5" />
       </button>
       <a href={$astroPath({ to: "/" })} className="px-1 font-semibold tracking-tight">
-        Omnis
+        Omvin
       </a>
     </header>
   );

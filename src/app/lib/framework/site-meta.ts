@@ -8,7 +8,7 @@
  * (`getImage` is Astro-only). Callers resolve those and pass the finished strings in.
  */
 export const SITE = {
-  name: "Omnis Start",
+  name: "Omvin Start",
   description: "A shared Astro and TanStack Start application shell.",
   /** The `lang` attribute on `<html>`, and the language half of `og:locale`. */
   lang: "en",
