@@ -7,7 +7,7 @@ description: Use for environment variables and secret handling in Omnis project 
 
 If `omnisd env` is available, use it for project environment variables.
 
-The application loader uses `omnis env export --local --format json` for local mode and switches to `--test` or `--production` for the other modes.
+The application loader uses `omvin env export --local --format json` for local mode and switches to `--test` or `--production` for the other modes.
 
 - Do not create `.env`, `.env.local`, `.env.test`, or secret-bearing env files unless the user explicitly asks for a compatibility escape hatch.
 - Inspect effective values with `omnisd env list --local` or `omnisd env list --test`.

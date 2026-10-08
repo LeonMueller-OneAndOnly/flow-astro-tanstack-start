@@ -93,7 +93,7 @@ function isAstroFrontmatter(filename, context) {
 
 export default {
   meta: {
-    name: "omnis",
+    name: "omvin",
   },
   rules: {
     "require-prerender-export": requirePrerenderExport,

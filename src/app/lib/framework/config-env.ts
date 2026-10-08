@@ -14,7 +14,7 @@ export function loadConfigEnv() {
   return {
     ...baseEnv,
     ...loadEnvFiles(getModeEnvFiles(mode)),
-    ...loadOmnisEnv(mode),
+    ...loadOmvinEnv(mode),
     ...currentProcessEnv(),
   };
 }
@@ -30,7 +30,7 @@ export function registerConfigEnv() {
 }
 
 // The environment the process was actually started with is the last layer: a
-// deployment that exports DATABASE_URL must win over every file and over the Omnis
+// deployment that exports DATABASE_URL must win over every file and over the Omvin
 // export, which returns nothing when it cannot reach the daemon.
 function currentProcessEnv(): Record<string, string> {
   return Object.fromEntries(
@@ -52,18 +52,18 @@ function loadEnvFiles(envFiles: Array<string>) {
   }, {});
 }
 
-function loadOmnisEnv(mode: ConfigMode) {
-  const result = spawnSync("omnis", ["env", "export", `--${mode}`, "--format", "json"], {
+function loadOmvinEnv(mode: ConfigMode) {
+  const result = spawnSync("omvin", ["env", "export", `--${mode}`, "--format", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
   });
   if (result.status !== 0 || result.error) return {};
 
-  const parsed = parseOmnisEnv(result.stdout);
+  const parsed = parseOmvinEnv(result.stdout);
   return parsed ?? {};
 }
 
-function parseOmnisEnv(value: string): Record<string, string> | null {
+function parseOmvinEnv(value: string): Record<string, string> | null {
   const decoded = Result.from(() => JSON.parse(value) as unknown);
   if (
     !decoded.success ||

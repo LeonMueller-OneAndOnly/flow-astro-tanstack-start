@@ -46,12 +46,12 @@ The demo stores metadata in the `demo_user_uploads` table via the `demoUserUploa
 
 ## Database Migrations and Environment
 
-The environment loader reads existing process variables, `.env` files, and the Omnis export. For local mode it invokes `omnis env export --local --format json`; test and production modes use `--test` and `--production`. Existing process variables remain authoritative, and dotenv files are the fallback when Omnis is unavailable.
+The environment loader reads existing process variables, `.env` files, and the Omvin export. For local mode it invokes `omvin env export --local --format json`; test and production modes use `--test` and `--production`. Existing process variables remain authoritative, and dotenv files are the fallback when Omvin is unavailable.
 
 Use `pnpm db:generate` after changing `src/db/schema.ts` to create a migration file. Use `pnpm db:migrate` to apply the committed migrations; `db:migrate` does not generate new migrations.
 
-When running a migration directly on an Omnis project server, provide the project context explicitly:
+When running a migration directly on an Omvin project server, provide the project context explicitly:
 
 ```bash
-omnisd env run --local --project-slot <project-slot> pnpm db:migrate
+omvin env run --local --project-slot <project-slot> pnpm db:migrate
 ```

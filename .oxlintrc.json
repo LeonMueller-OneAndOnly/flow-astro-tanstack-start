@@ -15,7 +15,7 @@
     "react/rules-of-hooks": "error",
     "typescript/no-unused-vars": "off",
     "typescript/triple-slash-reference": "off",
-    "omnis/require-prerender-export": "error",
+    "omvin/require-prerender-export": "error",
     "better-tailwindcss/no-conflicting-classes": "warn",
     "better-tailwindcss/no-unknown-classes": "warn"
   },
