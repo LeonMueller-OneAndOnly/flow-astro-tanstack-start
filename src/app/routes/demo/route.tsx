@@ -72,12 +72,15 @@ function DemoLayout() {
  * The fixed top bar. Lives inside `SidebarProvider` so it can toggle the
  * sidebar via context. `z-20` keeps the hamburger above the desktop slide-in
  * panel (`z-10`) so it stays clickable to close.
+ *
+ * Set in `font-ui` like omvin.ai's own header: chrome speaks Geist, content
+ * speaks Arimo. The mark is the favicon itself, so the two can never drift.
  */
 function MenuBar() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="fixed inset-x-0 top-0 z-20 flex h-header items-center gap-1 border-b border-border bg-background/60 px-4 backdrop-blur-xl">
+    <header className="font-ui fixed inset-x-0 top-0 z-20 flex h-header items-center gap-1 border-b border-border bg-background/60 px-4 backdrop-blur-xl">
       <button
         type="button"
         aria-label="Toggle menu"
@@ -86,7 +89,11 @@ function MenuBar() {
       >
         <Menu className="size-5" />
       </button>
-      <a href={$astroPath({ to: "/" })} className="px-1 font-semibold tracking-tight">
+      <a
+        href={$astroPath({ to: "/" })}
+        className="flex items-center gap-2.5 px-1 text-[0.95rem] font-semibold tracking-[0.18em] uppercase"
+      >
+        <img src="/favicon.svg" alt="" className="size-6" />
         Omvin
       </a>
     </header>
@@ -143,9 +150,9 @@ function DemoSidebar() {
   };
 
   return (
-    <Sidebar collapsible="offcanvas" className="pt-header">
+    <Sidebar collapsible="offcanvas" className="font-ui pt-header">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">Navigation</div>
+        <div className="eyebrow px-2 py-2">Navigation</div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -167,7 +174,7 @@ function DemoSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Demos</SidebarGroupLabel>
+          <SidebarGroupLabel className="tracking-[0.08em] uppercase">Demos</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>

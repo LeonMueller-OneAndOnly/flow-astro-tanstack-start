@@ -12,7 +12,7 @@ function GuitarsIndex() {
   return (
     <main className="mx-auto w-full max-w-5xl px-6 pt-10 pb-24">
       <BackLink to="/demo" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">Featured guitars</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">Featured guitars</h1>
       <DemoExplainer feature="Dynamic routes + typed params" className="mt-6 max-w-2xl">
         Each card is a typed <code>Link</code> that passes <code>guitarId</code> as a route param —
         the value printed on every card is exactly what it sends. On the detail route (

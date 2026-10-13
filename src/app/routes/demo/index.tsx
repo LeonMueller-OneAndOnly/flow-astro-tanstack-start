@@ -20,8 +20,6 @@ export const Route = createFileRoute("/demo/")({
 
 type Demo = {
   icon: ComponentType<{ className?: string }>;
-  /** Tailwind classes for the pastel icon tile, cycled from the three shared tints. */
-  tint: string;
   title: string;
   /** The framework capability the demo exists to show, not a category. */
   tag: string;
@@ -32,7 +30,6 @@ type Demo = {
 const demos: ReadonlyArray<Demo> = [
   {
     icon: Guitar,
-    tint: "bg-tint-lime text-tint-lime-ink",
     title: "Dynamic routes",
     tag: "Typed params",
     description:
@@ -41,7 +38,6 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: CloudUpload,
-    tint: "bg-tint-cyan text-tint-cyan-ink",
     title: "File uploads",
     tag: "Multipart API",
     description:
@@ -50,7 +46,6 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Mail,
-    tint: "bg-tint-mint text-tint-mint-ink",
     title: "Mail worker",
     tag: "Server fn → queue",
     description:
@@ -59,7 +54,6 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Server,
-    tint: "bg-tint-lime text-tint-lime-ink",
     title: "Server functions",
     tag: "RPC",
     description:
@@ -68,7 +62,6 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: RouteIcon,
-    tint: "bg-tint-cyan text-tint-cyan-ink",
     title: "API endpoint",
     tag: "Route handler",
     description: "A client page that fetches JSON from a colocated TanStack API route.",
@@ -76,7 +69,6 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: FileText,
-    tint: "bg-tint-mint text-tint-mint-ink",
     title: "SSR modes",
     tag: "Rendering",
     description: "The same list rendered three ways, one per value of the per-route ssr option.",
@@ -84,7 +76,6 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Database,
-    tint: "bg-tint-lime text-tint-lime-ink",
     title: "Client store",
     tag: "State",
     description: "A TanStack Store example with per-field subscriptions and derived state.",
@@ -92,7 +83,6 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: ImageIcon,
-    tint: "bg-tint-cyan text-tint-cyan-ink",
     title: "Responsive images",
     tag: "Build-time assets",
     description:
@@ -104,12 +94,9 @@ const demos: ReadonlyArray<Demo> = [
 function DemoIndex() {
   return (
     <main className="mx-auto w-full max-w-5xl px-5 pt-16 pb-28 sm:px-8">
-      <p className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-sm font-medium text-brand-ink">
-        <span className="size-2 rounded-full bg-brand" />
-        Demos
-      </p>
+      <p className="eyebrow">Starter demos</p>
 
-      <h1 className="mt-6 max-w-2xl text-4xl leading-[1.12] font-semibold tracking-tight text-balance sm:text-5xl">
+      <h1 className="mt-5 max-w-2xl text-4xl leading-[1.06] font-bold tracking-tighter text-balance sm:text-[3.4rem]">
         Have a look at <span className="text-brand-gradient">how it all fits together.</span>
       </h1>
 
@@ -123,16 +110,16 @@ function DemoIndex() {
           <li key={demo.title} className="flex">
             <Link
               to={demo.to}
-              className="shadow-soft hover:shadow-lifted group flex flex-1 flex-col rounded-xl border border-border bg-card p-6 transition-[transform,box-shadow] duration-200 hover:-translate-y-1"
+              className="shadow-soft hover:shadow-lifted group flex flex-1 flex-col rounded-xl border border-border bg-card p-6 transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-ring"
             >
               <div className="flex items-start justify-between gap-3">
                 <span
-                  className={`inline-flex size-9 items-center justify-center rounded-lg ${demo.tint}`}
+                  className="inline-flex size-9 items-center justify-center rounded-lg bg-brand-soft text-brand-ink ring-1 ring-brand-ink/15 ring-inset"
                   aria-hidden="true"
                 >
                   <demo.icon className="size-4.5" />
                 </span>
-                <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                <span className="font-ui rounded-full border border-border px-2.5 py-1 text-[0.7rem] font-medium tracking-[0.06em] text-muted-foreground uppercase">
                   {demo.tag}
                 </span>
               </div>

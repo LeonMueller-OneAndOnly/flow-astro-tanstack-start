@@ -34,7 +34,7 @@ function RouteComponent() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <BackLink to="/demo" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">SSR modes</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">SSR modes</h1>
       <p className="mt-4 leading-relaxed text-muted-foreground">
         The same punk-songs list, rendered three ways. Each route picks a different point on the
         server-versus-client spectrum — open them and watch where the work happens.

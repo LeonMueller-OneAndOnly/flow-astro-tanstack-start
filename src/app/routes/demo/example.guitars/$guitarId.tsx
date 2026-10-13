@@ -49,7 +49,7 @@ function RouteComponent() {
 
         <div>
           <code className="inline-block">GET {currentPath}</code>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight">{guitar.name}</h1>
+          <h1 className="mt-4 text-3xl font-bold tracking-tighter">{guitar.name}</h1>
           <p className="mt-2 text-lg font-medium tabular-nums">${guitar.price}</p>
           <p className="mt-4 leading-relaxed text-muted-foreground">{guitar.description}</p>
 

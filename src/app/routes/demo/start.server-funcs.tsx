@@ -90,7 +90,7 @@ function Home() {
     <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <BackLink to="/demo" />
       <div className="mt-6 flex items-center gap-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Todo example</h1>
+        <h1 className="text-3xl font-bold tracking-tighter">Todo example</h1>
         {todos ? <Badge variant="secondary">{todos.length}</Badge> : null}
       </div>
       <DemoExplainer feature="TanStack Start server functions" className="mt-6">

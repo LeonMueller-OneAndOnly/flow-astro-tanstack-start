@@ -9,7 +9,9 @@ import { cn } from "@/lib/utils";
  *
  * Tinted rather than bordered, because it sits among cards that are already
  * bordered — another outlined box would read as one more piece of the demo
- * rather than as an aside about it.
+ * rather than as an aside about it. The faint inset rim in the same hue is only
+ * there so the tint keeps an edge on the dark ground, where a wash alone blurs
+ * into the page. The gradient mark is omvin.ai's "this is the one" chip.
  */
 export function DemoExplainer({
   feature,
@@ -21,9 +23,14 @@ export function DemoExplainer({
   className?: string;
 }) {
   return (
-    <aside className={cn("flex gap-4 rounded-xl bg-brand-soft p-5", className)}>
+    <aside
+      className={cn(
+        "flex gap-4 rounded-xl bg-brand-soft p-5 ring-1 ring-brand-ink/15 ring-inset",
+        className,
+      )}
+    >
       <span
-        className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand text-primary-foreground"
+        className="shadow-brand-glow mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-gradient text-primary-foreground"
         aria-hidden="true"
       >
         <svg

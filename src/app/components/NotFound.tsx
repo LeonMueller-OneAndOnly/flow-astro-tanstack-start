@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <main className="mx-auto w-full max-w-xl px-6 py-24 text-center">
       <span
-        className="inline-flex size-14 items-center justify-center rounded-2xl bg-tint-mint text-tint-mint-ink"
+        className="inline-flex size-14 items-center justify-center rounded-2xl bg-brand-soft text-brand-ink ring-1 ring-brand-ink/15 ring-inset"
         aria-hidden="true"
       >
         <svg
@@ -23,8 +23,9 @@ export default function NotFound() {
         </svg>
       </span>
 
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-        This page has wandered off.
+      <p className="eyebrow mt-8 justify-center">Error 404</p>
+      <h1 className="mt-4 text-3xl leading-[1.08] font-bold tracking-tighter text-balance sm:text-[2.75rem]">
+        This page has <span className="text-brand-gradient">wandered off.</span>
       </h1>
       <p className="mt-4 leading-relaxed text-muted-foreground">
         The address does not point at anything in this app. No harm done — head back to the start

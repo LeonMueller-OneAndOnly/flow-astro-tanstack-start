@@ -133,21 +133,11 @@
      Not the lime: a lime ring on a lime button is invisible. */
   --ring: color-mix(in oklab, var(--brand-mint) 45%, transparent);
 
-  /* ── Tints ────────────────────────────────────────────────────────────────
-     Three pale surfaces that carry the icon tiles and section markers, each
-     paired with an `-ink` that is legible on it.
-
-     All three are brand hues at tint strength, so unlike a free trio of pastels
-     they read as one family — which is the trade the brand forces: Omvin is a
-     two-hue neon band plus the mint between them, so three *clearly different*
-     hues are not available without going off-brand. Order still carries
-     meaning, lime → cyan → mint being the gradient's own order. */
-  --tint-lime: #eefdd0;
-  --tint-lime-ink: var(--brand-lime-deep);
-  --tint-cyan: color-mix(in oklab, var(--brand-cyan) 14%, #ffffff);
-  --tint-cyan-ink: var(--brand-petrol);
-  --tint-mint: color-mix(in oklab, var(--brand-mint) 16%, #ffffff);
-  --tint-mint-ink: #0d5c49;
+  /* The small uppercase label above a heading, the gradient line in front of
+     it: omvin.ai's `.vocal-kicker`. The site sets it in the slate accent, which
+     only reaches 3:1 on white — fine at 13px on near-black, not here — so light
+     mode borrows the secondary-text grey and keeps the brand in the line. */
+  --eyebrow: var(--muted-foreground);
 
   /* The light behind the page. Big, low-contrast washes rather than visible
      shapes — they should register as "this page is Omvin", not as graphics
@@ -158,8 +148,11 @@
   --wash-3: color-mix(in oklab, var(--brand-lime) 10%, transparent);
 
   /* Shadows are the brand's own black-teal rather than a neutral grey, so the
-     edge of a card stays in the same family as everything above it. */
-  --shadow-color: 6 17 20;
+     edge of a card stays in the same family as everything above it. Whole
+     values rather than a shared colour, because the two palettes need different
+     shapes, not just different strengths: see the dark block. */
+  --shadow-soft: 0 1px 2px rgb(6 17 20 / 0.05), 0 8px 24px -8px rgb(6 17 20 / 0.12);
+  --shadow-lifted: 0 2px 4px rgb(6 17 20 / 0.06), 0 16px 36px -12px rgb(6 17 20 / 0.2);
   --chart-1: var(--brand-lime-deep);
   --chart-2: var(--brand-cyan-deep);
   --chart-3: var(--brand-petrol);
@@ -215,14 +208,7 @@
     --input: #faf7f424;
     --ring: color-mix(in oklab, var(--brand-mint) 45%, transparent);
 
-    /* The same three hues, now as glass over the ground instead of tint on
-       white, with the bright end of each as its ink. */
-    --tint-lime: color-mix(in oklab, var(--brand-lime) 15%, transparent);
-    --tint-lime-ink: #bff55a;
-    --tint-cyan: color-mix(in oklab, var(--brand-cyan) 14%, transparent);
-    --tint-cyan-ink: var(--brand-cyan);
-    --tint-mint: color-mix(in oklab, var(--brand-mint) 14%, transparent);
-    --tint-mint-ink: #34e6a0;
+    --eyebrow: var(--brand-slate);
 
     /* Petrol from the top corner, the way it falls across the workspace rail in
        FlowOffice, with the mint and cyan kept far weaker. On a dark ground the
@@ -232,9 +218,13 @@
     --wash-2: color-mix(in oklab, var(--brand-mint) 9%, transparent);
     --wash-3: color-mix(in oklab, var(--brand-cyan) 7%, transparent);
 
-    /* Black, because there is nothing left to darken: a tinted shadow on a
-       near-black ground only lightens the edge it is meant to seat. */
-    --shadow-color: 0 0 0;
+    /* omvin.ai's card shadow: one deep, tight-spread black drop, plus a 1px
+       paper-coloured line along the inside top edge. On glass there is no
+       surface for a soft shadow to darken, so the depth comes from the light
+       catching the rim instead. Black, because a tinted shadow on a near-black
+       ground only lightens the edge it is meant to seat. */
+    --shadow-soft: 0 22px 46px -26px rgb(0 0 0 / 0.9), inset 0 1px 0 #faf7f40d;
+    --shadow-lifted: 0 28px 56px -24px rgb(0 0 0 / 0.95), inset 0 1px 0 #faf7f414;
     --chart-1: var(--brand-lime);
     --chart-2: var(--brand-cyan);
     --chart-3: var(--brand-mint);
@@ -267,20 +257,8 @@
   --color-brand: var(--brand);
   --color-brand-soft: var(--brand-soft);
   --color-brand-ink: var(--brand-ink);
-  --color-brand-lime: var(--brand-lime);
-  --color-brand-cyan: var(--brand-cyan);
-  --color-brand-mint: var(--brand-mint);
-  --color-brand-petrol: var(--brand-petrol);
-  --color-brand-slate: var(--brand-slate);
-  --color-brand-night: var(--brand-night);
-  --color-brand-paper: var(--brand-paper);
+  --color-eyebrow: var(--eyebrow);
 
-  --color-tint-lime: var(--tint-lime);
-  --color-tint-lime-ink: var(--tint-lime-ink);
-  --color-tint-cyan: var(--tint-cyan);
-  --color-tint-cyan-ink: var(--tint-cyan-ink);
-  --color-tint-mint: var(--tint-mint);
-  --color-tint-mint-ink: var(--tint-mint-ink);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -353,21 +331,18 @@
 }
 
 /**
- * The resting shadow every raised surface sits on: two stacked layers, the near
- * one tight and the far one wide. One layer reads as a sticker; two read as an
- * object slightly above the page.
+ * The resting shadow every raised surface sits on. Light mode stacks two soft
+ * layers, the near one tight and the far one wide — one layer reads as a
+ * sticker, two as an object slightly above the page. Dark mode is omvin.ai's
+ * glass rim instead; the tokens carry the difference.
  */
 @utility shadow-soft {
-  box-shadow:
-    0 1px 2px rgb(var(--shadow-color) / 0.05),
-    0 8px 24px -8px rgb(var(--shadow-color) / 0.12);
+  box-shadow: var(--shadow-soft);
 }
 
 /** `shadow-soft` after the object has been picked up — used on hover. */
 @utility shadow-lifted {
-  box-shadow:
-    0 2px 4px rgb(var(--shadow-color) / 0.06),
-    0 16px 36px -12px rgb(var(--shadow-color) / 0.2);
+  box-shadow: var(--shadow-lifted);
 }
 
 /**
@@ -377,6 +352,58 @@
  */
 @utility shadow-brand-glow {
   box-shadow: 0 10px 24px -12px color-mix(in oklab, var(--brand-mint) 70%, transparent);
+}
+
+/**
+ * A 1px brand-gradient border, for the one surface on a page that is the point
+ * of it — omvin.ai's featured card. A border cannot take a gradient, so it is a
+ * pseudo-element the size of the box with its content area masked out, which is
+ * also why this sets `position: relative`. Pair with `border-transparent` if the
+ * element has a border of its own; the line is drawn inside the box edge.
+ */
+@utility border-brand-gradient {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--brand-gradient);
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    pointer-events: none;
+  }
+}
+
+/**
+ * The label above a heading: small, uppercase, widely tracked, led by a short
+ * line in the brand gradient. omvin.ai opens every section with one, so it is
+ * how a page here says "a new thing starts" without a divider.
+ */
+@utility eyebrow {
+  /* `flex`, not `inline-flex`: next to another inline box (an icon tile, say) an
+     inline eyebrow would join its line. Centre it with `justify-center`. */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: var(--eyebrow);
+
+  &::before {
+    content: "";
+    flex: none;
+    width: 1.75rem;
+    height: 1px;
+    background: var(--brand-gradient);
+  }
 }
 
 @layer base {
@@ -433,6 +460,12 @@
   textarea {
     font: inherit;
     font-family: var(--font-ui);
+  }
+
+  /* Selected text takes the mint glow instead of the system blue, which is the
+     one colour on a page that would otherwise never belong to it. */
+  ::selection {
+    background-color: color-mix(in oklab, var(--brand-mint) 35%, transparent);
   }
 
   /* Prose in this app is mostly about routes, files and config keys, so `code`

@@ -87,7 +87,7 @@ function MailWorkerTestPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <BackLink to="/demo" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">Queue a preview email</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">Queue a preview email</h1>
       <p className="mt-4 leading-relaxed text-muted-foreground">
         Submitting this form inserts a <code>send-mail</code> job. The background worker should pick
         it up and open the generated email preview.

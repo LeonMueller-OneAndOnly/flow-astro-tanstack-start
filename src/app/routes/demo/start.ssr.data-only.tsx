@@ -16,7 +16,7 @@ function RouteComponent() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <BackLink to="/demo/start/ssr" label="Back to SSR modes" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">Data only</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">Data only</h1>
       <DemoExplainer feature='ssr: "data-only"' className="mt-6">
         The <code>loader</code> runs on the server and its data is serialized into the page, but the
         component renders only on the client. You skip the client-side data waterfall without paying

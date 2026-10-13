@@ -9,8 +9,9 @@ const buttonVariants = cva(
      control in this design, and a square-cornered one reads as a foreign widget.
      `active:translate-y-px` is the whole press animation — a control that gives
      slightly under the cursor feels friendlier than one that only changes
-     colour, and it costs a single class. */
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold outline-none transition-[color,background-color,border-color,box-shadow,filter,translate] active:translate-y-px focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+     colour, and it costs a single class. `font-ui` here as well as on the base
+     `button` rule, because these classes also style anchors. */
+  "font-ui inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold outline-none transition-[color,background-color,border-color,box-shadow,filter,translate] active:translate-y-px focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -23,9 +24,11 @@ const buttonVariants = cva(
         /* Its partner, for the action beside the primary one. Filled rather than
            outlined — an outline next to a solid pill reads as disabled. */
         secondary: "bg-secondary text-secondary-foreground hover:bg-border",
-        outline: "border border-input bg-card hover:bg-secondary",
+        /* omvin.ai's second button: no fill of its own, just a rim that brightens
+           when the cursor arrives, so it never competes with the gradient. */
+        outline: "border border-input bg-transparent hover:border-foreground/40 hover:bg-accent",
         destructive: "shadow-soft bg-destructive text-destructive-foreground hover:brightness-95",
-        ghost: "hover:bg-secondary",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-brand-ink underline-offset-4 hover:underline",
       },
       size: {

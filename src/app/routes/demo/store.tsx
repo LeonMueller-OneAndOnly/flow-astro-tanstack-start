@@ -62,7 +62,7 @@ function DemoStore() {
   return (
     <main className="mx-auto w-full max-w-md px-6 pt-10 pb-24">
       <BackLink to="/demo" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">Reactive store</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">Reactive store</h1>
       <DemoExplainer feature="TanStack Store + derived state" className="mt-6">
         Each field subscribes to its own slice with <code>useSelector</code>, so typing in one input
         re-renders only that field. <code>Full name</code> is a <code>Derived</code> value that

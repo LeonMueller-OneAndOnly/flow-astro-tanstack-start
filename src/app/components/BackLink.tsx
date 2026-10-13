@@ -20,7 +20,7 @@ export function BackLink({
     <Link
       to={to}
       className={cn(
-        "group inline-flex items-center gap-2 rounded-full bg-secondary py-1.5 pr-4 pl-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-border hover:text-foreground",
+        "group font-ui inline-flex items-center gap-2 rounded-full bg-secondary py-1.5 pr-4 pl-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-border hover:text-foreground",
         className,
       )}
     >

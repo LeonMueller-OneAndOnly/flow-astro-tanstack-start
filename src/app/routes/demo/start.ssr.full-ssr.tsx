@@ -15,7 +15,7 @@ function RouteComponent() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <BackLink to="/demo/start/ssr" label="Back to SSR modes" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">Full SSR</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">Full SSR</h1>
       <DemoExplainer feature="ssr: true (default)" className="mt-6">
         The <code>loader</code> runs on the server and the component is rendered to HTML there, so
         the full list ships in the initial response and then hydrates. Best for SEO and first paint.

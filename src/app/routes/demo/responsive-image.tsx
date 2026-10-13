@@ -41,7 +41,7 @@ function DemoResponsiveImage() {
   return (
     <main className="mx-auto w-full max-w-4xl px-6 pt-10 pb-24">
       <BackLink to="/demo" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">Responsive images</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">Responsive images</h1>
 
       <DemoExplainer feature="@responsive-image/react + Vite plugin" className="mt-6">
         Images are imported with a <code>?responsive</code> query, resized and re-encoded at build

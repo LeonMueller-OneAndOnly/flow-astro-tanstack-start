@@ -28,7 +28,7 @@ function Home() {
     <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <BackLink to="/demo" />
       <div className="mt-6 flex items-center gap-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Names list</h1>
+        <h1 className="text-3xl font-bold tracking-tighter">Names list</h1>
         {names ? <Badge variant="secondary">{names.length}</Badge> : null}
       </div>
       <DemoExplainer feature="TanStack API route + client fetch" className="mt-6">

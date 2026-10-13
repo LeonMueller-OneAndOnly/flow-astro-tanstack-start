@@ -22,7 +22,7 @@ function RouteComponent() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pt-10 pb-24">
       <BackLink to="/demo/start/ssr" label="Back to SSR modes" />
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">SPA mode</h1>
+      <h1 className="mt-6 text-3xl font-bold tracking-tighter">SPA mode</h1>
       <DemoExplainer feature="ssr: false" className="mt-6">
         Nothing on this route renders on the server. The browser receives an empty shell, then
         fetches the songs client-side in an effect after hydration — expect a brief blank moment
