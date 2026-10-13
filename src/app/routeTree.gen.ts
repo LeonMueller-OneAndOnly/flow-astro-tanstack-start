@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DemoRouteRouteImport } from './routes/demo/route'
 import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DemoResponsiveImageRouteImport } from './routes/demo/responsive-image'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
@@ -26,20 +27,25 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 
-const DemoIndexRoute = DemoIndexRouteImport.update({
-  id: '/demo/',
-  path: '/demo/',
+const DemoRouteRoute = DemoRouteRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DemoIndexRoute = DemoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoResponsiveImageRoute = DemoResponsiveImageRouteImport.update({
-  id: '/demo/responsive-image',
-  path: '/demo/responsive-image',
-  getParentRoute: () => rootRouteImport,
+  id: '/responsive-image',
+  path: '/responsive-image',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
-  getParentRoute: () => rootRouteImport,
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -47,68 +53,69 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
-  id: '/demo/api/names',
-  path: '/demo/api/names',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/names',
+  path: '/api/names',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoApiUploadsRoute = DemoApiUploadsRouteImport.update({
-  id: '/demo/api/uploads',
-  path: '/demo/api/uploads',
-  getParentRoute: () => rootRouteImport,
+  id: '/api/uploads',
+  path: '/api/uploads',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: '/demo/start/api-request',
-  path: '/demo/start/api-request',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/api-request',
+  path: '/start/api-request',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStartMailWorkerRoute = DemoStartMailWorkerRouteImport.update({
-  id: '/demo/start/mail-worker',
-  path: '/demo/start/mail-worker',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/mail-worker',
+  path: '/start/mail-worker',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: '/demo/start/server-funcs',
-  path: '/demo/start/server-funcs',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/server-funcs',
+  path: '/start/server-funcs',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStartUploadsRoute = DemoStartUploadsRouteImport.update({
-  id: '/demo/start/uploads',
-  path: '/demo/start/uploads',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/uploads',
+  path: '/start/uploads',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoExampleGuitarsIndexRoute = DemoExampleGuitarsIndexRouteImport.update({
-  id: '/demo/example/guitars/',
-  path: '/demo/example/guitars/',
-  getParentRoute: () => rootRouteImport,
+  id: '/example/guitars/',
+  path: '/example/guitars/',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoExampleGuitarsGuitarIdRoute =
   DemoExampleGuitarsGuitarIdRouteImport.update({
-    id: '/demo/example/guitars/$guitarId',
-    path: '/demo/example/guitars/$guitarId',
-    getParentRoute: () => rootRouteImport,
+    id: '/example/guitars/$guitarId',
+    path: '/example/guitars/$guitarId',
+    getParentRoute: () => DemoRouteRoute,
   } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
-  id: '/demo/start/ssr/',
-  path: '/demo/start/ssr/',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/',
+  path: '/start/ssr/',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
-  id: '/demo/start/ssr/data-only',
-  path: '/demo/start/ssr/data-only',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/data-only',
+  path: '/start/ssr/data-only',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStartSsrFullSsrRoute = DemoStartSsrFullSsrRouteImport.update({
-  id: '/demo/start/ssr/full-ssr',
-  path: '/demo/start/ssr/full-ssr',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/full-ssr',
+  path: '/start/ssr/full-ssr',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
-  id: '/demo/start/ssr/spa-mode',
-  path: '/demo/start/ssr/spa-mode',
-  getParentRoute: () => rootRouteImport,
+  id: '/start/ssr/spa-mode',
+  path: '/start/ssr/spa-mode',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/demo': typeof DemoRouteRouteWithChildren
   '/demo/responsive-image': typeof DemoResponsiveImageRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/': typeof DemoIndexRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/demo': typeof DemoRouteRouteWithChildren
   '/demo/responsive-image': typeof DemoResponsiveImageRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/': typeof DemoIndexRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/demo'
     | '/demo/responsive-image'
     | '/demo/store'
     | '/demo/'
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr'
   id:
     | '__root__'
+    | '/demo'
     | '/demo/responsive-image'
     | '/demo/store'
     | '/demo/'
@@ -221,10 +231,138 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  DemoRouteRoute: typeof DemoRouteRouteWithChildren
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/': {
+      id: '/demo/'
+      path: '/'
+      fullPath: '/demo/'
+      preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/responsive-image': {
+      id: '/demo/responsive-image'
+      path: '/responsive-image'
+      fullPath: '/demo/responsive-image'
+      preLoaderRoute: typeof DemoResponsiveImageRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/store': {
+      id: '/demo/store'
+      path: '/store'
+      fullPath: '/demo/store'
+      preLoaderRoute: typeof DemoStoreRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/api/names': {
+      id: '/demo/api/names'
+      path: '/api/names'
+      fullPath: '/demo/api/names'
+      preLoaderRoute: typeof DemoApiNamesRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/api/uploads': {
+      id: '/demo/api/uploads'
+      path: '/api/uploads'
+      fullPath: '/demo/api/uploads'
+      preLoaderRoute: typeof DemoApiUploadsRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/api-request': {
+      id: '/demo/start/api-request'
+      path: '/start/api-request'
+      fullPath: '/demo/start/api-request'
+      preLoaderRoute: typeof DemoStartApiRequestRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/mail-worker': {
+      id: '/demo/start/mail-worker'
+      path: '/start/mail-worker'
+      fullPath: '/demo/start/mail-worker'
+      preLoaderRoute: typeof DemoStartMailWorkerRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/server-funcs': {
+      id: '/demo/start/server-funcs'
+      path: '/start/server-funcs'
+      fullPath: '/demo/start/server-funcs'
+      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/uploads': {
+      id: '/demo/start/uploads'
+      path: '/start/uploads'
+      fullPath: '/demo/start/uploads'
+      preLoaderRoute: typeof DemoStartUploadsRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/example/guitars/': {
+      id: '/demo/example/guitars/'
+      path: '/example/guitars'
+      fullPath: '/demo/example/guitars/'
+      preLoaderRoute: typeof DemoExampleGuitarsIndexRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/example/guitars/$guitarId': {
+      id: '/demo/example/guitars/$guitarId'
+      path: '/example/guitars/$guitarId'
+      fullPath: '/demo/example/guitars/$guitarId'
+      preLoaderRoute: typeof DemoExampleGuitarsGuitarIdRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/ssr/': {
+      id: '/demo/start/ssr/'
+      path: '/start/ssr'
+      fullPath: '/demo/start/ssr/'
+      preLoaderRoute: typeof DemoStartSsrIndexRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/ssr/data-only': {
+      id: '/demo/start/ssr/data-only'
+      path: '/start/ssr/data-only'
+      fullPath: '/demo/start/ssr/data-only'
+      preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/ssr/full-ssr': {
+      id: '/demo/start/ssr/full-ssr'
+      path: '/start/ssr/full-ssr'
+      fullPath: '/demo/start/ssr/full-ssr'
+      preLoaderRoute: typeof DemoStartSsrFullSsrRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/start/ssr/spa-mode': {
+      id: '/demo/start/ssr/spa-mode'
+      path: '/start/ssr/spa-mode'
+      fullPath: '/demo/start/ssr/spa-mode'
+      preLoaderRoute: typeof DemoStartSsrSpaModeRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+  }
+}
+
+interface DemoRouteRouteChildren {
   DemoResponsiveImageRoute: typeof DemoResponsiveImageRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoIndexRoute: typeof DemoIndexRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiUploadsRoute: typeof DemoApiUploadsRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -239,128 +377,10 @@ export interface RootRouteChildren {
   DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/demo/': {
-      id: '/demo/'
-      path: '/demo'
-      fullPath: '/demo/'
-      preLoaderRoute: typeof DemoIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/responsive-image': {
-      id: '/demo/responsive-image'
-      path: '/demo/responsive-image'
-      fullPath: '/demo/responsive-image'
-      preLoaderRoute: typeof DemoResponsiveImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/demo/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/api/names': {
-      id: '/demo/api/names'
-      path: '/demo/api/names'
-      fullPath: '/demo/api/names'
-      preLoaderRoute: typeof DemoApiNamesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/api/uploads': {
-      id: '/demo/api/uploads'
-      path: '/demo/api/uploads'
-      fullPath: '/demo/api/uploads'
-      preLoaderRoute: typeof DemoApiUploadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/api-request': {
-      id: '/demo/start/api-request'
-      path: '/demo/start/api-request'
-      fullPath: '/demo/start/api-request'
-      preLoaderRoute: typeof DemoStartApiRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/mail-worker': {
-      id: '/demo/start/mail-worker'
-      path: '/demo/start/mail-worker'
-      fullPath: '/demo/start/mail-worker'
-      preLoaderRoute: typeof DemoStartMailWorkerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/server-funcs': {
-      id: '/demo/start/server-funcs'
-      path: '/demo/start/server-funcs'
-      fullPath: '/demo/start/server-funcs'
-      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/uploads': {
-      id: '/demo/start/uploads'
-      path: '/demo/start/uploads'
-      fullPath: '/demo/start/uploads'
-      preLoaderRoute: typeof DemoStartUploadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/example/guitars/': {
-      id: '/demo/example/guitars/'
-      path: '/demo/example/guitars'
-      fullPath: '/demo/example/guitars/'
-      preLoaderRoute: typeof DemoExampleGuitarsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/example/guitars/$guitarId': {
-      id: '/demo/example/guitars/$guitarId'
-      path: '/demo/example/guitars/$guitarId'
-      fullPath: '/demo/example/guitars/$guitarId'
-      preLoaderRoute: typeof DemoExampleGuitarsGuitarIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/': {
-      id: '/demo/start/ssr/'
-      path: '/demo/start/ssr'
-      fullPath: '/demo/start/ssr/'
-      preLoaderRoute: typeof DemoStartSsrIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/data-only': {
-      id: '/demo/start/ssr/data-only'
-      path: '/demo/start/ssr/data-only'
-      fullPath: '/demo/start/ssr/data-only'
-      preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/full-ssr': {
-      id: '/demo/start/ssr/full-ssr'
-      path: '/demo/start/ssr/full-ssr'
-      fullPath: '/demo/start/ssr/full-ssr'
-      preLoaderRoute: typeof DemoStartSsrFullSsrRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/spa-mode': {
-      id: '/demo/start/ssr/spa-mode'
-      path: '/demo/start/ssr/spa-mode'
-      fullPath: '/demo/start/ssr/spa-mode'
-      preLoaderRoute: typeof DemoStartSsrSpaModeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
-}
-
-const rootRouteChildren: RootRouteChildren = {
+const DemoRouteRouteChildren: DemoRouteRouteChildren = {
   DemoResponsiveImageRoute: DemoResponsiveImageRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoIndexRoute: DemoIndexRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiUploadsRoute: DemoApiUploadsRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
@@ -373,6 +393,15 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
   DemoExampleGuitarsIndexRoute: DemoExampleGuitarsIndexRoute,
   DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
+}
+
+const DemoRouteRouteWithChildren = DemoRouteRoute._addFileChildren(
+  DemoRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  DemoRouteRoute: DemoRouteRouteWithChildren,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

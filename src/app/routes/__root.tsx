@@ -1,7 +1,6 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 
-import Header from "@/components/Header";
 import NotFound from "@/components/NotFound";
 import { buildMetaTags, HEAD_LINKS, SITE } from "@/lib/framework/site-meta";
 
@@ -60,14 +59,13 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Header />
         {/*
-         * Page content gets its own stacking context via `isolate`, so any z-index a
-         * route sets stays self-contained and can never paint over the fixed chrome —
-         * the MenuBar (z-20) and the offcanvas Sidebar (z-10) live outside this
-         * wrapper and must always sit on top.
+         * No shell chrome here on purpose: the only navigation in the starter is the
+         * demo sidebar, and it is the layout route `src/app/routes/demo/route.tsx`,
+         * so it covers the demos and nothing else. A route that wants chrome brings
+         * its own.
          */}
-        <div className="isolate">{children}</div>
+        {children}
 
         {Devtools ? (
           <Suspense fallback={null}>
