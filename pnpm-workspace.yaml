@@ -27,3 +27,9 @@ allowBuilds:
 # different encoders. Astro's pages were already on 0.34 and always will be.
 overrides:
   sharp: "$sharp"
+  # One Vite for everything. The TanStack Start plugins run inside Astro's Vite config
+  # (`composeAstroTanStackBuild` in astro.config.ts), so a second copy would hand them
+  # a different module graph, environment classes and HMR pipeline than the server they
+  # run in, and `instanceof`/`isRunnableDevEnvironment` checks across the two fail
+  # silently. `$vite` is the version in this package.json, the one place to bump it.
+  vite: "$vite"
