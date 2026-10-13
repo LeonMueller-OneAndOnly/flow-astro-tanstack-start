@@ -101,8 +101,14 @@ function DemoIndex() {
       </h1>
 
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-        One small, working example per pattern — routing, API handlers, server functions, rendering
-        modes, state and dynamic params. Open one, then go and read how it is put together.
+        Each demo is one technical building block of an app as a small, working example —
+        routing, API handlers, server functions, rendering modes, state and dynamic params. They
+        are the reference your coding agent reads to build features the way this project does.
+      </p>
+
+      <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+        Keep them while you build the first version. Delete the demo pages before you take your
+        project live.
       </p>
 
       <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
