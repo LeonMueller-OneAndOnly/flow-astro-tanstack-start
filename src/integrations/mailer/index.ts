@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 
 import { htmlToText } from "nodemailer-html-to-text";
 
-import { ZMail, type TMail } from "./types";
+import { ZMail, type TMail, type TMailTransport } from "./types";
 import { previewMail } from "./preview";
 import { getMailSender } from "./sender";
 
@@ -13,10 +13,6 @@ import { z } from "zod";
 export const ZMailOutgoingMailer = z.object({ type: z.literal("internal") });
 
 export type TMailOutgoingMailer = z.infer<typeof ZMailOutgoingMailer>;
-
-export const ZMailTransport = z.enum(["send-via-smtp", "preview-in-browser", "ignore"]);
-
-export type TMailTransport = z.infer<typeof ZMailTransport>;
 
 const isTestEnv = process.env.APP_ENV === "test";
 

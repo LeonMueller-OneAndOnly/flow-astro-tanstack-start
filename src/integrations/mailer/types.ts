@@ -28,3 +28,7 @@ export const ZMail = z.object({
 });
 
 export type TMail = z.infer<typeof ZMail>;
+
+export const ZMailTransport = z.enum(["send-via-smtp", "preview-in-browser", "ignore"]);
+
+export type TMailTransport = z.infer<typeof ZMailTransport>;
