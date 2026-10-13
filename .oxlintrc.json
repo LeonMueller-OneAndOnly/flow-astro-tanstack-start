@@ -20,6 +20,27 @@
     "better-tailwindcss/no-conflicting-classes": "warn",
     "better-tailwindcss/no-unknown-classes": "warn"
   },
+  "overrides": [
+    {
+      // TanStack Start's production manifest gets no CSS from the build composed with
+      // Astro, so a stylesheet imported here is never linked in the SSR HTML and the
+      // page renders unstyled until its JS loads. Styles go through src/styles/globals.css.
+      "files": ["src/app/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "\\.(css|scss|sass|less|styl|pcss)$",
+                "message": "Never linked in production SSR HTML here. Import it with `?url` and add it to head().links, or put the styles in src/styles/globals.css."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
   "env": {
     "builtin": true
   }
