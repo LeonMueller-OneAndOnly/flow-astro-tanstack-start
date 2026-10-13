@@ -1,0 +1,417 @@
+---
+import "./BeispielKarussell.css";
+import { Image } from "astro:assets";
+import cabinHero from "./bilder/cabin-hero-1200.webp";
+import kreavoHome from "./bilder/kreavo-home.webp";
+import adProduct from "./bilder/ad-product.webp";
+import adProductB from "./bilder/ad-product-b.webp";
+import adProductC from "./bilder/ad-product-c.webp";
+import villaCover from "./bilder/villa-cover.webp";
+import villaPool from "./bilder/villa-pool.webp";
+import villaWohnen from "./bilder/villa-wohnen.webp";
+import villaKueche from "./bilder/villa-kueche.webp";
+import posterFitness from "./bilder/poster-fitness.webp";
+
+/**
+ * Das Glasfenster-Karussell aus dem Hero von omvin.ai, verschlankt: dieselben
+ * Beispiele, aber Bilder statt HTML-Nachbauten, ohne H1-Rotor, Videos und
+ * Wischgesten. Prompts sind Imperative an OMVIN, deshalb spricht hier „Du“.
+ * Bilder in ./bilder/, Quelle omvin.ai. Nur kreavo.de
+ * ist ein echtes Projekt, alles andere ist erfunden.
+ *
+ * Gehört zur Platzhalter-Startseite (`@omvin-placeholder`): Wird sie
+ * überschrieben, geht dieser Ordner mit.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+type BeispielKey = "web" | "shop" | "ad" | "expose" | "poster";
+interface Beispiel {
+  key: BeispielKey;
+  title: string;
+  prompt: string;
+  state: string;
+  /** Standzeit in ms; der Shop braucht länger, weil seine Seite durchscrollt. */
+  hold: number;
+}
+const beispiele: readonly Beispiel[] = [
+  { key: "web", title: "Website", prompt: "Bau uns eine Website fürs Waldrefugium.", state: "Fertig · zur Freigabe", hold: 6500 },
+  { key: "shop", title: "Webshop", prompt: "Bau uns einen Shop für unsere 3D⁠-⁠Figuren.", state: "Live · kreavo.de", hold: 9000 },
+  { key: "ad", title: "Kampagne", prompt: "Plan eine Kampagne für die AURA Buds.", state: "Fertig · zur Freigabe", hold: 6500 },
+  { key: "expose", title: "Exposé", prompt: "Erstell ein Exposé für die Villa am Hang.", state: "Fertig · zur Freigabe", hold: 6500 },
+  { key: "poster", title: "Plakat", prompt: "Gestalte ein Plakat fürs Fitnessstudio.", state: "Fertig · zur Freigabe", hold: 6500 },
+];
+const anzahl = beispiele.length;
+const nummer = (n: number) => String(n).padStart(2, "0");
+/** Startplätze, wie das Skript sie für Fenster 1 berechnet; ohne JavaScript steht damit schon die fertige Bühne. */
+const startPlatz = (i: number) => {
+  const d = ((i + anzahl + Math.floor(anzahl / 2)) % anzahl) - Math.floor(anzahl / 2);
+  return d === 0 ? "current" : d === 1 ? "next" : d === -1 ? "previous" : d < 0 ? "before" : "after";
+};
+const kampagne = [
+  { bild: adProduct, titel: "AURA Buds Pro", claim: "Mehr als nur Sound.", cta: "Jetzt vorbestellen" },
+  { bild: adProductB, titel: "Bis zu 32 dB leiser.", claim: "Stille auf Knopfdruck.", cta: "Mehr erfahren" },
+  { bild: adProductC, titel: "40 Std. Laufzeit.", claim: "Eine Ladung. Ganze Woche.", cta: "Jetzt vorbestellen" },
+];
+const exposeDaten = [
+  ["Wohnfläche", "212 m²"],
+  ["Grundstück", "1.180 m²"],
+  ["Zimmer", "5"],
+  ["Energieklasse", "A+"],
+];
+const druckDaten = [
+  ["Format", "DIN A1"],
+  ["Farbraum", "CMYK"],
+  ["Auflösung", "300 dpi"],
+  ["Datei", "PDF/X⁠-⁠4"],
+];
+const plakatFarben = ["#c4f23a", "#151815", "#f1f0ec", "#6f7d2c"];
+---
+
+<section
+  class:list={["ex-stage", className]}
+  data-ex-stage
+  role="region"
+  aria-roledescription="Karussell"
+  aria-label="Beispiele: Ein Satz, ein Ergebnis"
+>
+  <div class="ex-show" id="ex-gallery">
+    {
+      beispiele.map((b, i) => (
+        <figure
+          class="ex-card"
+          data-ex-card
+          data-kind={b.key}
+          data-position={startPlatz(i)}
+          data-hold={b.hold}
+          role="group"
+          aria-roledescription="Folie"
+          aria-label={`${i + 1} von ${anzahl}: ${b.title}`}
+          aria-hidden={i === 0 ? undefined : "true"}
+        >
+          <div class="ex-bar">
+            <p class="ex-ask">
+              <span class="ex-who">Du</span>
+              <span class="min-w-0">„{b.prompt}“</span>
+            </p>
+            <span class="ex-num" aria-hidden="true">
+              {nummer(i + 1)} / {nummer(anzahl)}
+            </span>
+          </div>
+          <div class="ex-body" aria-hidden="true">
+            <div class="ex-result">
+              {b.key === "web" && (
+                <div class="ex-browser">
+                  <span class="ex-browser__bar">
+                    <i class="ex-dots"><i /><i /><i /></i>
+                    <b class="ex-url">waldrefugium.de</b>
+                  </span>
+                  <div class="ex-browser__view">
+                    <Image class="ex-web__img" src={cabinHero} alt="" draggable="false" />
+                    <span class="absolute inset-0 bg-[linear-gradient(180deg,rgb(0_0_0/0.45),transparent_30%,rgb(0_0_0/0.7))]" />
+                    <span class="absolute inset-x-0 top-0 flex items-center justify-between px-[1.1em] py-[0.8em] text-[0.7em] text-white">
+                      <b class="tracking-wide">Waldrefugium</b>
+                      <span class="flex gap-[1.2em] opacity-80 max-sm:hidden"><i>Ausstattung</i><i>Galerie</i><i>Lage</i></span>
+                      <em class="rounded-full bg-[#e8b04a] px-[0.9em] py-[0.35em] font-semibold text-[#1d1408] not-italic">Jetzt buchen</em>
+                    </span>
+                    <span class="absolute inset-x-0 bottom-0 grid gap-[0.45em] p-[1.3em] text-white">
+                      <small class="text-[0.62em] font-semibold tracking-[0.14em] text-[#f3cf86] uppercase">Naturrefugium · Schwarzwald</small>
+                      <strong class="text-[1.9em] leading-[1.02] font-bold tracking-tight">Ihr Refugium<br />tief im Wald.</strong>
+                      <span class="mt-[0.3em] flex items-center gap-[1em] text-[0.75em]">
+                        <em class="rounded-full bg-[#e8b04a] px-[1em] py-[0.45em] font-semibold text-[#1d1408] not-italic">Jetzt reservieren</em>
+                        <span class="opacity-85">ab <b>149 €</b> / Nacht</span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              )}
+              {b.key === "shop" && (
+                <div class="ex-browser">
+                  <span class="ex-browser__bar">
+                    <i class="ex-dots"><i /><i /><i /></i>
+                    <b class="ex-url">kreavo.de</b>
+                    <em class="ex-real">Echtes Projekt</em>
+                  </span>
+                  <div class="ex-browser__view bg-white">
+                    <Image class="ex-shop__img" src={kreavoHome} alt="" draggable="false" />
+                  </div>
+                </div>
+              )}
+              {b.key === "ad" && (
+                <div class="grid h-full w-full grid-cols-3 gap-[0.7em]">
+                  {kampagne.map((motiv) => (
+                    <span class="relative overflow-hidden rounded-[0.7em] bg-black shadow-[0_10px_24px_-10px_rgb(0_0_0/0.7)]">
+                      <Image class="absolute inset-0 size-full object-cover" src={motiv.bild} alt="" draggable="false" />
+                      <span class="absolute inset-0 bg-[linear-gradient(180deg,transparent_45%,rgb(0_0_0/0.85))]" />
+                      <span class="absolute inset-x-0 bottom-0 grid gap-[0.35em] p-[0.8em] text-white">
+                        <strong class="text-[0.95em] leading-tight font-bold">{motiv.titel}</strong>
+                        <small class="text-[0.68em] opacity-80">{motiv.claim}</small>
+                        <em class="mt-[0.3em] justify-self-start rounded-full bg-[#e83440] px-[0.8em] py-[0.35em] text-[0.62em] font-semibold not-italic">{motiv.cta}</em>
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {b.key === "expose" && (
+                <div class="grid h-full w-full grid-cols-2 overflow-hidden rounded-[0.6em] shadow-[0_14px_30px_-12px_rgb(0_0_0/0.7)]">
+                  <span class="relative">
+                    <Image class="absolute inset-0 size-full object-cover" src={villaCover} alt="" draggable="false" />
+                    <span class="absolute inset-0 bg-[linear-gradient(180deg,rgb(0_0_0/0.5),transparent_40%)]" />
+                    <span class="absolute inset-x-0 top-0 grid gap-[0.3em] p-[1em] text-white">
+                      <small class="text-[0.58em] font-semibold tracking-[0.14em] uppercase opacity-85">Exposé · Baden⁠-⁠Baden</small>
+                      <strong class="text-[1.45em] leading-none font-bold tracking-tight">Villa am Hang</strong>
+                      <small class="text-[0.72em] opacity-85">Wohnen mit Weitblick.</small>
+                    </span>
+                  </span>
+                  <span class="flex min-h-0 flex-col gap-[0.6em] bg-[#f7f5f0] p-[0.9em] text-[#1c2430]">
+                    <Image class="aspect-video w-full rounded-[0.35em] object-cover" src={villaPool} alt="" draggable="false" />
+                    <span class="flex items-baseline justify-between border-b border-[#1c2430]/12 pb-[0.4em]">
+                      <small class="text-[0.6em] tracking-[0.1em] text-[#1c2430]/60 uppercase">Kaufpreis</small>
+                      <b class="text-[1.05em] text-[#1f5fae]">1.890.000 €</b>
+                    </span>
+                    <span class="grid grid-cols-2 gap-x-[0.8em] gap-y-[0.35em] text-[0.66em]">
+                      {exposeDaten.map(([k, v]) => (
+                        <span class="flex justify-between gap-[0.5em]"><i class="text-[#1c2430]/60 not-italic">{k}</i><b>{v}</b></span>
+                      ))}
+                    </span>
+                    <span class="mt-auto grid min-h-0 flex-1 grid-cols-2 gap-[0.4em]">
+                      <Image class="size-full min-h-0 rounded-[0.3em] object-cover" src={villaWohnen} alt="" draggable="false" />
+                      <Image class="size-full min-h-0 rounded-[0.3em] object-cover" src={villaKueche} alt="" draggable="false" />
+                    </span>
+                  </span>
+                </div>
+              )}
+              {b.key === "poster" && (
+                <div class="grid h-full w-full grid-cols-[auto_1fr] grid-rows-[100%] items-center gap-[1.2em]">
+                  <Image class="h-full min-h-0 w-auto rounded-[0.2em] object-contain shadow-[0_16px_34px_-12px_rgb(0_0_0/0.8),0_0_0_0.5em_#fff]" src={posterFitness} alt="" draggable="false" />
+                  <span class="grid gap-[0.55em] text-[0.74em] text-[#e6f2ef]">
+                    <small class="text-[0.82em] font-semibold tracking-[0.12em] text-[#c4f23a] uppercase">Druckdaten</small>
+                    {druckDaten.map(([k, v]) => (
+                      <span class="flex justify-between gap-[0.8em] border-b border-white/10 pb-[0.4em]"><i class="text-white/55 not-italic">{k}</i><b class="font-semibold whitespace-nowrap">{v}</b></span>
+                    ))}
+                    <span class="mt-[0.4em] flex gap-[0.4em]">
+                      {plakatFarben.map((farbe) => (
+                        <i class="size-[1.6em] rounded-full ring-1 ring-white/20" style={`background:${farbe}`} />
+                      ))}
+                    </span>
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+          <figcaption class="ex-foot">
+            <span class="ex-name" aria-hidden="true"><span>OMVIN /</span> <b>{b.title}</b></span>
+            <span class="ex-status">
+              <span class="ex-status__work" aria-hidden="true"><i class="ex-ring" />OMVIN arbeitet …</span>
+              <span class="ex-status__done">{b.state}</span>
+            </span>
+            <span class="ex-kind">{b.key === "shop" ? "Echtes Projekt" : "Beispiel"}</span>
+          </figcaption>
+          <span class="ex-frost" aria-hidden="true" />
+        </figure>
+      ))
+    }
+  </div>
+
+  <div class="ex-controls" data-ex-controls hidden>
+    <button class="ex-button" type="button" data-ex-pause aria-label="Automatischen Wechsel pausieren" aria-pressed="false" aria-controls="ex-gallery">
+      <svg class="ex-pause-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M9 6.5v11M15 6.5v11" /></svg>
+      <svg class="ex-play-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 9 6-9 6Z" /></svg>
+    </button>
+    <button class="ex-button" type="button" data-ex-previous aria-label="Vorheriges Beispiel" aria-controls="ex-gallery">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg>
+    </button>
+    <div class="flex items-center" role="group" aria-label="Beispiel auswählen">
+      {
+        beispiele.map((b, i) => (
+          <button
+            class="ex-choice"
+            type="button"
+            data-ex-select={i}
+            aria-label={`Beispiel ${i + 1} von ${anzahl}: ${b.title}`}
+            aria-current={i === 0 ? "true" : undefined}
+            aria-controls="ex-gallery"
+          >
+            <span />
+          </button>
+        ))
+      }
+    </div>
+    <button class="ex-button" type="button" data-ex-next aria-label="Nächstes Beispiel" aria-controls="ex-gallery">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg>
+    </button>
+  </div>
+</section>
+
+<script>
+  /**
+   * Karussell (Ablauf wie omvin.ai, src/scripts/omvin-hero.ts dort): jedes Fenster
+   * steht auf einem Platz (`data-position`). Die Fahrten sind CSS-Transitionen;
+   * Fenster, die sichtbar werden, setzt das Skript vorher ohne Transition auf die
+   * Seite, aus der sie kommen, damit nie eines gegen die Laufrichtung durch die
+   * Mitte fährt. Pausiert bei Maus über der Bühne, Tastaturfokus, außerhalb des
+   * Viewports, verborgenem Tab und reduzierter Bewegung (bis jemand „Start“ drückt).
+   */
+  type Slot = "current" | "previous" | "next" | "before" | "after";
+
+  const stage = document.querySelector<HTMLElement>("[data-ex-stage]");
+  if (stage) {
+    const gallery = stage.querySelector<HTMLElement>(".ex-show");
+    const controls = stage.querySelector<HTMLElement>("[data-ex-controls]");
+    const cards = Array.from(stage.querySelectorAll<HTMLElement>("[data-ex-card]"));
+    const choices = Array.from(stage.querySelectorAll<HTMLButtonElement>("[data-ex-select]"));
+    const pause = stage.querySelector<HTMLButtonElement>("[data-ex-pause]");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const holds = cards.map((card) => Number(card.dataset.hold) || 6500);
+    const count = cards.length;
+    const half = Math.floor(count / 2);
+
+    let index = Math.max(0, cards.findIndex((card) => card.dataset.position === "current"));
+    let choice: "play" | "pause" | undefined;
+    let timer = 0;
+    let hold = holds[index] ?? 6500;
+    let remaining = hold;
+    let startedAt = 0;
+    let progress: Animation | undefined;
+    let hovered = false;
+    let focused = false;
+    let visible = false;
+
+    /** Abstand von Fenster `card` zu Fenster `from` auf dem Ring: −half … half. */
+    const offset = (card: number, from: number) => ((card - from + count + half) % count) - half;
+    const onStage = (slot: string | undefined) => slot === "current" || slot === "previous" || slot === "next";
+
+    const synchronize = () => {
+      if (timer) {
+        remaining = Math.max(0, remaining - (performance.now() - startedAt));
+        window.clearTimeout(timer);
+        timer = 0;
+      }
+      const paused = choice ? choice === "pause" : reducedMotion.matches;
+      const running = visible && !document.hidden && !paused && !hovered && !focused;
+      pause?.setAttribute("aria-pressed", String(paused));
+      controls?.toggleAttribute("data-paused", !running);
+      if (!running) {
+        progress?.pause();
+        return;
+      }
+      progress?.play();
+      startedAt = performance.now();
+      timer = window.setTimeout(() => {
+        timer = 0;
+        show(index + 1);
+      }, remaining);
+    };
+
+    const show = (target: number) => {
+      window.clearTimeout(timer);
+      timer = 0;
+      const next = ((target % count) + count) % count;
+      const delta = offset(next, index);
+      const direction = Math.sign(delta);
+
+      const moves = cards.map((card, cardIndex) => {
+        const from = card.dataset.position;
+        const distance = offset(cardIndex, next);
+        let to: Slot =
+          distance === 0
+            ? "current"
+            : distance === -1
+              ? "previous"
+              : distance === 1
+                ? "next"
+                : distance < 0
+                  ? "before"
+                  : "after";
+        // Unsichtbare bleiben, wo sie sind; sichtbare gehen gegen die Laufrichtung ab.
+        if (!onStage(to) && !onStage(from)) to = from === "before" ? "before" : "after";
+        else if (!onStage(to) && direction) to = direction > 0 ? "before" : "after";
+        else if (onStage(to) && !onStage(from)) {
+          const entry = to === "previous" ? "before" : to === "next" ? "after" : direction < 0 ? "before" : "after";
+          if (from !== entry) {
+            card.dataset.snap = "";
+            card.dataset.position = entry;
+          }
+        }
+        return { card, to };
+      });
+      // Die vorab gesetzten Einfahrplätze festschreiben, bevor die Fahrt von dort startet.
+      if (moves.some(({ card }) => card.hasAttribute("data-snap"))) void gallery?.offsetWidth;
+      for (const { card, to } of moves) {
+        card.removeAttribute("data-snap");
+        card.dataset.position = to;
+        if (to === "current") card.removeAttribute("aria-hidden");
+        else card.setAttribute("aria-hidden", "true");
+      }
+
+      for (const [choiceIndex, button] of choices.entries()) {
+        if (choiceIndex === next) button.setAttribute("aria-current", "true");
+        else button.removeAttribute("aria-current");
+      }
+      hold = holds[next] ?? 6500;
+      progress?.cancel();
+      progress = choices[next]
+        ?.querySelector("span")
+        ?.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], {
+          duration: hold,
+          easing: "linear",
+          fill: "forwards",
+        });
+      index = next;
+      remaining = hold;
+      synchronize();
+    };
+
+    controls?.removeAttribute("hidden");
+    stage.querySelector("[data-ex-previous]")?.addEventListener("click", () => show(index - 1));
+    stage.querySelector("[data-ex-next]")?.addEventListener("click", () => show(index + 1));
+    for (const button of choices) {
+      button.addEventListener("click", () => show(Number(button.dataset.exSelect)));
+    }
+    pause?.addEventListener("click", () => {
+      choice = pause.getAttribute("aria-pressed") === "true" ? "play" : "pause";
+      synchronize();
+    });
+    stage.addEventListener("pointerenter", (event) => {
+      hovered = event.pointerType === "mouse";
+      synchronize();
+    });
+    stage.addEventListener("pointerleave", () => {
+      hovered = false;
+      synchronize();
+    });
+    // Nur Tastaturfokus pausiert: Chromium fokussiert Knöpfe auch beim Mausklick.
+    const trackFocus = () => {
+      focused = stage.matches(":has(:focus-visible)");
+      synchronize();
+    };
+    stage.addEventListener("focusin", trackFocus);
+    stage.addEventListener("focusout", trackFocus);
+    stage.addEventListener("keydown", (event) => {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      show(index + (event.key === "ArrowRight" ? 1 : -1));
+    });
+    // Klick auf ein Nachbarfenster neben dem vorderen wechselt dorthin.
+    gallery?.addEventListener("click", (event) => {
+      const rect = cards[index]?.getBoundingClientRect();
+      if (!rect || event.clientY < rect.top || event.clientY > rect.bottom) return;
+      if (event.clientX < rect.left) show(index - 1);
+      else if (event.clientX > rect.right) show(index + 1);
+    });
+
+    reducedMotion.addEventListener("change", synchronize);
+    document.addEventListener("visibilitychange", synchronize);
+    new IntersectionObserver(
+      (entries) => {
+        visible = entries.at(-1)?.isIntersecting ?? false;
+        synchronize();
+      },
+      { threshold: 0.25 },
+    ).observe(stage);
+    show(index);
+  }
+</script>

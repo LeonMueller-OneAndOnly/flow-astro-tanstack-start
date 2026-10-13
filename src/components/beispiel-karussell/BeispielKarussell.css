@@ -1,0 +1,583 @@
+/*
+ * Glasfenster wie im Hero von omvin.ai (omvin-hero-gallery.css dort). Die
+ * Fenster sind in beiden Farbschemata dunkel: Sie stellen Bildschirme dar,
+ * keine Flächen der Seite. Plätze (`data-position`): `current` vorn,
+ * `previous`/`next` gekippt dahinter, `before`/`after` unsichtbar. Alle
+ * nutzen dieselbe Funktionsliste in `transform`, damit jede Funktion für sich
+ * interpoliert; die Tiefe (z-index) wechselt erst zur Hälfte der Fahrt.
+ */
+@property --ex-amb {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgb(46 222 170);
+}
+
+@layer components {
+  .ex-stage {
+    --ex-ease: cubic-bezier(0.23, 1, 0.32, 1);
+    --ex-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    position: relative;
+    overflow-x: clip;
+    padding-block: 1.5rem 0.5rem;
+    touch-action: pan-y;
+  }
+  /* Umgebungslicht in der Farbe des vorderen Fensters. */
+  .ex-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0 -10% 3rem;
+    pointer-events: none;
+    background: radial-gradient(
+      50% 46% at 50% 50%,
+      color-mix(in srgb, var(--ex-amb) 30%, transparent),
+      color-mix(in srgb, var(--ex-amb) 10%, transparent) 55%,
+      transparent
+    );
+    transition: --ex-amb 900ms var(--ex-ease);
+  }
+  .ex-stage:has([data-kind="web"][data-position="current"])::before { --ex-amb: rgb(217 164 65); }
+  .ex-stage:has([data-kind="shop"][data-position="current"])::before { --ex-amb: rgb(245 146 40); }
+  .ex-stage:has([data-kind="ad"][data-position="current"])::before { --ex-amb: rgb(232 52 64); }
+  .ex-stage:has([data-kind="expose"][data-position="current"])::before { --ex-amb: rgb(70 160 255); }
+  .ex-stage:has([data-kind="poster"][data-position="current"])::before { --ex-amb: rgb(200 245 40); }
+
+  .ex-show {
+    position: relative;
+    width: min(84%, 36rem);
+    aspect-ratio: 1.15;
+    margin-inline: auto;
+    perspective: 1500px;
+    container-type: size;
+    user-select: none;
+  }
+
+  .ex-card {
+    --acc: 46, 222, 170;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 1.375rem;
+    font-size: clamp(11px, 2.35cqw, 15px);
+    color: #f6fbf9;
+    background:
+      radial-gradient(90% 55% at 0% 0%, rgb(255 255 255 / 0.085), transparent 60%),
+      linear-gradient(180deg, rgb(210 255 240 / 0.07), rgb(210 255 240 / 0.025) 38%, rgba(var(--acc), 0.05)),
+      rgb(8 24 27 / 0.9);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.2),
+      inset 0 0 0 1px rgb(255 255 255 / 0.075),
+      inset 0 -24px 48px -24px rgba(var(--acc), 0.16),
+      0 2px 2px rgb(0 0 0 / 0.25),
+      0 28px 56px -18px rgb(0 0 0 / 0.6),
+      0 36px 80px -48px rgba(var(--acc), 0.45);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate3d(40%, 1%, -440px) rotateY(-26deg) scale(0.94);
+    transition:
+      transform 700ms var(--ex-ease),
+      opacity 320ms var(--ex-ease),
+      z-index 0s linear 150ms,
+      visibility 0s;
+  }
+  .ex-card[data-kind="web"] { --acc: 217, 164, 65; }
+  .ex-card[data-kind="shop"] { --acc: 245, 146, 40; }
+  .ex-card[data-kind="ad"] { --acc: 232, 52, 64; }
+  .ex-card[data-kind="expose"] { --acc: 70, 160, 255; }
+  .ex-card[data-kind="poster"] { --acc: 200, 245, 40; }
+
+  /* Lichtkante: hell oben links, farbig unten rechts. */
+  .ex-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      155deg,
+      rgb(255 255 255 / 0.42),
+      rgb(255 255 255 / 0.1) 22%,
+      rgb(255 255 255 / 0.03) 55%,
+      rgba(var(--acc), 0.45)
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+
+  .ex-card[data-position="current"] {
+    z-index: 4;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0) rotateY(0deg) scale(1);
+  }
+  .ex-card:is([data-position="previous"], [data-position="next"]) {
+    z-index: 3;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .ex-card[data-position="previous"] {
+    transform: translate3d(-21%, 0, -240px) rotateY(18deg) scale(1);
+  }
+  .ex-card[data-position="next"] {
+    transform: translate3d(21%, 0, -240px) rotateY(-18deg) scale(1);
+  }
+  .ex-card:is([data-position="before"], [data-position="after"]) {
+    z-index: 1;
+    transition:
+      transform 700ms var(--ex-ease),
+      opacity 240ms var(--ex-ease),
+      z-index 0s linear 150ms,
+      visibility 0s linear 240ms;
+  }
+  .ex-card[data-position="before"] {
+    transform: translate3d(-40%, 1%, -440px) rotateY(26deg) scale(0.94);
+  }
+  .ex-card[data-snap] {
+    transition: none;
+  }
+  /* Schmal: keine gekippten Nachbarn, sie würden nur als Splitter am Rand stehen. */
+  @media (max-width: 639px) {
+    .ex-show {
+      width: 100%;
+      aspect-ratio: 0.95;
+    }
+    .ex-card:is([data-position="previous"], [data-position="next"]) {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  /* Abdunklung der Nachbarn. */
+  .ex-frost {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    border-radius: inherit;
+    pointer-events: none;
+    background: rgb(6 17 20 / 0.7);
+    transition: opacity 200ms var(--ex-ease);
+  }
+  .ex-card[data-position="current"] .ex-frost {
+    opacity: 0;
+    transition: opacity 380ms var(--ex-ease) 120ms;
+  }
+
+  /* Titelleiste: der auslösende Satz. */
+  .ex-bar {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3.35em;
+    padding: 0.55em 1.1em;
+    overflow: hidden;
+    border-bottom: 1px solid rgb(255 255 255 / 0.07);
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.012));
+  }
+  .ex-ask {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.6em;
+    min-width: 0;
+    margin: 0;
+    font-size: 1.05em;
+    line-height: 1.35;
+  }
+  .ex-who {
+    flex: none;
+    padding: 0.24em 0.5em;
+    border-radius: 0.35em;
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgb(250 247 244 / 0.12);
+  }
+  .ex-num {
+    flex: none;
+    font-family: var(--font-ui);
+    font-size: 0.85em;
+    font-variant-numeric: tabular-nums;
+    color: rgb(215 233 231 / 0.66);
+  }
+
+  .ex-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    padding: 0.85em 1em 0.95em;
+  }
+  .ex-result {
+    position: relative;
+    display: grid;
+    /* Eine Zelle in Fenstergröße, sonst wächst sie mit dem Bild (Plakat). */
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    flex: 1;
+    min-height: 0;
+    container-type: size;
+  }
+
+  /* Browserrahmen für Website und Shop. */
+  .ex-browser {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 0.8em;
+    background: #121a1c;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 16px 32px -14px rgb(0 0 0 / 0.7);
+  }
+  .ex-browser__bar {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    height: 2.4em;
+    padding-inline: 0.8em;
+    font-size: 0.85em;
+  }
+  .ex-dots {
+    position: absolute;
+    left: 0.9em;
+    display: flex;
+    gap: 0.35em;
+  }
+  .ex-dots i {
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 50%;
+    background: #ff5f57;
+  }
+  .ex-dots i:nth-child(2) { background: #febc2e; }
+  .ex-dots i:nth-child(3) { background: #28c840; }
+  .ex-url {
+    padding: 0.2em 0.9em;
+    border-radius: 999px;
+    font-weight: 500;
+    color: rgb(230 242 239 / 0.85);
+    background: rgb(255 255 255 / 0.06);
+  }
+  .ex-real {
+    position: absolute;
+    right: 0.6em;
+    padding: 0.25em 0.7em;
+    border-radius: 999px;
+    font-size: 0.78em;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-night);
+    background: var(--brand-gradient);
+  }
+  .ex-browser__view {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    container-type: size;
+  }
+  .ex-web__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ex-shop__img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Vorn läuft die Website langsam heran, der Shop scrollt einmal durch. */
+  .ex-card[data-position="current"] .ex-web__img {
+    animation: ex-zoom 7s ease-out both;
+  }
+  .ex-card[data-position="current"] .ex-shop__img {
+    animation: ex-scroll 6.5s var(--ex-ease-in-out) 1.6s both;
+  }
+  @keyframes ex-zoom {
+    from {
+      transform: scale(1.08);
+    }
+  }
+  @keyframes ex-scroll {
+    to {
+      transform: translateY(calc(-100% + 100cqh));
+    }
+  }
+
+  /* Fußzeile: Absender, Status, Art des Ergebnisses. */
+  .ex-foot {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.9em;
+    min-height: 2.9em;
+    padding: 0.55em 1.1em;
+    border-top: 1px solid rgb(255 255 255 / 0.07);
+    font-size: 0.9em;
+    white-space: nowrap;
+    color: rgb(215 233 231 / 0.7);
+  }
+  .ex-name {
+    margin-right: auto;
+    font-family: var(--font-ui);
+    font-weight: 550;
+    color: rgb(234 245 241 / 0.88);
+  }
+  .ex-name b {
+    font-weight: 400;
+    color: rgb(215 233 231 / 0.68);
+  }
+  .ex-status {
+    display: grid;
+    justify-items: end;
+    font-weight: 550;
+  }
+  .ex-status > * {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+  }
+  .ex-status__done {
+    color: #c9f5e2;
+  }
+  .ex-status__done::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand-lime);
+    box-shadow: 0 0 8px rgb(162 241 28 / 0.8);
+  }
+  .ex-status__work {
+    opacity: 0;
+  }
+  .ex-ring {
+    width: 0.95em;
+    height: 0.95em;
+    border: 2px solid rgb(255 255 255 / 0.15);
+    border-top-color: var(--brand-lime);
+    border-radius: 50%;
+  }
+  @container (max-width: 420px) {
+    .ex-name > span,
+    .ex-kind {
+      display: none;
+    }
+  }
+
+  /* Ankunft vorn: Glanz über den Satz, „OMVIN arbeitet“, Scan über das Ergebnis, Fertig. */
+  .ex-bar::after,
+  .ex-result::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .ex-bar::after {
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.16) 50%, transparent 70%);
+  }
+  .ex-result::after {
+    inset: 0 0 auto;
+    z-index: 3;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--brand-lime) 20%, var(--brand-cyan) 80%, transparent);
+    box-shadow: 0 0 16px 2px rgb(162 241 28 / 0.45);
+  }
+  .ex-card[data-position="current"] .ex-bar::after {
+    animation: ex-sheen 560ms var(--ex-ease-in-out) 380ms;
+  }
+  .ex-card[data-position="current"] .ex-result::after {
+    animation: ex-scan 760ms var(--ex-ease-in-out) 600ms;
+  }
+  .ex-card[data-position="current"] .ex-status__work {
+    animation: ex-work 1520ms linear;
+  }
+  .ex-card[data-position="current"] .ex-ring {
+    animation: ex-spin 1.1s linear 1.2;
+  }
+  .ex-card[data-position="current"] .ex-status__done {
+    animation: ex-done 1520ms linear;
+  }
+  @keyframes ex-sheen {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    30%,
+    70% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+  @keyframes ex-scan {
+    0% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+    10%,
+    85% {
+      opacity: 0.85;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100cqh);
+    }
+  }
+  @keyframes ex-work {
+    0%,
+    3% {
+      opacity: 0;
+    }
+    8.5%,
+    88% {
+      opacity: 1;
+    }
+    93%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes ex-done {
+    0% {
+      opacity: 1;
+    }
+    3%,
+    93% {
+      opacity: 0;
+      transform: scale(1.08);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes ex-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  /* Steuerleiste: auf der Seite, nicht im Fenster, deshalb in den Farben der Seite. */
+  .ex-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    margin-top: 1.1rem;
+  }
+  .ex-controls[hidden] {
+    display: none;
+  }
+  .ex-button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    color: var(--foreground);
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--border);
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      transform 120ms var(--ex-ease);
+  }
+  .ex-button:active {
+    transform: scale(0.94);
+  }
+  .ex-button svg {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+  .ex-play-icon,
+  .ex-button[aria-pressed="true"] .ex-pause-icon {
+    display: none;
+  }
+  .ex-button[aria-pressed="true"] .ex-play-icon {
+    display: block;
+  }
+  .ex-choice {
+    position: relative;
+    width: 1.5rem;
+    height: 2.75rem;
+    cursor: pointer;
+    transition: width 240ms var(--ex-ease);
+  }
+  .ex-choice[aria-current="true"] {
+    width: 2.5rem;
+  }
+  .ex-choice::before,
+  .ex-choice > span {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    translate: -50% -50%;
+  }
+  .ex-choice::before {
+    background: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+    transition: width 240ms var(--ex-ease);
+  }
+  .ex-choice > span {
+    opacity: 0;
+    background: var(--brand-gradient);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .ex-choice[aria-current="true"]::before {
+    width: 1.75rem;
+    background: color-mix(in oklab, var(--muted-foreground) 35%, transparent);
+  }
+  .ex-choice[aria-current="true"] > span {
+    width: 1.75rem;
+    opacity: 1;
+  }
+  [data-paused] .ex-choice[aria-current="true"] > span {
+    opacity: 0.55;
+  }
+  .ex-controls button:focus-visible {
+    outline: 2px solid var(--brand-mint);
+    outline-offset: 2px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ex-button:hover {
+      background: var(--accent);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ex-card,
+    .ex-card:is([data-position="before"], [data-position="after"]) {
+      transition:
+        opacity 200ms ease,
+        visibility 0s linear 200ms;
+    }
+    .ex-card *,
+    .ex-card *::after {
+      animation: none !important;
+    }
+  }
+}

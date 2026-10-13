@@ -26,6 +26,7 @@
 
 import { $appPath } from "../app/lib/framework/typesafe-paths";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import BeispielKarussell from "../components/beispiel-karussell/BeispielKarussell.astro";
 
 export const prerender = true;
 
@@ -85,6 +86,9 @@ const steps = [
         > Sag deinem Agenten, was er hier ändern soll.
       </p>
     </section>
+
+    {/* Deko: was andere schon so gesagt haben, und was dabei herauskam. */}
+    <BeispielKarussell class="mt-14" />
 
     <p class="eyebrow mt-16">So geht es weiter</p>
     <section class="mt-5 grid gap-4 sm:grid-cols-3" aria-label="So geht es weiter">
