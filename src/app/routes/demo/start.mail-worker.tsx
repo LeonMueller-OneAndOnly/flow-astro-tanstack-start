@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Result } from "@/lib/framework/result";
+import { sendMail } from "src/integrations/mailer";
 
 const ZMailWorkerInput = z.object({
   to: z.email(),
@@ -22,7 +23,7 @@ const ZMailWorkerInput = z.object({
 type MailWorkerInput = z.infer<typeof ZMailWorkerInput>;
 
 type QueueMailResult =
-  | { success: true; jobId: number; to: string }
+  | { success: true; jobId: number | null; to: string }
   | { success: false; error: string };
 
 const queueMail = createServerFn({ method: "POST" })
@@ -37,26 +38,21 @@ const queueMail = createServerFn({ method: "POST" })
       };
     }
 
-    const { sendMailJob } = await import("src/jobs/send-mail");
     const jobResult = await Result.fromAsync(() =>
-      sendMailJob.enqueue(
-        {
-          mail: {
-            to: parsedInput.data.to,
-            subject: parsedInput.data.subject,
-            text: parsedInput.data.message,
-            html: `<p>${escapeHtml(parsedInput.data.message).replaceAll("\n", "<br>")}</p>`,
-          },
-          reason: "manual mail worker test",
-          transport: "preview-in-browser",
+      sendMail({
+        mail: {
+          to: parsedInput.data.to,
+          subject: parsedInput.data.subject,
+          text: parsedInput.data.message,
+          html: `<p>${escapeHtml(parsedInput.data.message).replaceAll("\n", "<br>")}</p>`,
         },
-        { maxAttempts: 1 },
-      ),
+        reason: "manual mail worker test",
+      }),
     );
 
     if (!jobResult.success) return { success: false, error: jobResult.error.message };
 
-    return { success: true, jobId: jobResult.data.id, to: parsedInput.data.to };
+    return { success: true, jobId: jobResult?.data?.id ?? null, to: parsedInput.data.to };
   });
 
 /** Served at `/app/demo/start/mail-worker`; TanStack route paths are mounted under Astro's `/app` catch-all. */

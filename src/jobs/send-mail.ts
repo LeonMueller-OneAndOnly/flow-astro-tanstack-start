@@ -1,5 +1,5 @@
 import { jobs } from "src/integrations/job-queue";
-import { handleJob_sendMail } from "src/integrations/mailer";
+import { handleJob_sendMail } from "src/integrations/mailer/deliver";
 
 import { ZMail, ZMailTransport } from "src/integrations/mailer/types";
 import { z } from "zod";
