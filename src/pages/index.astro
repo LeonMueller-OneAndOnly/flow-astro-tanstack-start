@@ -1,10 +1,4 @@
 ---
-import Header from "../app/components/Header";
-import { $appPath } from "../app/lib/framework/typesafe-paths";
-import BaseLayout from "../layouts/BaseLayout.astro";
-
-export const prerender = true;
-
 /**
  * HINWEIS FÜR AGENTEN  @omvin-placeholder
  *
@@ -29,6 +23,12 @@ export const prerender = true;
  *
  * Prüfen mit: `grep -c "@omvin-placeholder" src/pages/index.astro`
  */
+
+import Header from "../app/components/Header";
+import { $appPath } from "../app/lib/framework/typesafe-paths";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+export const prerender = true;
 
 const demoHubHref = $appPath({ to: "/demo" });
 
