@@ -245,7 +245,7 @@ index d34965fcfd63147ab1e7c72a0b0e20c073f4fc61..891d6c04a7b9bfcf870b582a08156522
          console.log(
            `[astro-grab] Copied snippet from ${data.file}:${data.targetLine}`
 diff --git a/dist/index.js b/dist/index.js
-index cda638c656d28b34c2fc093064d63c8dbb9b9243..ca9a4b3e7b5fd633199c6d84d5256c171ec8943c 100644
+index cda638c656d28b34c2fc093064d63c8dbb9b9243..8552b5d3713a3909297861af9d9452d310949d51 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -1,6 +1,6 @@
@@ -525,7 +525,29 @@ index cda638c656d28b34c2fc093064d63c8dbb9b9243..ca9a4b3e7b5fd633199c6d84d5256c17
      throw new Error(
        `Failed to read file "${loc.file}": ${error instanceof Error ? error.message : String(error)}`
      );
-@@ -365,7 +373,7 @@ var astroGrabVitePlugin = (options = {}) => {
+@@ -294,18 +302,9 @@ var astroGrabVitePlugin = (options = {}) => {
+         return null;
+       }
+     },
+-    handleHotUpdate({ file, modules, server }) {
+-      if (file.endsWith(".astro")) {
+-        for (const mod of modules) {
+-          server.moduleGraph.invalidateModule(mod);
+-        }
+-        server.ws.send({
+-          type: "full-reload",
+-          path: "*"
+-        });
+-        return [];
+-      }
+-    },
++    // No `handleHotUpdate`: Astro reloads changed `.astro` files itself, and
++    // returning `[]` here emptied the module list Vite hands to Astro's
++    // `astro:hmr-reload` hook, so the page's dev CSS was never refreshed.
+     configureServer(server) {
+       server.middlewares.use(async (req, res, next) => {
+         if (req.url === "/__astro_grab_client/auto.js") {
+@@ -365,7 +364,7 @@ var astroGrabVitePlugin = (options = {}) => {
  // src/server/snippet-handler-content.ts
  async function handleSnippetRequestFromContent(src, content, options = {}) {
    const { contextLines = 4 } = options;
