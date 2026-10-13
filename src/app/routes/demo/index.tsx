@@ -32,7 +32,7 @@ type Demo = {
 const demos: ReadonlyArray<Demo> = [
   {
     icon: Guitar,
-    tint: "bg-tint-sky text-tint-sky-ink",
+    tint: "bg-tint-lime text-tint-lime-ink",
     title: "Dynamic routes",
     tag: "Typed params",
     description:
@@ -41,7 +41,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: CloudUpload,
-    tint: "bg-tint-mint text-tint-mint-ink",
+    tint: "bg-tint-cyan text-tint-cyan-ink",
     title: "File uploads",
     tag: "Multipart API",
     description:
@@ -50,7 +50,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Mail,
-    tint: "bg-tint-sun text-tint-sun-ink",
+    tint: "bg-tint-mint text-tint-mint-ink",
     title: "Mail worker",
     tag: "Server fn → queue",
     description:
@@ -59,7 +59,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Server,
-    tint: "bg-tint-sky text-tint-sky-ink",
+    tint: "bg-tint-lime text-tint-lime-ink",
     title: "Server functions",
     tag: "RPC",
     description:
@@ -68,7 +68,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: RouteIcon,
-    tint: "bg-tint-mint text-tint-mint-ink",
+    tint: "bg-tint-cyan text-tint-cyan-ink",
     title: "API endpoint",
     tag: "Route handler",
     description: "A client page that fetches JSON from a colocated TanStack API route.",
@@ -76,7 +76,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: FileText,
-    tint: "bg-tint-sun text-tint-sun-ink",
+    tint: "bg-tint-mint text-tint-mint-ink",
     title: "SSR modes",
     tag: "Rendering",
     description: "The same list rendered three ways, one per value of the per-route ssr option.",
@@ -84,7 +84,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: Database,
-    tint: "bg-tint-sky text-tint-sky-ink",
+    tint: "bg-tint-lime text-tint-lime-ink",
     title: "Client store",
     tag: "State",
     description: "A TanStack Store example with per-field subscriptions and derived state.",
@@ -92,7 +92,7 @@ const demos: ReadonlyArray<Demo> = [
   },
   {
     icon: ImageIcon,
-    tint: "bg-tint-mint text-tint-mint-ink",
+    tint: "bg-tint-cyan text-tint-cyan-ink",
     title: "Responsive images",
     tag: "Build-time assets",
     description:
@@ -110,7 +110,7 @@ function DemoIndex() {
       </p>
 
       <h1 className="mt-6 max-w-2xl text-4xl leading-[1.12] font-semibold tracking-tight text-balance sm:text-5xl">
-        Have a look at <span className="text-brand">how it all fits together.</span>
+        Have a look at <span className="text-brand-gradient">how it all fits together.</span>
       </h1>
 
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">

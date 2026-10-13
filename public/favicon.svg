@@ -1,16 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Omvin Start">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116.46 116.46" width="116.46" height="116.46" fill="none" role="img" aria-label="Omvin">
   <!--
-    Neutral placeholder mark: a solid dot with a punched-out centre. Colours
-    invert on dark browser chrome so the dot never sinks into the tab bar.
+    The Omvin ring: the "O" of the wordmark on its own, since the full wordmark
+    is illegible at 16px and the ring still reads as a shape. Copied from
+    FlowOffice's `public/logo/omvin/omvin-ring.favicon.svg`; the raster icons
+    next to this file are rendered from it, so replace them together.
+
+    No dark-mode variant, same as Omvin's own. The cyan half reads on any tab
+    bar; the lime half is weak on a light one, most visibly at 16px.
   -->
-  <style>
-    .dot { fill: #111111; }
-    .hole { fill: #ffffff; }
-    @media (prefers-color-scheme: dark) {
-      .dot { fill: #fafafa; }
-      .hole { fill: #111111; }
-    }
-  </style>
-  <circle class="dot" cx="16" cy="16" r="14" />
-  <circle class="hole" cx="16" cy="16" r="5.5" />
+  <defs>
+    <!-- Axis at 45°: lime top-left to cyan bottom-right. -->
+    <linearGradient id="omvin-favicon-ring" gradientUnits="userSpaceOnUse"
+      x1="20.94" y1="20.94" x2="95.52" y2="95.52">
+      <stop offset="0" stop-color="#d9f23c"/>
+      <stop offset="0.5" stop-color="#83d79b"/>
+      <stop offset="1" stop-color="#0fc6f7"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M73.12 108.81A52.73 52.73 0 1 1 102.80 86.41"
+    stroke="url(#omvin-favicon-ring)" stroke-width="11"
+    stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

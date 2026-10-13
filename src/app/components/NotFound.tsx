@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <main className="mx-auto w-full max-w-xl px-6 py-24 text-center">
       <span
-        className="inline-flex size-14 items-center justify-center rounded-2xl bg-tint-sun text-tint-sun-ink"
+        className="inline-flex size-14 items-center justify-center rounded-2xl bg-tint-mint text-tint-mint-ink"
         aria-hidden="true"
       >
         <svg

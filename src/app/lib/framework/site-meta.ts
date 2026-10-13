@@ -21,9 +21,10 @@ export const SITE = {
    * around was fixed in iOS 6 — so this is convention, not a fix.
    */
   viewport: "width=device-width, initial-scale=1",
-  /** Matches `theme_color` in `public/manifest.json`; an installed PWA and a
+  /** The brand's own ground (`--brand-night` in `src/styles/globals.css`).
+      Matches `theme_color` in `public/manifest.json`; an installed PWA and a
       browser chrome tinting from the tag should not disagree. */
-  themeColor: "#111111",
+  themeColor: "#061114",
   /** Stand-in for a page with no image of its own. Square — see `imageIsSized`. */
   fallbackImage: "/logo512.png",
   /** The 1.91:1 box Facebook, X, LinkedIn, WhatsApp and Slack all render. */

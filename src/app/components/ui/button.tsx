@@ -10,12 +10,16 @@ const buttonVariants = cva(
      `active:translate-y-px` is the whole press animation — a control that gives
      slightly under the cursor feels friendlier than one that only changes
      colour, and it costs a single class. */
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold outline-none transition-[color,background-color,border-color,box-shadow,translate] active:translate-y-px focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold outline-none transition-[color,background-color,border-color,box-shadow,filter,translate] active:translate-y-px focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        /* The one primary action on a view: solid brand over the warm paper. */
-        default: "shadow-soft bg-primary text-primary-foreground hover:bg-brand-hover",
+        /* The one primary action on a view: Omvin's lime-to-cyan gradient with
+           the mint glow under it, dark ink on top. Brightness rather than a
+           second colour on hover, because a gradient has no darker version that
+           still reads as the same button — `filter` is in the base transition
+           list above for this and for `destructive`. */
+        default: "shadow-brand-glow bg-brand-gradient text-primary-foreground hover:brightness-[1.12]",
         /* Its partner, for the action beside the primary one. Filled rather than
            outlined — an outline next to a solid pill reads as disabled. */
         secondary: "bg-secondary text-secondary-foreground hover:bg-border",
