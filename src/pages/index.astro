@@ -6,19 +6,28 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 export const prerender = true;
 
 /**
- * HINWEIS FÜR AGENTEN
+ * HINWEIS FÜR AGENTEN  @omvin-placeholder
  *
  * Diese Seite ist ein Platzhalter — die Begrüßung, die ein Kunde sieht, wenn
  * sein frisch angelegtes Omvin-Projekt zum ersten Mal ausgeliefert wird. Sie
  * gehört nicht zum Produkt, sie überbrückt nur die Zeit bis zum ersten Auftrag.
  *
- * Solange diese Datei seit dem Anlegen des Projekts durch keinen Commit
- * verändert wurde, darf sie beim ersten Auftrag des Nutzers vollständig
- * überschrieben werden — und soll es auch. Nichts hier ist erhaltenswert: kein
- * Text, kein Layout, keine Struktur. Erst wenn ein Commit die Seite angefasst
- * hat, steckt darin eine Entscheidung des Nutzers, die zu respektieren ist.
+ * Der Marker `@omvin-placeholder` in der Zeile oben ist die Bedingung, nicht
+ * die Git-Historie: solange er hier steht, ist die Seite unberührt. Dann wird
+ * sie beim ersten Auftrag, der keine Zielroute nennt, vollständig
+ * überschrieben — und zwar ohne Rückfrage. Nichts hier ist erhaltenswert: kein
+ * Text, kein Layout, keine Struktur, kein Kommentar. Der Marker verschwindet
+ * mit dem Rest; danach steckt in dieser Datei eine Entscheidung des Nutzers.
  *
- * Prüfen mit: `git log --oneline -- src/pages/index.astro`
+ * Fehlt der Marker, ist die Seite echt: nicht anfassen, sondern eine neue
+ * Route anlegen.
+ *
+ * Ist die Arbeit app-artig (siehe Framework-Abschnitt in CLAUDE.md), gehört
+ * sie unter `/app`. Diese Seite wird dann nicht zum Feature, sondern durch
+ * einen knappen Einstiegspunkt dorthin ersetzt — überschrieben wird sie so
+ * oder so.
+ *
+ * Prüfen mit: `grep -c "@omvin-placeholder" src/pages/index.astro`
  */
 
 const demoHubHref = $appPath({ to: "/demo" });
