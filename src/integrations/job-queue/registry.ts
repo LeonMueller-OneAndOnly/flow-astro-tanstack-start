@@ -8,7 +8,7 @@ export const jobQueueNames = ["job-queue-cleanup", "send-mail"] as const;
 export type TQueueName = (typeof jobQueueNames)[number];
 
 type TJobRegistryMap = {
-  [TName in TQueueName]: DefinedJob<TName, z.ZodSchema<any>>;
+  [TName in TQueueName]: DefinedJob<TName, z.ZodType<any>>;
 };
 
 /**

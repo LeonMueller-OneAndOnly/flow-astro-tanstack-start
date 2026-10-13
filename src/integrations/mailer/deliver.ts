@@ -27,7 +27,7 @@ export async function handleJob_sendMail(input: {
     return;
   }
 
-  const never: never = input.transport;
+  input.transport satisfies never;
 }
 
 async function sendMailViaSmtp(mail: TMail, reason: string) {

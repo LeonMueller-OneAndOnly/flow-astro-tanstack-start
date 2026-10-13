@@ -27,7 +27,7 @@ export type ScheduleJobOptions = {
   timezone?: string;
 };
 
-export type DefineCronOptions<TSchema extends z.ZodTypeAny> = ScheduleJobOptions & {
+export type DefineCronOptions<TSchema extends z.ZodType> = ScheduleJobOptions & {
   key: string;
   cron: string;
   payload: z.input<TSchema>;
@@ -65,14 +65,14 @@ export function readHotApi(meta: ImportMeta | undefined): HotApi | undefined {
   return Result.from(() => (meta as HotImportMeta | undefined)?.hot).unwrapOr(undefined);
 }
 
-export type DefineJobOptions<TName extends TQueueName, TSchema extends z.ZodTypeAny> = {
+export type DefineJobOptions<TName extends TQueueName, TSchema extends z.ZodType> = {
   importMeta?: HotImportMeta;
   name: TName;
   schema: TSchema;
   handler: JobHandler<z.output<TSchema>>;
 };
 
-export type DefinedJob<TName extends TQueueName, TSchema extends z.ZodTypeAny> = {
+export type DefinedJob<TName extends TQueueName, TSchema extends z.ZodType> = {
   name: TName;
   schema: TSchema;
   handler: JobHandler<z.output<TSchema>>;
@@ -90,7 +90,7 @@ export type DefinedJob<TName extends TQueueName, TSchema extends z.ZodTypeAny> =
 
 export type RegisteredJob<
   TName extends TQueueName = TQueueName,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+  TSchema extends z.ZodType = z.ZodType,
 > = {
   name: TName;
   schema: TSchema;
@@ -99,7 +99,7 @@ export type RegisteredJob<
 
 export type RegisteredCron<
   TName extends TQueueName = TQueueName,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+  TSchema extends z.ZodType = z.ZodType,
 > = {
   key: string;
   job: RegisteredJob<TName, TSchema>;
@@ -109,7 +109,7 @@ export type RegisteredCron<
 };
 
 export type JobRegistry = {
-  defineJob: <TName extends TQueueName, TSchema extends z.ZodTypeAny>(
+  defineJob: <TName extends TQueueName, TSchema extends z.ZodType>(
     options: DefineJobOptions<TName, TSchema>,
   ) => DefinedJob<TName, TSchema>;
   getJobs: () => WorkerJob[];
@@ -152,7 +152,7 @@ type ClaimedJobRow = Omit<JobQueueJobRow, "payload"> & { payload: string };
 
 type WorkerJob = {
   name: TQueueName;
-  schema: z.ZodTypeAny;
+  schema: z.ZodType;
   handler: JobHandler<unknown>;
 };
 
@@ -360,7 +360,7 @@ export function createJobQueueWorker(registry: JobRegistry, options: JobQueueWor
   };
 }
 
-function toWorkerJob<TName extends TQueueName, TSchema extends z.ZodTypeAny>(
+function toWorkerJob<TName extends TQueueName, TSchema extends z.ZodType>(
   job: RegisteredJob<TName, TSchema>,
 ): WorkerJob {
   return {
@@ -370,7 +370,7 @@ function toWorkerJob<TName extends TQueueName, TSchema extends z.ZodTypeAny>(
   };
 }
 
-function createDefinedJob<TName extends TQueueName, TSchema extends z.ZodTypeAny>(
+function createDefinedJob<TName extends TQueueName, TSchema extends z.ZodType>(
   options: DefineJobOptions<TName, TSchema>,
   registerCron: (cron: RegisteredCron<TName, TSchema>) => void,
 ): DefinedJob<TName, TSchema> {
@@ -400,7 +400,7 @@ function createDefinedJob<TName extends TQueueName, TSchema extends z.ZodTypeAny
   };
 }
 
-async function enqueueJob<TSchema extends z.ZodTypeAny>(
+async function enqueueJob<TSchema extends z.ZodType>(
   name: TQueueName,
   schema: TSchema,
   payload: z.input<TSchema>,
@@ -428,7 +428,7 @@ async function enqueueJob<TSchema extends z.ZodTypeAny>(
   return job;
 }
 
-async function scheduleJob<TSchema extends z.ZodTypeAny>(
+async function scheduleJob<TSchema extends z.ZodType>(
   key: string | undefined,
   name: TQueueName,
   schema: TSchema,
@@ -643,7 +643,7 @@ async function startJob(id: number, workerId: string): Promise<ClaimedJobRow | u
   return job as ClaimedJobRow | undefined;
 }
 
-function parsePayload<TSchema extends z.ZodTypeAny>(job: ClaimedJobRow, schema: TSchema) {
+function parsePayload<TSchema extends z.ZodType>(job: ClaimedJobRow, schema: TSchema) {
   const jsonResult = Result.from(() => JSON.parse(job.payload));
 
   if (!jsonResult.success) return jsonResult;
