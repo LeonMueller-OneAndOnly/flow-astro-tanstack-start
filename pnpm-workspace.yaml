@@ -1,4 +1,23 @@
 minimumReleaseAge: 10080
+# Exact releases let through the age gate for the Astro 7.3 upgrade (scoped-style HMR
+# fix, withastro/astro#18075). Pinned to the version, so later releases still wait the
+# full week. The newest here, postcss 8.5.30, matures on 2026-10-19 — after that this
+# list can go.
+minimumReleaseAgeExclude:
+  - astro@7.3.8
+  - vite@8.3.4
+  - "@astrojs/react@7.0.1"
+  - "@astrojs/internal-helpers@0.12.0"
+  - "@astrojs/markdown-satteri@0.4.3"
+  # Patch releases the bypassed install pulled in transitively; already in the lockfile,
+  # and pnpm re-checks them on every later `pnpm add`.
+  - rolldown@1.2.13
+  # pnpm takes no version on a name pattern. Safe without one: rolldown pins its native
+  # bindings exactly, so a binding only ever arrives through a rolldown that passed the gate.
+  - "@rolldown/binding-*"
+  - postcss@8.5.30
+  - p-queue@9.3.5
+  - smol-toml@1.9.1
 
 allowBuilds:
   "@parcel/watcher": true
