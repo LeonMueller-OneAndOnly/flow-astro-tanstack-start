@@ -567,9 +567,9 @@ const tryPrompt =
       // Was dunkel über der Nacht liegt, färbt hier das Papier wie Aquarell,
       // in vollem Farbton, aber nur bis knapp zur Hälfte deckend, damit
       // dunkler Text darauf lesbar bleibt. Sterne gibt es tagsüber keine.
-      vec3 glow=max(col-night,0.);
-      float amount=max(glow.r,max(glow.g,glow.b));
-      vec3 tint=glow/max(amount,1e-3)*.72;
+      vec3 lit=max(col-night,0.);
+      float amount=max(lit.r,max(lit.g,lit.b));
+      vec3 tint=lit/max(amount,1e-3)*.72;
       vec3 day=mix(paper,tint,min(amount*.62,.42)*mix(.55,1.,smoothstep(.0,.8,uv.y)));
       col=mix(col,day,light);
 
