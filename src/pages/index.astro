@@ -21,8 +21,8 @@
  * einen knappen Einstiegspunkt dorthin ersetzt, z.B. als Weiterleitung oder zentrale Übersicht.
  * Überschrieben wird sie so oder so.
  *
- * Wichtig beim Überschreiben: Der `<style is:global>`-Block unten schaltet die
- * ganze Seite auf die dunkle Markenpalette (über `[data-omvin-stage]`). Er
+ * Wichtig beim Überschreiben: Der `<style is:global>`-Block unten setzt über
+ * `[data-omvin-stage]` seitenweite Werte (Bühnen-Tokens, sanftes Scrollen). Er
  * gehört zum Platzhalter und verschwindet mit ihm.
  *
  * Prüfen mit: `grep -c "@omvin-placeholder" src/pages/index.astro`
@@ -311,7 +311,7 @@ const tryPrompt =
             niemand von selbst findet: zeigen statt beschreiben. */}
         <div class="mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-[1.45fr_1fr]">
           <div class="reveal prompt-card">
-            <div class="relative h-full rounded-[calc(var(--radius)-1px)] bg-[#081619]/95 p-5 sm:p-8">
+            <div class="relative h-full rounded-[calc(var(--radius)-1px)] bg-[var(--stage-glass-solid)] p-5 sm:p-8">
               <p class="eyebrow">Zum Ausprobieren</p>
               <p class="mt-4 text-[1.05rem] leading-relaxed text-pretty sm:text-xl">„{tryPrompt}“</p>
               <div class="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
@@ -455,6 +455,7 @@ const tryPrompt =
     uniform vec2 mouse;
     uniform float scroll;
     uniform float intro;
+    uniform float light;
     float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
     float noise(vec2 p){
       vec2 i=floor(p),f=fract(p);
@@ -510,6 +511,7 @@ const tryPrompt =
       vec3 mint=vec3(.18,.871,.667);
       vec3 cyan=vec3(0.,.89,.945);
       vec3 lime=vec3(.635,.945,.11);
+      vec3 paper=vec3(.976,.98,.984);
 
       // Grundton: tiefe Nacht, Petrol nur in den Strömungen — die dunklen
       // Stellen dazwischen geben dem Licht erst seine Tiefe.
@@ -519,7 +521,7 @@ const tryPrompt =
       vec2 cell=floor(gl_FragCoord.xy+vec2(0.,scroll*res.y*.08));
       float star=step(.9975,hash(cell));
       float twinkle=.55+.45*sin(time*(1.2+hash(cell+3.)*2.)+hash(cell)*60.);
-      col+=vec3(.85,.97,1.)*star*twinkle*.55*smoothstep(.25,.95,uv.y);
+      col+=vec3(.85,.97,1.)*star*twinkle*.55*smoothstep(.25,.95,uv.y)*(1.-light);
 
       // Zwei Polarlicht-Vorhänge. Unten an der Kante Lime/Mint, nach oben
       // Cyan — wie echtes Polarlicht, in den Farben der Marke.
@@ -561,6 +563,16 @@ const tryPrompt =
       // Licht unter dem Zeiger.
       col+=mint*.045*bloom(p,pm,.05);
 
+      // Hell: Licht kann auf Papier nicht leuchten, also wird es zu Farbe.
+      // Was dunkel über der Nacht liegt, färbt hier das Papier wie Aquarell,
+      // in vollem Farbton, aber nur bis knapp zur Hälfte deckend, damit
+      // dunkler Text darauf lesbar bleibt. Sterne gibt es tagsüber keine.
+      vec3 glow=max(col-night,0.);
+      float amount=max(glow.r,max(glow.g,glow.b));
+      vec3 tint=glow/max(amount,1e-3)*.72;
+      vec3 day=mix(paper,tint,min(amount*.62,.42)*mix(.55,1.,smoothstep(.0,.8,uv.y)));
+      col=mix(col,day,light);
+
       // Dithering gegen Farbstufen in den dunklen Verläufen.
       col+=(hash(gl_FragCoord.xy+fract(time))-.5)/128.;
       gl_FragColor=vec4(col,1.);
@@ -595,7 +607,11 @@ const tryPrompt =
       mouse: gl.getUniformLocation(program, "mouse"),
       scroll: gl.getUniformLocation(program, "scroll"),
       intro: gl.getUniformLocation(program, "intro"),
+      light: gl.getUniformLocation(program, "light"),
     };
+    const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const applyScheme = () => gl.uniform1f(uniform.light, darkScheme.matches ? 0 : 1);
+    applyScheme();
 
     // Halbe Auflösung am Rechner, ein Drittel auf dem Handy: das Bild ist
     // weich, mehr Pixel sähe man nicht, würde aber den Akku spüren.
@@ -653,37 +669,37 @@ const tryPrompt =
     );
     document.addEventListener("visibilitychange", synchronize);
     reducedMotion.addEventListener("change", synchronize);
+    darkScheme.addEventListener("change", () => {
+      applyScheme();
+      if (reducedMotion.matches) render(performance.now());
+    });
   }
 </script>
 
 <style is:global>
-  /* Der Platzhalter trägt immer die dunkle Markenpalette — wie omvin.ai selbst.
-     Die Werte sind die des Dark-Blocks in globals.css, hier nur unabhängig von
-     der OS-Einstellung aktiviert. */
+  /* Die Seite folgt der OS-Einstellung wie der Rest des Projekts; die Paletten
+     kommen aus globals.css. Hier stehen nur die Flächen der Bühne, die es dort
+     nicht gibt: Glas über dem Hintergrund, der Schein hinter Fließtext und die
+     Vignette. Hell sind das weißes Glas und ein heller Schein, dunkel die
+     teal-schwarzen Werte von omvin.ai. Die Schleier aus globals.css bleiben
+     aus, der Hintergrund kommt von der Bühne selbst. */
   :root:has([data-omvin-stage]) {
-    color-scheme: dark;
     scroll-behavior: smooth;
-    --brand-ink: var(--brand-lime);
-    --brand-soft: color-mix(in oklab, var(--brand-mint) 14%, transparent);
-    --brand-gradient-ink: var(--brand-gradient);
-    --background: var(--brand-night);
-    --foreground: var(--brand-paper);
-    --card: #faf7f40b;
-    --card-foreground: var(--brand-paper);
-    --secondary: #798fb624;
-    --secondary-foreground: var(--brand-paper);
-    --muted: #798fb624;
-    --muted-foreground: #faf7f4ad;
-    --accent: color-mix(in oklab, var(--brand-mint) 14%, transparent);
-    --accent-foreground: var(--brand-lime);
-    --border: #faf7f41a;
-    --input: #faf7f424;
-    --eyebrow: var(--brand-slate);
     --wash-1: transparent;
     --wash-2: transparent;
     --wash-3: transparent;
-    --shadow-soft: 0 22px 46px -26px rgb(0 0 0 / 0.9), inset 0 1px 0 #faf7f40d;
-    --shadow-lifted: 0 28px 56px -24px rgb(0 0 0 / 0.95), inset 0 1px 0 #faf7f414;
+    --stage-glass: #ffffffb3;
+    --stage-glass-solid: #ffffffeb;
+    --stage-halo: 0 0 14px rgb(255 255 255 / 0.9), 0 0 2px rgb(255 255 255 / 0.8);
+    --stage-vignette: rgb(4 98 104 / 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:has([data-omvin-stage]) {
+      --stage-glass: #0b1d21b3;
+      --stage-glass-solid: #0a1a1ee6;
+      --stage-halo: 0 1px 2px rgb(6 17 20 / 0.6), 0 0 18px rgb(6 17 20 / 0.85);
+      --stage-vignette: rgb(6 17 20 / 0.65);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     :root:has([data-omvin-stage]) { scroll-behavior: auto; }
@@ -702,7 +718,7 @@ const tryPrompt =
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
-    background: var(--brand-night);
+    background: var(--background);
   }
   /* Ersatz ohne WebGL: treibende Schleier, die beim Scrollen mitwandern. */
   .stage-sky__scroll {
@@ -732,8 +748,11 @@ const tryPrompt =
   }
   .aurora--a { top: 6%; left: 8%; width: 46vmax; height: 30vmax; background: color-mix(in oklab, var(--brand-lime) 30%, transparent); }
   .aurora--b { top: 2%; right: 4%; width: 44vmax; height: 34vmax; background: color-mix(in oklab, var(--brand-cyan) 28%, transparent); animation-duration: 28s; animation-delay: -9s; }
-  .aurora--c { top: 42%; left: 22%; width: 56vmax; height: 30vmax; background: color-mix(in oklab, var(--brand-petrol) 85%, transparent); opacity: 0.6; animation-duration: 32s; animation-delay: -15s; }
+  .aurora--c { top: 42%; left: 22%; width: 56vmax; height: 30vmax; background: color-mix(in oklab, var(--brand-mint) 30%, transparent); opacity: 0.6; animation-duration: 32s; animation-delay: -15s; }
   .aurora--d { bottom: 0; right: 10%; width: 40vmax; height: 28vmax; background: color-mix(in oklab, var(--brand-mint) 22%, transparent); animation-duration: 36s; animation-delay: -4s; }
+  @media (prefers-color-scheme: dark) {
+    .aurora--c { background: color-mix(in oklab, var(--brand-petrol) 85%, transparent); }
+  }
   @keyframes aurora-drift {
     0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
     50% { transform: translate3d(6vw, 6vh, 0) scale(1.12) rotate(8deg); }
@@ -770,6 +789,9 @@ const tryPrompt =
     filter: blur(24px);
     mix-blend-mode: plus-lighter;
   }
+  @media (prefers-color-scheme: light) {
+    .stage-beam { display: none; }
+  }
   @media (prefers-reduced-motion: no-preference) {
     .stage-beam { animation: beam-sway 18s ease-in-out infinite alternate; }
   }
@@ -780,7 +802,7 @@ const tryPrompt =
   .stage-vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(140% 100% at 50% 35%, transparent 55%, rgb(6 17 20 / 0.65));
+    background: radial-gradient(140% 100% at 50% 35%, transparent 55%, var(--stage-vignette));
   }
   /* Filmkorn: nimmt dem Verlauf das Digitale und den Farbstufen die Kanten. */
   .stage-grain {
@@ -827,8 +849,8 @@ const tryPrompt =
     font-size: 0.72rem;
     font-weight: 500;
     color: var(--muted-foreground);
-    background: #faf7f408;
-    box-shadow: inset 0 0 0 1px #faf7f41a;
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--border);
     transition: color 400ms, background 400ms, box-shadow 400ms;
   }
   @media (min-width: 400px) {
@@ -840,10 +862,10 @@ const tryPrompt =
     box-shadow: 0 0 22px -4px color-mix(in oklab, var(--brand-mint) 80%, transparent);
   }
 
-  /* Das Polarlicht läuft hinter dem Text durch; ein weicher dunkler Schatten
-     hält auch den grauen Fließtext auf hellen Strahlen lesbar. */
+  /* Das Polarlicht läuft hinter dem Text durch; ein weicher Schein in der
+     Grundfarbe hält auch den grauen Fließtext auf den Strahlen lesbar. */
   .hero-copy p {
-    text-shadow: 0 1px 2px rgb(6 17 20 / 0.6), 0 0 18px rgb(6 17 20 / 0.85);
+    text-shadow: var(--stage-halo);
   }
 
   /* Der Einstieg zu den drei Schritten: Glas-Pille mit Rand im Markenverlauf,
@@ -859,7 +881,7 @@ const tryPrompt =
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--foreground);
-    background: color-mix(in oklab, var(--brand-mint) 10%, #081619cc);
+    background: color-mix(in oklab, var(--brand-mint) 10%, var(--stage-glass));
     box-shadow: 0 12px 34px -14px color-mix(in oklab, var(--brand-mint) 70%, transparent);
     backdrop-filter: blur(10px);
     transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 300ms;
@@ -980,8 +1002,8 @@ const tryPrompt =
     white-space: nowrap;
     font-size: 0.875rem;
     color: var(--foreground);
-    background: #0b1d21b3;
-    box-shadow: inset 0 0 0 1px #faf7f41a, inset 0 1px 0 #faf7f414;
+    background: var(--stage-glass);
+    box-shadow: inset 0 0 0 1px var(--border), var(--shadow-soft);
     backdrop-filter: blur(8px);
     transition: background 200ms, box-shadow 200ms;
   }
@@ -989,7 +1011,7 @@ const tryPrompt =
     .idea-chip { padding: 0.7rem 1.1rem; font-size: 0.95rem; }
   }
   .idea-chip:hover {
-    background: color-mix(in oklab, var(--brand-mint) 12%, #0b1d21);
+    background: color-mix(in oklab, var(--brand-mint) 12%, var(--stage-glass-solid));
     box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-mint) 50%, transparent), 0 0 24px -6px var(--brand-mint);
   }
   .idea-chip__dot {
@@ -1023,7 +1045,7 @@ const tryPrompt =
   }
   .orbit__ring--outer {
     inset: 10%;
-    border: 1px dashed #faf7f42a;
+    border: 1px dashed var(--input);
   }
   .orbit__ring--inner {
     inset: 25%;
@@ -1052,8 +1074,8 @@ const tryPrompt =
     font-size: clamp(0.68rem, 3cqw, 0.8rem);
     font-weight: 500;
     color: var(--foreground);
-    background: #0b1d21e6;
-    box-shadow: inset 0 0 0 1px #faf7f42a, 0 8px 20px -10px #000;
+    background: var(--stage-glass-solid);
+    box-shadow: inset 0 0 0 1px var(--input), var(--shadow-soft);
     animation: orbit-spin 60s linear infinite reverse;
   }
   .orbit__ring--inner .orbit__chip {
@@ -1061,7 +1083,7 @@ const tryPrompt =
     animation-direction: normal;
   }
   .orbit__chip--bright {
-    color: var(--brand-lime);
+    color: var(--brand-ink);
     box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-lime) 45%, transparent), 0 0 18px -6px var(--brand-lime);
   }
   .orbit__core {
@@ -1103,7 +1125,7 @@ const tryPrompt =
     position: relative;
     padding: 1.25rem;
     border-radius: var(--radius);
-    background: #0a1a1ee0;
+    background: var(--stage-glass-solid);
     box-shadow: var(--shadow-soft), inset 0 0 0 1px var(--border);
     backdrop-filter: blur(10px);
     transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 300ms;
@@ -1124,7 +1146,7 @@ const tryPrompt =
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 0.9rem;
-    color: var(--brand-lime);
+    color: var(--brand-ink);
     background: color-mix(in oklab, var(--brand-mint) 12%, transparent);
     box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-mint) 30%, transparent);
   }
@@ -1140,11 +1162,11 @@ const tryPrompt =
     border-radius: var(--radius);
     background: conic-gradient(
       from var(--stage-angle),
-      #faf7f41a 0deg,
+      var(--border) 0deg,
       var(--brand-lime) 60deg,
       var(--brand-cyan) 120deg,
-      #faf7f41a 180deg,
-      #faf7f41a 360deg
+      var(--border) 180deg,
+      var(--border) 360deg
     );
     box-shadow: 0 24px 60px -30px var(--brand-mint);
     animation: border-spin 6s linear infinite;
