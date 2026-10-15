@@ -1,16 +1,11 @@
-/* 
- * The three layout classes `<ResponsiveImage>` puts on every image it renders 
- * ~150 bytes— `src/app/components/ResponsiveImage.tsx`  why the layer matters. 
- */
+/* Layout classes for `<ResponsiveImage>` (src/app/components/ResponsiveImage.tsx), in
+   the base layer so utilities on the image can override them. */
 @import "@responsive-image/react/responsive-image.css" layer(base);
 
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* The two brand faces, self-hosted rather than fetched from Google: Arimo for
-   running text, Geist for controls. Both are variable, so one file per subset
-   covers every weight, and `unicode-range` on the `@font-face` blocks means a
-   German or English page only ever downloads the latin subset. */
+/* Self-hosted variable fonts: Arimo for running text, Geist for controls. */
 @import "@fontsource-variable/arimo";
 @import "@fontsource-variable/geist";
 
@@ -19,88 +14,50 @@
 @source "../layouts";
 @source "../pages";
 
-/* The palette follows the reader's OS setting and nothing else: there is no
-   theme toggle, so a `.dark` class would never be applied by anything. Driving
-   the variant off the media query instead means the right palette is chosen by
-   CSS before first paint — no inline script, no flash of the wrong theme.
-   Add a toggle later and this becomes `(&:where(.dark, .dark *))` plus a
-   `:root:not(.light)` wrapper on the dark block below. */
+/* Dark mode follows the OS setting; there is no theme toggle. To add one, switch
+   this to `(&:where(.dark, .dark *))` and wrap the dark block in `:root:not(.light)`. */
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
-/* ── Omvin brand constants ──────────────────────────────────────────────────
-   The fixed hues, taken from the two places the brand is already written down:
-   the token block omvin.ai ships (`--vocal-from`/`--vocal-to`/`--brand-rgb`),
-   and the `omvin-*` scales in FlowOffice's `tailwind.config.js`, which is where
-   the light-mode steps of the lime live. Nothing below invents a hue; the mode
-   blocks only decide which of these a surface or a piece of text gets.
-
-   These stay outside the mode blocks because a brand hue is not a mode
-   decision — only its *role* is. */
+/* ── Brand hues ─────────────────────────────────────────────────────────────
+   Fixed in both modes; the mode blocks below only assign them to roles. */
 :root {
-  /* The brand mark's two ends: lime at one end, cyan at the other. Every Omvin
-     call to action is the gradient between them. */
+  /* The two ends of the brand gradient. */
   --brand-lime: #a2f11c;
   --brand-cyan: #00e3f1;
-  /* The same two hues further down their scales, for anything that has to read
-     as text or as a line on white. The bright pair cannot: lime hits about
-     1.3:1 there. The lime is FlowOffice's `omvin-lime-800` rather than the 700
-     that its own light mode uses for brand text — 700 lands at 4.2:1 on white,
-     which is under AA for the label and link sizes this ends up on. */
+  /* Text and line variants for light backgrounds, where the bright pair fails
+     contrast. lime-deep is the lightest step that passes AA on white. */
   --brand-lime-deep: #3e6b0e;
   --brand-cyan-deep: #00c2cf;
-  /* The mint the gradient passes through in the middle. On omvin.ai it is the
-     glow colour — rings, focus states and the light under a raised card — far
-     more than a fill. */
+  /* Glow colour: rings, focus states, light under raised surfaces. */
   --brand-mint: #2edeaa;
-  /* Petrol: the dark end of the same family, used as the wash on near-black and
-     as a line colour on white. */
   --brand-petrol: #046268;
-  /* The muted slate omvin.ai carries as `--primary`: the calm accent that keeps
-     a page of neon from reading as a toy. Here it is what the greys are made of
-     in the dark palette, and the fourth chart series in both. */
+  /* Calm accent; base of the dark-mode greys. */
   --brand-slate: #798fb6;
-  /* The ground and the ink of the brand's own dark surfaces. `night` is a
-     teal-black, not a neutral one, and `paper` is faintly warm — the pairing is
-     what keeps the neon from looking like it was dropped onto a grey app. */
+  /* Dark-mode ground and text. */
   --brand-night: #061114;
   --brand-paper: #faf7f4;
 
-  /* The call to action, verbatim from omvin.ai's `--emph-gradient`. Identical in
-     both palettes: the gradient carries dark ink on top either way, so it needs
-     no light-mode variant. */
+  /* Carries dark text in both modes, so it needs no light variant. */
   --brand-gradient: linear-gradient(100deg, var(--brand-lime) 0%, var(--brand-cyan) 100%);
 }
 
 :root {
-  /* omvin.ai's own `--radius`. Cards land at `--radius`, controls at
-     `--radius-lg`, and nothing in the design is square. */
+  /* Cards use `--radius`, controls `--radius-lg`. */
   --radius: 1.5rem;
 
-  /* The fixed top bar's height. Shared by the bar itself, the spacer that keeps
-     content out from under it, and the sidebar's top inset, so the three can
-     never drift apart. Exposed to Tailwind as `--spacing-header` below. */
+  /* Shared by the top bar, its spacer and the sidebar inset. */
   --header-height: 4rem;
 
-  /* ── Brand roles, light ─────────────────────────────────────────────────
-     `--brand` is the fill, `--brand-ink` the text: on white they cannot be the
-     same colour, which is the one rule the brand bends for nobody. Fills keep
-     the bright lime and carry `--primary-foreground` (near-black) on top, the
-     way Omvin's own primary button does in both palettes; text drops to the
-     deep lime FlowOffice uses for light-mode brand text. */
+  /* ── Light palette ───────────────────────────────────────────────────────
+     `--brand` is for fills (with dark text on top), `--brand-ink` for text:
+     bright lime is unreadable as text on white. */
   --brand: var(--brand-lime);
   --brand-soft: #eefdd0;
   --brand-ink: var(--brand-lime-deep);
-  /* Emphasised words in a headline, the `.vocal-emph` treatment from omvin.ai.
-     A separate gradient from `--brand-gradient` because this one is read rather
-     than pressed: on light it runs deep lime to petrol, which is legible, where
-     the bright pair would not be. */
+  /* For gradient text (`text-brand-gradient`); must stay legible as text. */
   --brand-gradient-ink: linear-gradient(100deg, var(--brand-lime-deep) 0%, var(--brand-petrol) 100%);
 
-  /* Neutrals as Omvin's light mode actually renders them in FlowOffice: white
-     cards on a hair of grey, Tailwind's grey scale for lines and secondary text.
-     Deliberately not tinted towards the brand — the neon needs somewhere quiet
-     to sit, and a teal-tinted grey next to a teal-tinted accent reads as a
-     printing error rather than as a choice. */
+  /* Neutral greys, deliberately not tinted towards the brand. */
   --background: #f9fafb;
   --foreground: #111827;
   --card: #ffffff;
@@ -108,57 +65,41 @@
   --popover: #ffffff;
   --popover-foreground: #111827;
   --primary: var(--brand);
-  /* Near-black, not white: white type on lime is unreadable at any size, and
-     every Omvin primary button is dark ink on the bright fill. */
+  /* Dark text on lime; white is unreadable. */
   --primary-foreground: var(--brand-night);
   --secondary: #f3f4f6;
   --secondary-foreground: #111827;
   --muted: #f3f4f6;
   --muted-foreground: #6b7280;
-  /* The hover surface, and the one place the brand shows up uninvited: a mint
-     wash rather than a grey one, so a ghost button lights up in the brand's
-     colour instead of going dusty. Same token omvin.ai uses, same strength. */
+  /* Hover surface: a mint tint instead of grey. */
   --accent: color-mix(in oklab, var(--brand-mint) 14%, transparent);
   --accent-foreground: var(--brand-lime-deep);
   --destructive: oklch(57.7% 0.245 27.325);
   --destructive-foreground: var(--brand-paper);
-  /* Confirmations. shadcn ships no success token, but any app past a first form
-     needs one, and omvin.ai had already picked the colour: the glow mint, one
-     step brighter, with dark ink on it. */
+  /* Not in shadcn by default. */
   --success: #34e6a0;
   --success-foreground: var(--brand-night);
   --border: #e5e7eb;
   --input: #d1d5db;
-  /* The focus ring is the mint glow at omvin.ai's strength, in both palettes.
-     Not the lime: a lime ring on a lime button is invisible. */
+  /* Mint, not lime: a lime ring on a lime button is invisible. */
   --ring: color-mix(in oklab, var(--brand-mint) 45%, transparent);
 
-  /* The small uppercase label above a heading, the gradient line in front of
-     it: omvin.ai's `.vocal-kicker`. The site sets it in the slate accent, which
-     only reaches 3:1 on white — fine at 13px on near-black, not here — so light
-     mode borrows the secondary-text grey and keeps the brand in the line. */
+  /* Slate is only 3:1 on white, so light mode uses the secondary-text grey. */
   --eyebrow: var(--muted-foreground);
 
-  /* The light behind the page. Big, low-contrast washes rather than visible
-     shapes — they should register as "this page is Omvin", not as graphics
-     competing with the content. On white the brand can only be whispered, so
-     these sit near the bottom of what a screen can still show. */
+  /* Background washes behind the page (see `body::before`). Kept faint on light. */
   --wash-1: color-mix(in oklab, var(--brand-mint) 10%, transparent);
   --wash-2: color-mix(in oklab, var(--brand-cyan) 8%, transparent);
   --wash-3: color-mix(in oklab, var(--brand-lime) 10%, transparent);
 
-  /* Shadows are the brand's own black-teal rather than a neutral grey, so the
-     edge of a card stays in the same family as everything above it. Whole
-     values rather than a shared colour, because the two palettes need different
-     shapes, not just different strengths: see the dark block. */
+  /* Full values rather than a shared colour: the dark palette needs a different shape. */
   --shadow-soft: 0 1px 2px rgb(6 17 20 / 0.05), 0 8px 24px -8px rgb(6 17 20 / 0.12);
   --shadow-lifted: 0 2px 4px rgb(6 17 20 / 0.06), 0 16px 36px -12px rgb(6 17 20 / 0.2);
   --chart-1: var(--brand-lime-deep);
   --chart-2: var(--brand-cyan-deep);
   --chart-3: var(--brand-petrol);
   --chart-4: var(--brand-slate);
-  /* The quiet fifth series is whatever secondary text is in this palette — it is
-     the same job, and it keeps the two in step. */
+
   --chart-5: var(--muted-foreground);
 
   --sidebar: #ffffff;
@@ -172,12 +113,10 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  /* This block is omvin.ai's `:root` — the brand's native palette, since the
-     site itself is dark-only. The hexes with alpha in them are its glass:
-     surfaces are the paper colour at 4–14% over the teal-black ground, which is
-     why a card here lets the washes below show through. */
+  /* ── Dark palette ────────────────────────────────────────────────────────
+     Surfaces are translucent paper over the night ground. */
   :root {
-    /* On near-black the fill and the text can finally be the same lime. */
+
     --brand-ink: var(--brand-lime);
     --brand-soft: color-mix(in oklab, var(--brand-mint) 14%, transparent);
     --brand-gradient-ink: var(--brand-gradient);
@@ -186,14 +125,12 @@
     --foreground: var(--brand-paper);
     --card: #faf7f40b;
     --card-foreground: var(--brand-paper);
-    /* Opaque where `--card` is not: a popover that lets the page show through is
-       unreadable the moment it lands over text. */
+    /* Opaque, unlike `--card`: a translucent popover is unreadable over text. */
     --popover: #0a171b;
     --popover-foreground: var(--brand-paper);
     --primary: var(--brand);
     --primary-foreground: var(--brand-night);
-    /* The greys of the dark palette are the slate accent at low alpha, not neutral
-       white — that is what keeps this surface teal rather than ash. */
+    /* Greys are slate at low alpha, which keeps surfaces teal rather than ash. */
     --secondary: #798fb624;
     --secondary-foreground: var(--brand-paper);
     --muted: #798fb624;
@@ -210,19 +147,13 @@
 
     --eyebrow: var(--brand-slate);
 
-    /* Petrol from the top corner, the way it falls across the workspace rail in
-       FlowOffice, with the mint and cyan kept far weaker. On a dark ground the
-       brand can be stated instead of whispered, so the first wash is an order of
-       magnitude stronger than its light-mode counterpart. */
+
     --wash-1: color-mix(in oklab, var(--brand-petrol) 40%, transparent);
     --wash-2: color-mix(in oklab, var(--brand-mint) 9%, transparent);
     --wash-3: color-mix(in oklab, var(--brand-cyan) 7%, transparent);
 
-    /* omvin.ai's card shadow: one deep, tight-spread black drop, plus a 1px
-       paper-coloured line along the inside top edge. On glass there is no
-       surface for a soft shadow to darken, so the depth comes from the light
-       catching the rim instead. Black, because a tinted shadow on a near-black
-       ground only lightens the edge it is meant to seat. */
+    /* A deep black drop plus a 1px light rim on the top edge: on glass there is
+       no surface for a soft shadow to darken. */
     --shadow-soft: 0 22px 46px -26px rgb(0 0 0 / 0.9), inset 0 1px 0 #faf7f40d;
     --shadow-lifted: 0 28px 56px -24px rgb(0 0 0 / 0.95), inset 0 1px 0 #faf7f414;
     --chart-1: var(--brand-lime);
@@ -231,8 +162,7 @@
     --chart-4: var(--brand-slate);
     --chart-5: var(--muted-foreground);
 
-    /* One step darker than the page, so the rail reads as beneath it. omvin.ai's
-       own sidebar value. */
+    /* One step darker than the page, so the rail reads as beneath it. */
     --sidebar: #080d14;
     --sidebar-foreground: var(--brand-paper);
     --sidebar-primary: var(--brand);
@@ -244,10 +174,8 @@
   }
 }
 
-/* A plain `@theme` rather than `@theme inline`, because these have to exist as
-   custom properties too: Tailwind's preflight picks `--font-sans` up for the
-   document's default family, and `font-ui` is applied by hand in the base layer
-   below. Names and stacks are omvin.ai's. */
+/* Plain `@theme`, not `inline`: the fonts must also exist as custom properties,
+   because preflight reads `--font-sans` and the base layer uses `--font-ui`. */
 @theme {
   --font-sans: "Arimo Variable", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-ui: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
@@ -258,7 +186,6 @@
   --color-brand-soft: var(--brand-soft);
   --color-brand-ink: var(--brand-ink);
   --color-eyebrow: var(--eyebrow);
-
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -301,28 +228,17 @@
   --radius-xl: var(--radius);
   --radius-2xl: calc(var(--radius) + 8px);
 
-  /* Registered as a spacing step so the bar, its spacer and the sidebar inset
-     can all say `h-header` / `pt-header` instead of repeating a magic number. */
+  /* Enables `h-header` / `pt-header`. */
   --spacing-header: var(--header-height);
 }
 
-/**
- * The call to action: the lime-to-cyan gradient, Omvin's most recognisable
- * surface. A utility rather than a token because a gradient is a
- * `background-image`, which no `--color-*` entry can carry, and because the
- * things that wear it — the primary button, a selected tile — all want the glow
- * underneath it as well.
- */
+/* The call-to-action background. Pair with `shadow-brand-glow`. */
 @utility bg-brand-gradient {
   background-image: var(--brand-gradient);
 }
 
-/**
- * The same gradient read instead of pressed: `.vocal-emph` on omvin.ai, for the
- * emphasised half of a headline. Uses `--brand-gradient-ink`, which drops to
- * legible hues in the light palette. `-webkit-text-fill-color` is still required
- * on Safari, where `color: transparent` alone paints solid text.
- */
+/* Gradient text for emphasised headline words. `-webkit-text-fill-color` is
+   required on Safari, where `color: transparent` alone paints solid text. */
 @utility text-brand-gradient {
   background-image: var(--brand-gradient-ink);
   background-clip: text;
@@ -330,37 +246,24 @@
   -webkit-text-fill-color: transparent;
 }
 
-/**
- * The resting shadow every raised surface sits on. Light mode stacks two soft
- * layers, the near one tight and the far one wide — one layer reads as a
- * sticker, two as an object slightly above the page. Dark mode is omvin.ai's
- * glass rim instead; the tokens carry the difference.
- */
+/* Resting shadow for raised surfaces. */
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
 }
 
-/** `shadow-soft` after the object has been picked up — used on hover. */
+/* `shadow-soft` on hover. */
 @utility shadow-lifted {
   box-shadow: var(--shadow-lifted);
 }
 
-/**
- * The mint light under anything wearing the brand gradient. Omvin puts it on
- * every call to action; without it the gradient sits flat on the page and reads
- * as a coloured rectangle rather than as the thing to press.
- */
+/* Mint glow under anything wearing the brand gradient. */
 @utility shadow-brand-glow {
   box-shadow: 0 10px 24px -12px color-mix(in oklab, var(--brand-mint) 70%, transparent);
 }
 
-/**
- * A 1px brand-gradient border, for the one surface on a page that is the point
- * of it — omvin.ai's featured card. A border cannot take a gradient, so it is a
- * pseudo-element the size of the box with its content area masked out, which is
- * also why this sets `position: relative`. Pair with `border-transparent` if the
- * element has a border of its own; the line is drawn inside the box edge.
- */
+/* 1px gradient border for the one featured surface on a page. Drawn as a masked
+   pseudo-element, hence `position: relative`; pair with `border-transparent`
+   if the element has a border of its own. */
 @utility border-brand-gradient {
   position: relative;
 
@@ -378,14 +281,10 @@
   }
 }
 
-/**
- * The label above a heading: small, uppercase, widely tracked, led by a short
- * line in the brand gradient. omvin.ai opens every section with one, so it is
- * how a page here says "a new thing starts" without a divider.
- */
+/* Small uppercase label above a heading, led by a short gradient line. */
 @utility eyebrow {
-  /* `flex`, not `inline-flex`: next to another inline box (an icon tile, say) an
-     inline eyebrow would join its line. Centre it with `justify-center`. */
+  /* `flex`, not `inline-flex`, so it never joins a neighbouring inline box.
+     Centre it with `justify-center`. */
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -412,20 +311,13 @@
   }
 
   html {
-    /* The background colour lives here, not on `body`, so the fixed wash layer
-       below can sit between it and the page content. An element painted at
-       `z-index: -1` goes behind its parent's background but still in front of
-       the canvas colour, which `html` propagates. */
+    /* Background on `html`, not `body`, so the fixed wash in `body::before`
+       (z-index -1) can sit between it and the content. */
     @apply min-h-dvh bg-background text-foreground;
-    /* `width=device-width` already buys fast tapping on iOS, but only at
-       initial scale: once the reader pinches in, every tap waits ~350 ms again
-       while Safari watches for a second one. `manipulation` is the documented
-       opt-in that holds at all zoom scales. It drops double-tap zoom and
-       nothing else; pinch zoom, and with it the ability to enlarge the page,
-       stays. https://webkit.org/blog/5610/more-responsive-tapping-on-ios/ */
+    /* Removes the tap delay at every zoom level; pinch zoom still works.
+       https://webkit.org/blog/5610/more-responsive-tapping-on-ios/ */
     touch-action: manipulation;
-    /* Tells the browser both palettes exist, so form controls, scrollbars and
-       the caret follow the same OS setting the tokens above do. */
+    /* Form controls and scrollbars follow the OS setting too. */
     color-scheme: light dark;
   }
 
@@ -433,10 +325,8 @@
     @apply m-0 min-h-dvh font-sans text-foreground antialiased;
   }
 
-  /* The brand light the page sits in. `fixed` rather than
-     `background-attachment: fixed`, which iOS Safari renders incorrectly, so the
-     wash stays put while the page scrolls past it. Not focusable, not
-     hit-testable, and behind everything. */
+  /* `position: fixed` instead of `background-attachment: fixed`, which iOS
+     Safari renders incorrectly. */
   body::before {
     content: "";
     position: fixed;
@@ -449,10 +339,8 @@
       radial-gradient(52rem 26rem at 50% 108%, var(--wash-2), transparent 70%);
   }
 
-  /* Controls get the UI face rather than the reading one, which is the whole
-     point of the brand carrying two. `font: inherit` first, because it is what
-     clears the user agent's own control styling — size, weight and line height
-     included — and only then is the family overridden. */
+  /* Controls use the UI font. `font: inherit` first clears the browser's own
+     control styling. */
   button,
   input,
   optgroup,
@@ -462,14 +350,12 @@
     font-family: var(--font-ui);
   }
 
-  /* Selected text takes the mint glow instead of the system blue, which is the
-     one colour on a page that would otherwise never belong to it. */
+
   ::selection {
     background-color: color-mix(in oklab, var(--brand-mint) 35%, transparent);
   }
 
-  /* Prose in this app is mostly about routes, files and config keys, so `code`
-     is styled once here rather than re-classed at every mention. */
+
   code {
     @apply rounded-md bg-secondary px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;
   }
