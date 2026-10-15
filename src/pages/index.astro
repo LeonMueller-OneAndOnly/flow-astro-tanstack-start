@@ -310,14 +310,14 @@ const tryPrompt =
             Erklärung, wie man mit einem Agenten redet. Daneben der Griff, den
             niemand von selbst findet: zeigen statt beschreiben. */}
         <div class="mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-[1.45fr_1fr]">
-          <div class="reveal prompt-card">
-            <div class="relative h-full rounded-[calc(var(--radius)-1px)] bg-[var(--stage-glass-solid)] p-5 sm:p-8">
+          <div class="reveal prompt-card @container">
+            <div class="relative h-full rounded-[calc(var(--radius)-1px)] bg-[var(--stage-glass-solid)] p-5 @md:p-8">
               <p class="eyebrow">Zum Ausprobieren</p>
-              <p class="mt-4 text-[1.05rem] leading-relaxed text-pretty sm:text-xl">„{tryPrompt}“</p>
-              <div class="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <p class="mt-4 text-[1.05rem] leading-relaxed text-pretty @xl:text-xl">„{tryPrompt}“</p>
+              <div class="mt-6 flex flex-col items-stretch gap-3 @md:flex-row @md:items-center @md:gap-4">
                 <button
                   type="button"
-                  class="bg-brand-gradient shadow-brand-glow font-ui inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-[var(--brand-night)] transition-transform hover:-translate-y-0.5 active:translate-y-0 sm:py-2.5"
+                  class="bg-brand-gradient shadow-brand-glow font-ui inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold whitespace-nowrap text-[var(--brand-night)] transition-transform hover:-translate-y-0.5 active:translate-y-0 @md:py-2.5"
                   data-copy={tryPrompt}
                 >
                   <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -325,7 +325,7 @@ const tryPrompt =
                   </svg>
                   <span data-copy-label aria-live="polite">Satz kopieren</span>
                 </button>
-                <span class="text-center text-sm text-muted-foreground sm:text-left">
+                <span class="text-center text-sm text-balance text-muted-foreground @md:text-left">
                   Diese Seite darf dabei ruhig verschwinden.
                 </span>
               </div>
