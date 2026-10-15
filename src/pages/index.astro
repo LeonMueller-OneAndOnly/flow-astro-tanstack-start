@@ -21,6 +21,10 @@
  * einen knappen Einstiegspunkt dorthin ersetzt, z.B. als Weiterleitung oder zentrale Übersicht.
  * Überschrieben wird sie so oder so.
  *
+ * Wichtig beim Überschreiben: Der `<style is:global>`-Block unten schaltet die
+ * ganze Seite auf die dunkle Markenpalette (über `[data-omvin-stage]`). Er
+ * gehört zum Platzhalter und verschwindet mit ihm.
+ *
  * Prüfen mit: `grep -c "@omvin-placeholder" src/pages/index.astro`
  */
 
@@ -33,130 +37,1143 @@ export const prerender = true;
 const demoHubHref = $appPath({ to: "/demo" });
 
 /**
- * Drei Schritte statt eines Fließtextes, weil die eigentliche Botschaft ein
- * Ablauf ist: sagen, warten, sehen. Die Nummern tragen die Abfolge — „01“ statt
- * „1“ wie bei omvin.ai, damit sie als Zählung lesbar sind und nicht als Wert.
+ * Das wechselnde Wort in der Überschrift, mit Artikel, weil „dein“/„deine“
+ * mitwechseln muss. `chip` verbindet es mit der Formatleiste darunter; die
+ * letzte Zeile („deine Idee.“) lässt alle Chips zugleich aufleuchten.
  */
+const rotatorWords = [
+  { word: "Deine App.", chip: "App" },
+  { word: "Deine Website.", chip: "Website" },
+  { word: "Dein Spiel.", chip: "Spiel" },
+  { word: "Dein Webshop.", chip: "Webshop" },
+  { word: "Dein Dashboard.", chip: "Dashboard" },
+  { word: "Deine Idee.", chip: undefined },
+];
+const formatChips = rotatorWords.flatMap((entry) => (entry.chip ? [entry.chip] : []));
+
+const ideaRows = [
+  [
+    "Eine Website für die Schreinerei",
+    "Eine Buchungs-App für den Salon",
+    "Ein Quiz-Spiel für die Weihnachtsfeier",
+    "Ein Webshop für Handgemachtes",
+    "Ein Dashboard für die Monatszahlen",
+    "Ein Kundenportal mit Login",
+    "Eine Speisekarte mit QR-Code",
+  ],
+  [
+    "Ein Jump ’n’ Run im Retro-Look",
+    "Ein Angebotsrechner für Handwerker",
+    "Eine Landingpage mit Imagefilm",
+    "Eine Event-App mit Anmeldung",
+    "Ein Mitgliederbereich für den Verein",
+    "Ein Blog mit KI-Bildern",
+    "Ein Lernspiel für Vokabeln",
+  ],
+];
+
+/** Was um den Kern kreist: Aufgabenarten, keine Modellnamen — die ändern sich zu schnell. */
+const innerOrbit = ["Code", "Texte", "Bilder"];
+const outerOrbit = ["Video", "Stimmen", "Daten", "Übersetzung", "Recherche"];
+
 const steps = [
   {
-    title: "Du sagst, was du willst",
+    title: "Du sagst, was Du willst",
     detail: "In normalen Sätzen. „Oben soll unser Logo hin, darunter die Öffnungszeiten.“",
+    icon: "M7 8h10M7 12h6m-9 8 3.2-3H18a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7a3 3 0 0 0 1 2.2Z",
   },
   {
     title: "Dein Agent baut es",
-    detail: "Er schreibt den Code, prüft ihn und stellt die Seite neu bereit.",
+    detail: "Er schreibt den Code, holt sich Texte, Bilder oder Stimmen von den passenden KIs und prüft alles.",
+    icon: "m8 9-3 3 3 3m8-6 3 3-3 3m-2.5-9-3 12",
   },
   {
     title: "Du siehst es hier",
     detail: "Diese Seite aktualisiert sich, sobald die Änderung fertig ist. Live, ohne Neustart.",
+    icon: "M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Zm9.5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z",
   },
 ];
+
+const tryPrompt =
+  "Erstelle mir hier eine professionelle Webseite für meinen Betrieb. Frag mich alles, was Du dafür wissen musst, und nutze dann verschiedene KIs für Bilder und Texte, sofern Du sie brauchst.";
 ---
 
 <BaseLayout
-  title="Willkommen — hier entsteht deine Website"
-  description="Die Live-Vorschau deines Omvin-Projekts. Sag deinem Agenten, was sich ändern soll, und sieh direkt hier zu."
+  title="Willkommen — hier entsteht Dein Projekt"
+  description="Die Live-Vorschau Deines Omvin-Projekts. Sag Deinem Agenten, was entstehen soll, und sieh direkt hier zu."
 >
-  <main class="mx-auto w-full max-w-3xl px-5 pt-16 pb-28 sm:px-8">
-    <section>
-      {/* Der leuchtende Punkt ist omvin.ais Zeichen für „läuft gerade“. Er pulsiert
-          nur, solange niemand reduzierte Bewegung eingestellt hat. */}
-      <p
-        class="font-ui inline-flex items-center gap-2.5 rounded-full border border-ring/60 bg-brand-soft px-3.5 py-1.5 text-xs font-semibold tracking-[0.08em] text-brand-ink uppercase"
+  <div data-omvin-stage class="relative isolate overflow-x-clip">
+    {/* Der Hintergrund, fest hinter der ganzen Seite: fließendes Licht in den
+        Markenfarben, live auf der Grafikkarte gerechnet (Shader unten im
+        Skript). Ohne WebGL übernehmen die CSS-Schleier. Darüber feines Korn
+        gegen Farbstufen und eine Vignette, die den Blick in der Mitte hält. */}
+    <div class="stage-sky" aria-hidden="true">
+      <div class="stage-sky__scroll">
+        <span class="aurora aurora--a"></span>
+        <span class="aurora aurora--b"></span>
+        <span class="aurora aurora--c"></span>
+        <span class="aurora aurora--d"></span>
+      </div>
+      <canvas class="stage-silk" data-stage-silk></canvas>
+      <span class="stage-beam"></span>
+      <span class="stage-vignette"></span>
+      <span class="stage-grain"></span>
+    </div>
+
+    <main class="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-8 sm:pb-24 xl:px-12">
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section
+        class="grid items-center gap-10 pt-12 sm:pt-16 lg:min-h-[min(80svh,52rem)] lg:grid-cols-[1fr_1.12fr] lg:gap-10 lg:pt-8 lg:pb-6"
       >
-        <span class="relative flex size-2">
-          <span
-            class="absolute inset-0 rounded-full bg-success opacity-70 motion-safe:animate-ping"
-          ></span>
-          <span class="relative size-2 rounded-full bg-success shadow-[0_0_10px_var(--color-success)]"
-          ></span>
-        </span>
-        Live-Vorschau
-      </p>
-
-      <h1 class="mt-7 text-4xl leading-[1.06] font-bold tracking-tighter text-balance sm:text-[3.4rem]">
-        Schön, dass du da bist.
-        <span class="block text-brand-gradient">Hier entsteht dein Projekt.</span>
-      </h1>
-
-      <p class="mt-6 text-lg leading-relaxed text-muted-foreground">
-        Der Entwicklungs-Server ist angelegt und läuft. Was du gerade siehst, ist noch nichts von dir — es ist
-        die Vorschau, die jedes neue Projekt am Anfang zeigt. <strong class="font-semibold text-foreground"
-          >Ab jetzt bestimmst du, was hier steht.</strong
-        > Sag deinem Agenten, was er hier ändern soll.
-      </p>
-    </section>
-
-    {/* Deko: was andere schon so gesagt haben, und was dabei herauskam. */}
-    <BeispielKarussell class="mt-14" />
-
-    <p class="eyebrow mt-16">So geht es weiter</p>
-    <section class="mt-5 grid gap-4 sm:grid-cols-3" aria-label="So geht es weiter">
-      {
-        steps.map((step, index) => (
-          <div class="shadow-soft rounded-xl border border-border bg-card p-6">
-            <span
-              class="font-ui inline-flex size-9 items-center justify-center rounded-lg bg-brand-soft text-xs font-semibold tracking-[0.06em] text-brand-ink ring-1 ring-brand-ink/15 ring-inset"
-              aria-hidden="true"
-            >
-              {String(index + 1).padStart(2, "0")}
+        <div class="hero-copy flex flex-col items-center text-center lg:items-start lg:text-left">
+          <p
+            class="reveal font-ui inline-flex items-center gap-2.5 rounded-full border border-ring/60 bg-brand-soft px-3.5 py-1.5 text-[0.7rem] font-semibold tracking-[0.08em] text-brand-ink uppercase backdrop-blur sm:text-xs"
+          >
+            <span class="relative flex size-2">
+              <span class="absolute inset-0 rounded-full bg-success opacity-70 motion-safe:animate-ping"></span>
+              <span class="relative size-2 rounded-full bg-success shadow-[0_0_10px_var(--color-success)]"></span>
             </span>
-            <h2 class="mt-4 font-semibold tracking-tight">{step.title}</h2>
-            <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.detail}</p>
+            Live-Vorschau · Dein Projekt läuft
+          </p>
+
+          <h1
+            class="reveal mt-7 text-[clamp(2.5rem,11vw,4.25rem)] leading-[1.02] font-bold tracking-tighter lg:text-[clamp(3rem,4.6vw,4.75rem)]"
+            style="--delay:80ms"
+            aria-label="Hier entsteht Dein Projekt."
+          >
+            <span class="block" aria-hidden="true">Hier entsteht</span>
+            <span class="rotator" data-rotator aria-hidden="true">
+              {
+                rotatorWords.map((entry, i) => (
+                  <span
+                    class="rotator__word text-brand-gradient"
+                    data-chip={entry.chip ?? "*"}
+                    data-active={i === 0 ? "" : undefined}
+                  >
+                    {entry.word}
+                  </span>
+                ))
+              }
+            </span>
+          </h1>
+
+          <ul class="reveal mt-6 flex flex-wrap justify-center gap-1.5 sm:gap-2 lg:justify-start" style="--delay:140ms" aria-label="Was hier entstehen kann">
+            {
+              formatChips.map((chip, i) => (
+                <li class="format-chip" data-format-chip={chip} data-lit={i === 0 ? "" : undefined}>
+                  {chip}
+                </li>
+              ))
+            }
+          </ul>
+
+          <p class="reveal mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg" style="--delay:200ms">
+            Beschreib Deinem Agenten, was Du Dir vorstellst — er baut es, und Du siehst es genau hier
+            entstehen.{" "}
+            <strong class="font-semibold text-foreground">Ab jetzt bestimmst Du, was auf dieser Seite steht.</strong>
+          </p>
+          <p class="reveal mt-3 max-w-md text-sm leading-relaxed text-muted-foreground/75" style="--delay:260ms">
+            Noch ist das hier der Platzhalter, mit dem jedes neue Projekt startet. Er macht Platz, sobald Du
+            loslegst.
+          </p>
+
+          <a href="#schritte" class="reveal start-button group mt-8" style="--delay:320ms">
+            <span class="start-button__label">So geht es los</span>
+            <span class="start-button__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14m-6-6 6 6 6-6" />
+              </svg>
+            </span>
+          </a>
+        </div>
+
+        <div class="reveal hero-gallery" style="--delay:240ms">
+          <BeispielKarussell />
+        </div>
+      </section>
+
+      {/* ── Was entstehen kann ───────────────────────────────────────────── */}
+      <section class="mt-20 sm:mt-24 lg:mt-10" aria-labelledby="ideen-titel">
+        <div class="reveal mx-auto max-w-2xl text-center">
+          <p class="eyebrow justify-center">Was hier entstehen kann</p>
+          <h2 id="ideen-titel" class="mt-4 text-[clamp(1.75rem,6.5vw,2.5rem)] leading-tight font-bold tracking-tight text-balance">
+            Was Du beschreiben kannst,
+            <span class="block text-brand-gradient">kann hier entstehen.</span>
+          </h2>
+        </div>
+
+        {/* Zwei Bänder, gegenläufig. Die zweite Hälfte jedes Bandes ist eine
+            Kopie für den nahtlosen Übergang und für Screenreader verborgen. */}
+        <div class="marquee reveal mt-9" style="--delay:120ms">
+          {
+            ideaRows.map((row, rowIndex) => (
+              <div class="marquee__row" data-reverse={rowIndex % 2 === 1 ? "" : undefined}>
+                <ul class="marquee__track">
+                  {[...row, ...row].map((idea, i) => (
+                    <li class="idea-chip" aria-hidden={i >= row.length ? "true" : undefined}>
+                      <span class="idea-chip__dot" />
+                      {idea}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      {/* ── Die Kraft dahinter ───────────────────────────────────────────── */}
+      <section
+        class="mt-20 grid items-center gap-8 sm:mt-28 md:grid-cols-[1fr_1fr] md:gap-12"
+        aria-labelledby="ki-titel"
+      >
+        <div class="reveal text-center md:text-left">
+          <p class="eyebrow justify-center md:justify-start">Die Kraft dahinter</p>
+          <h2 id="ki-titel" class="mt-4 text-[clamp(1.75rem,6.5vw,2.5rem)] leading-tight font-bold tracking-tight text-balance">
+            Über <span class="text-brand-gradient tabular-nums" data-count-to="1000">1.000</span> KI-Modelle.
+            <span class="block">Ein Agent, der sie einsetzt.</span>
+          </h2>
+          <p class="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg md:max-w-none lg:max-w-xl">
+            Dein Agent arbeitet nicht allein. Für Code, Texte, Bilder, Videos und Stimmen greift er über
+            OMVIN auf über 1.000 spezialisierte KI-Modelle zu und wählt für jede Aufgabe das passende. Du
+            musst keines davon kennen — Du beschreibst nur, was entstehen soll.
+          </p>
+        </div>
+
+        {/* Der Kern mit zwei Umlaufbahnen. Die Chips drehen gegen ihre Bahn,
+            damit die Schrift aufrecht bleibt. */}
+        <div class="reveal orbit" style="--delay:120ms" aria-hidden="true">
+          <span class="orbit__ring orbit__ring--outer">
+            {
+              outerOrbit.map((label, i) => (
+                <span class="orbit__slot" style={`--a:${(360 / outerOrbit.length) * i - 90}deg;--r:40cqw`}>
+                  <span class="orbit__anchor">
+                    <span class="orbit__chip">{label}</span>
+                  </span>
+                </span>
+              ))
+            }
+          </span>
+          <span class="orbit__ring orbit__ring--inner">
+            {
+              innerOrbit.map((label, i) => (
+                <span class="orbit__slot" style={`--a:${(360 / innerOrbit.length) * i + 30}deg;--r:25cqw`}>
+                  <span class="orbit__anchor">
+                    <span class="orbit__chip orbit__chip--bright">{label}</span>
+                  </span>
+                </span>
+              ))
+            }
+          </span>
+          <span class="orbit__core">
+            <span class="orbit__pulse"></span>
+            <span class="orbit__pulse orbit__pulse--late"></span>
+            <span class="grid gap-0.5 text-center leading-none text-[var(--brand-night)]">
+              <span class="font-ui text-[clamp(0.55rem,2.6cqw,0.65rem)] font-semibold tracking-[0.14em] uppercase opacity-70">Dein Agent</span>
+              <span class="font-ui text-[clamp(0.8rem,4cqw,0.95rem)] font-bold tracking-[0.2em]">OMVIN</span>
+            </span>
+          </span>
+        </div>
+      </section>
+
+      {/* ── So geht es weiter ────────────────────────────────────────────── */}
+      <section id="schritte" class="mt-20 scroll-mt-8 sm:mt-28" aria-labelledby="schritte-titel">
+        <div class="reveal text-center md:text-left">
+          <p class="eyebrow justify-center md:justify-start">So geht es los</p>
+          <h2 id="schritte-titel" class="mt-4 text-[clamp(1.75rem,6.5vw,2.5rem)] leading-tight font-bold tracking-tight text-balance">
+            Drei Schritte. Den Rest erledigt Dein Agent.
+          </h2>
+        </div>
+
+        <ol class="steps mt-9 grid gap-3 sm:gap-4 md:grid-cols-3">
+          {
+            steps.map((step, index) => (
+              <li class="reveal step-card" style={`--delay:${index * 120}ms`}>
+                <span class="flex items-center justify-between">
+                  <span class="step-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d={step.icon} />
+                    </svg>
+                  </span>
+                  <span class="font-ui text-xs font-semibold tracking-[0.12em] text-muted-foreground" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </span>
+                <h3 class="mt-5 text-lg font-semibold tracking-tight">{step.title}</h3>
+                <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.detail}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        {/* Ein konkreter Satz zum Abschreiben nimmt mehr Hemmung als jede
+            Erklärung, wie man mit einem Agenten redet. Daneben der Griff, den
+            niemand von selbst findet: zeigen statt beschreiben. */}
+        <div class="mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-[1.45fr_1fr]">
+          <div class="reveal prompt-card">
+            <div class="relative h-full rounded-[calc(var(--radius)-1px)] bg-[#081619]/95 p-5 sm:p-8">
+              <p class="eyebrow">Zum Ausprobieren</p>
+              <p class="mt-4 text-[1.05rem] leading-relaxed text-pretty sm:text-xl">„{tryPrompt}“</p>
+              <div class="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+                <button
+                  type="button"
+                  class="bg-brand-gradient shadow-brand-glow font-ui inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-[var(--brand-night)] transition-transform hover:-translate-y-0.5 active:translate-y-0 sm:py-2.5"
+                  data-copy={tryPrompt}
+                >
+                  <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="9" y="9" width="12" height="12" rx="2.5" /><path d="M5 15V5a2 2 0 0 1 2-2h8" />
+                  </svg>
+                  <span data-copy-label aria-live="polite">Satz kopieren</span>
+                </button>
+                <span class="text-center text-sm text-muted-foreground sm:text-left">
+                  Diese Seite darf dabei ruhig verschwinden.
+                </span>
+              </div>
+            </div>
           </div>
-        ))
-      }
-    </section>
 
-    {/* Ein konkreter Satz zum Abschreiben nimmt mehr Hemmung als jede Erklärung,
-        wie man mit einem Agenten redet. */}
-    {/* Der Rahmen im Markenverlauf und der Schein darunter sind omvin.ais
-        Hervorhebung für das eine Element einer Seite, um das es geht. Hier ist
-        das der Satz, den man abschreiben soll. */}
-    <section class="border-brand-gradient shadow-brand-glow mt-10 rounded-xl bg-card p-6">
-      <p class="eyebrow">Zum Ausprobieren, einfach so gesagt</p>
-      <p class="mt-4 text-lg leading-relaxed text-balance">
-        „Mach aus der Startseite eine Begrüßung für meine Kunden, mit unserem Namen, einem kurzen
-        Satz dazu, was wir machen, und unseren Kontaktdaten.“
-      </p>
-      <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
-        Lass diese Seite dabei ruhig verschwinden. Sie ist nur der Anfang, nichts, was erhalten
-        bleiben muss.
-      </p>
-    </section>
+          <div class="reveal step-card" style="--delay:120ms">
+            <span class="step-card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V12m0-1a1.5 1.5 0 0 1 3 0v4.5A5.5 5.5 0 0 1 12.5 21h-1a5.6 5.6 0 0 1-4-1.7L4.3 16a1.5 1.5 0 0 1 2.2-2.1L9 16.5" />
+              </svg>
+            </span>
+            <h3 class="mt-5 text-lg font-semibold tracking-tight">Zeig einfach drauf</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Am Computer: Halte <kbd class="kbd">⌘</kbd> + <kbd class="kbd">C</kbd> gedrückt und klick ein
+              Element an. Es landet in Deiner Zwischenablage — füg es in Deine Nachricht ein, und Dein Agent
+              weiß genau, welche Stelle Du meinst.
+            </p>
+          </div>
+        </div>
+      </section>
 
-    {/* Der Griff, der einem Kunden am meisten hilft und den niemand von selbst
-        findet: zeigen statt beschreiben. Steht deshalb als eigener Block direkt
-        nach dem Beispielsatz und nicht unten bei den Hinweisen. */}
-    <section class="mt-10 rounded-xl border border-border bg-card p-6 shadow-soft">
-      <h2 class="font-semibold tracking-tight">Zeig einfach drauf</h2>
-      <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
-        Etwas auf der Seite, das dir nicht gefällt, aber du weißt nicht, wie du es beschreiben
-        sollst? Halte <kbd
-          class="rounded-md border border-border bg-secondary px-1.5 py-0.5 font-ui text-xs font-medium text-foreground"
-          >⌘</kbd
-        > + <kbd
-          class="rounded-md border border-border bg-secondary px-1.5 py-0.5 font-ui text-xs font-medium text-foreground"
-          >C</kbd
-        > gedrückt und klick es an. Das Element landet in deiner Zwischenablage — füg es einfach in deine
-        Nachricht ein, dann weiß dein Agent genau, welche Stelle du meinst. Wie als ob Du mit dem Finger draufzeigst.
-      </p>
-    </section>
-
-    <section
-      class="mt-16 border-t border-border pt-8 text-sm leading-relaxed text-muted-foreground"
-      aria-label="Hinweise"
-    >
-      <p>
-        Diese Adresse ist deine Vorschau — sie zeigt immer den aktuellen Stand, auch mitten in der
-        Arbeit. Es kann also sein, dass sich hier etwas ändert, während du zusiehst.
-      </p>
-      <p class="mt-3">
-        Für Entwickler: die mitgelieferten Beispiele liegen unter <a
-          class="font-medium text-brand-ink underline decoration-brand-ink/40 underline-offset-4 transition-colors hover:decoration-brand-ink"
-          href={demoHubHref}>/app/demo</a
-        >.
-      </p>
-    </section>
-  </main>
+      <footer class="mt-16 border-t border-border pt-7 text-sm leading-relaxed text-muted-foreground sm:mt-20">
+        <p>
+          Diese Adresse ist Deine Vorschau — sie zeigt immer den aktuellen Stand, auch mitten in der Arbeit. Es
+          kann also sein, dass sich hier etwas ändert, während Du zusiehst.
+        </p>
+        <p class="mt-3">
+          Für Entwickler: die mitgelieferten Beispiele liegen unter <a
+            class="font-medium text-brand-ink underline decoration-brand-ink/40 underline-offset-4 transition-colors hover:decoration-brand-ink"
+            href={demoHubHref}>/app/demo</a
+          >.
+        </p>
+      </footer>
+    </main>
+  </div>
 </BaseLayout>
+
+<script>
+  import { Result } from "@/lib/framework/result";
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // Abschnitte blenden beim ersten Erscheinen ein. Ohne JavaScript oder mit
+  // reduzierter Bewegung sind sie von Anfang an sichtbar (siehe CSS).
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.setAttribute("data-visible", "");
+        revealObserver.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
+  );
+  for (const element of document.querySelectorAll(".reveal")) revealObserver.observe(element);
+
+  // Das wechselnde Wort in der Überschrift und der passende Chip darunter.
+  const words = Array.from(document.querySelectorAll<HTMLElement>("[data-rotator] .rotator__word"));
+  const chips = Array.from(document.querySelectorAll<HTMLElement>("[data-format-chip]"));
+  let active = 0;
+  window.setInterval(() => {
+    if (reducedMotion.matches || document.hidden) return;
+    const leaving = words[active];
+    leaving?.removeAttribute("data-active");
+    leaving?.setAttribute("data-leaving", "");
+    window.setTimeout(() => leaving?.removeAttribute("data-leaving"), 700);
+    active = (active + 1) % words.length;
+    const current = words[active];
+    current?.setAttribute("data-active", "");
+    const chip = current?.dataset.chip;
+    for (const element of chips) {
+      element.toggleAttribute("data-lit", chip === "*" || element.dataset.formatChip === chip);
+    }
+  }, 2600);
+
+  // „Über 1.000“ zählt einmal hoch, wenn die Zahl ins Bild kommt.
+  const counter = document.querySelector<HTMLElement>("[data-count-to]");
+  if (counter && !reducedMotion.matches) {
+    const target = Number(counter.dataset.countTo);
+    const format = new Intl.NumberFormat("de-DE");
+    const counterObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        counterObserver.disconnect();
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / 1600);
+          counter.textContent = format.format(Math.round(target * (1 - (1 - t) ** 4)));
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      },
+      { threshold: 0.6 },
+    );
+    counterObserver.observe(counter);
+  }
+
+  // Beispielsatz in die Zwischenablage.
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    const label = button.querySelector("[data-copy-label]");
+    const initial = label?.textContent ?? "";
+    button.addEventListener("click", async () => {
+      const copied = await Result.fromAsync(() => navigator.clipboard.writeText(button.dataset.copy ?? ""));
+      if (label) label.textContent = copied.success ? "Kopiert — jetzt einfügen" : "Bitte markieren und kopieren";
+      window.setTimeout(() => {
+        if (label) label.textContent = initial;
+      }, 2400);
+    });
+  }
+
+  /**
+   * Fließendes Licht im Hintergrund: ein Fragment-Shader, der Rauschen in sich
+   * selbst verzerrt (domain warping) und das Ergebnis auf die Markenpalette
+   * legt — Nacht, Petrol, Mint, Cyan, ein Hauch Lime. Gerechnet in reduzierter
+   * Auflösung, weil das Bild ohnehin weich ist; der Browser skaliert es hoch.
+   * Der Zeiger setzt ein sanftes Licht, Scrollen verschiebt das Feld. Läuft
+   * nur bei sichtbarem Tab; bei reduzierter Bewegung steht ein Standbild.
+   */
+  const silk = document.querySelector<HTMLCanvasElement>("[data-stage-silk]");
+  const gl = silk?.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" });
+  const vertexSource = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
+  const fragmentSource = `
+    precision highp float;
+    uniform vec2 res;
+    uniform float time;
+    uniform vec2 mouse;
+    uniform float scroll;
+    uniform float intro;
+    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float noise(vec2 p){
+      vec2 i=floor(p),f=fract(p);
+      vec2 u=f*f*(3.-2.*f);
+      return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);
+    }
+    float fbm(vec2 p){
+      float v=0.,a=.5;
+      mat2 r=mat2(.8,.6,-.6,.8);
+      for(int i=0;i<4;i++){v+=a*noise(p);p=r*p*2.03+3.1;a*=.42;}
+      return v;
+    }
+    // Weicher Lichtfleck: Gauß um c, Breite w.
+    float bloom(vec2 p,vec2 c,float w){vec2 d=p-c;return exp(-dot(d,d)/w);}
+    // Ein Polarlicht-Vorhang: eine wellige Linie bei Höhe y0, von der das Licht
+    // nach oben ausläuft, durchzogen von senkrechten Strahlen. Der Zeiger (m)
+    // zieht die Kante sanft zu sich. Liefert Helligkeit und Höhe über der
+    // Kante, für den Farbverlauf.
+    //
+    // Zwei Dinge lassen so eine Kante wie einen Darstellungsfehler aussehen,
+    // und beide sind hier vermieden:
+    // - Ein Knick im Helligkeitsverlauf (steil hier, flach dort) liest das Auge
+    //   als Linie. Deshalb ist die Form überall glatt: weicher Anstieg über
+    //   smoothstep, Auslauf nach oben über softplus statt über max(d,0).
+    // - Feines Rauschen in x wird zu Treppenstufen, wo es die schräge Kante
+    //   kreuzt, zumal das Bild in reduzierter Auflösung gerechnet und dann
+    //   hochskaliert wird. Deshalb nur grobe, weich interpolierte Strahlen.
+    // soft ist die Breite des Anstiegs: klein = klare Kante, groß = Schleier.
+    vec2 curtain(vec2 p,float y0,float amp,float freq,float t,float seed,vec2 m,float soft){
+      float wave=y0+amp*sin(p.x*freq+t*2.2+seed)+amp*.6*sin(p.x*freq*2.3-t*1.6+seed*2.)+(fbm(vec2(p.x*.9+seed,t*.8))-.5)*.3;
+      wave+=(m.y-wave)*.12*exp(-(p.x-m.x)*(p.x-m.x)*5.);
+      float d=p.y-wave;
+      float rise=smoothstep(-soft,soft*.7,d);
+      float up=log(1.+exp(d*24.))/24.;
+      float shape=rise*exp(-up*4.4);
+      float n=noise(vec2(p.x*13.+seed,t*1.5+d*.3))*.55+noise(vec2(p.x*34.+seed*1.7,t*2.2+d*.5))*.45;
+      float rays=.15+1.8*n*n;
+      float fade=smoothstep(-1.5,-.5,p.x)*smoothstep(1.7,.6,p.x);
+      return vec2(shape*rays*fade,d);
+    }
+    void main(){
+      vec2 uv=gl_FragCoord.xy/res;
+      vec2 p=(gl_FragCoord.xy-.5*res)/min(res.x,res.y);
+      float aspect=res.x/res.y;
+      vec2 s=p*.9-vec2(0.,scroll*.6);
+      float t=time*.055;
+      vec2 q=vec2(fbm(s+vec2(0.,t)),fbm(s+vec2(5.2,1.3)-t*.8));
+      vec2 r=vec2(fbm(s+2.6*q+vec2(1.7,9.2)+t*1.2),fbm(s+2.6*q+vec2(8.3,2.8)-t));
+      float f=fbm(s+2.4*r);
+
+      vec3 night=vec3(.018,.05,.06);
+      vec3 petrol=vec3(.016,.384,.408);
+      vec3 mint=vec3(.18,.871,.667);
+      vec3 cyan=vec3(0.,.89,.945);
+      vec3 lime=vec3(.635,.945,.11);
+
+      // Grundton: tiefe Nacht, Petrol nur in den Strömungen — die dunklen
+      // Stellen dazwischen geben dem Licht erst seine Tiefe.
+      vec3 col=mix(night,petrol*.8,smoothstep(.4,.95,f)*.7);
+
+      // Sterne: spärlich, fein, oben dichter, funkeln langsam.
+      vec2 cell=floor(gl_FragCoord.xy+vec2(0.,scroll*res.y*.08));
+      float star=step(.9975,hash(cell));
+      float twinkle=.55+.45*sin(time*(1.2+hash(cell+3.)*2.)+hash(cell)*60.);
+      col+=vec3(.85,.97,1.)*star*twinkle*.55*smoothstep(.25,.95,uv.y);
+
+      // Zwei Polarlicht-Vorhänge. Unten an der Kante Lime/Mint, nach oben
+      // Cyan — wie echtes Polarlicht, in den Farben der Marke.
+      vec2 a=vec2(p.x/aspect*1.6,p.y);
+      vec2 pm=(mouse-.5*res)/min(res.x,res.y);
+      vec2 am=vec2(pm.x/aspect*1.6,pm.y);
+      float sy=scroll*1.4;
+      vec2 c1=curtain(a,.06+sy,.12,1.6,t,0.,am,.038);
+      // Der untere Vorhang läuft quer durchs Bild; mit scharfer Kante läse er
+      // sich als Bruchlinie, deshalb endet er weich.
+      vec2 c2=curtain(a+vec2(.3,0.),-.3+sy,.09,2.1,t*1.15,4.7,am,.24);
+      vec3 edge1=mix(lime,mint,smoothstep(-.9,.9,a.x+.3*sin(t)));
+      vec3 hue1=mix(edge1,cyan,smoothstep(.0,.38,c1.y));
+      vec3 hue2=mix(mint,cyan*.9,smoothstep(.0,.3,c2.y));
+      col+=hue1*c1.x*.75*intro;
+      col+=hue2*c2.x*.42*intro;
+
+      // Markenlichter in den oberen Ecken, vom Strömungsfeld verformt.
+      vec2 w=(r-.5)*.6;
+      float l=bloom(p+w,vec2(-.6*aspect+.25*sin(t*2.),.62+scroll*.8),.3);
+      float c=bloom(p-w,vec2(.55*aspect+.2*cos(t*1.7),.58+scroll*.8),.34);
+      col+=lime*l*.26*(.4+.6*intro);
+      col+=cyan*c*.3*(.4+.6*intro);
+
+      // Gegen Ende der Seite steigt von unten ein ruhiges Licht auf, damit der
+      // Schluss nicht flach ins Schwarz fällt, wenn die Vorhänge weggezogen sind.
+      float rise=smoothstep(.35,1.,scroll);
+      float glow=bloom(p+w*.8,vec2(.15*sin(t*1.4),-.75),.55);
+      col+=mix(petrol,mint,.35)*glow*.45*rise;
+      col+=cyan*bloom(p-w,vec2(.6*aspect,-.55),.3)*.12*rise;
+
+      // Sanft komprimieren statt hart abschneiden: helle Stellen glühen, statt
+      // weiß auszubrennen.
+      col=1.-exp(-col*1.3);
+
+      // Nach unten etwas ruhiger, damit Text lesbar bleibt.
+      col=night+(col-night)*mix(.6,1.,smoothstep(.0,.8,uv.y));
+
+      // Licht unter dem Zeiger.
+      col+=mint*.045*bloom(p,pm,.05);
+
+      // Dithering gegen Farbstufen in den dunklen Verläufen.
+      col+=(hash(gl_FragCoord.xy+fract(time))-.5)/128.;
+      gl_FragColor=vec4(col,1.);
+    }`;
+
+  const compile = (context: WebGLRenderingContext, type: number, source: string) => {
+    const shader = context.createShader(type);
+    if (!shader) return null;
+    context.shaderSource(shader, source);
+    context.compileShader(shader);
+    return context.getShaderParameter(shader, context.COMPILE_STATUS) ? shader : null;
+  };
+
+  const program = gl?.createProgram();
+  const vertex = gl ? compile(gl, gl.VERTEX_SHADER, vertexSource) : null;
+  const fragment = gl ? compile(gl, gl.FRAGMENT_SHADER, fragmentSource) : null;
+  if (silk && gl && program && vertex && fragment) {
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.linkProgram(program);
+  }
+  if (silk && gl && program && gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const position = gl.getAttribLocation(program, "p");
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+    const uniform = {
+      res: gl.getUniformLocation(program, "res"),
+      time: gl.getUniformLocation(program, "time"),
+      mouse: gl.getUniformLocation(program, "mouse"),
+      scroll: gl.getUniformLocation(program, "scroll"),
+      intro: gl.getUniformLocation(program, "intro"),
+    };
+
+    // Halbe Auflösung am Rechner, ein Drittel auf dem Handy: das Bild ist
+    // weich, mehr Pixel sähe man nicht, würde aber den Akku spüren.
+    let scale = 0.5;
+    const resize = () => {
+      scale = window.innerWidth < 640 ? 0.5 : 0.66;
+      silk.width = Math.max(1, Math.round(window.innerWidth * scale));
+      silk.height = Math.max(1, Math.round(window.innerHeight * scale));
+      gl.viewport(0, 0, silk.width, silk.height);
+      gl.uniform2f(uniform.res, silk.width, silk.height);
+    };
+
+    const target = { x: window.innerWidth * 0.7, y: window.innerHeight * 0.3 };
+    const light = { ...target };
+    const startedAt = performance.now();
+    let frame = 0;
+    const render = (now: number) => {
+      light.x += (target.x - light.x) * 0.04;
+      light.y += (target.y - light.y) * 0.04;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      gl.uniform1f(uniform.time, (now - startedAt) / 1000 + 40);
+      gl.uniform2f(uniform.mouse, light.x * scale, (window.innerHeight - light.y) * scale);
+      gl.uniform1f(uniform.scroll, window.scrollY / maxScroll);
+      // Das Polarlicht erwacht beim Laden über knapp drei Sekunden aus dem Dunkel.
+      const awake = reducedMotion.matches ? 1 : Math.min(1, (now - startedAt) / 2800);
+      gl.uniform1f(uniform.intro, 1 - (1 - awake) ** 3);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    const loop = (now: number) => {
+      render(now);
+      frame = requestAnimationFrame(loop);
+    };
+    const synchronize = () => {
+      cancelAnimationFrame(frame);
+      if (reducedMotion.matches) render(performance.now());
+      else if (!document.hidden) frame = requestAnimationFrame(loop);
+    };
+
+    resize();
+    silk.setAttribute("data-ready", "");
+    synchronize();
+    window.addEventListener("resize", () => {
+      resize();
+      if (reducedMotion.matches) render(performance.now());
+    });
+    window.addEventListener("scroll", () => reducedMotion.matches && render(performance.now()), { passive: true });
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        if (event.pointerType !== "mouse") return;
+        target.x = event.clientX;
+        target.y = event.clientY;
+      },
+      { passive: true },
+    );
+    document.addEventListener("visibilitychange", synchronize);
+    reducedMotion.addEventListener("change", synchronize);
+  }
+</script>
+
+<style is:global>
+  /* Der Platzhalter trägt immer die dunkle Markenpalette — wie omvin.ai selbst.
+     Die Werte sind die des Dark-Blocks in globals.css, hier nur unabhängig von
+     der OS-Einstellung aktiviert. */
+  :root:has([data-omvin-stage]) {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    --brand-ink: var(--brand-lime);
+    --brand-soft: color-mix(in oklab, var(--brand-mint) 14%, transparent);
+    --brand-gradient-ink: var(--brand-gradient);
+    --background: var(--brand-night);
+    --foreground: var(--brand-paper);
+    --card: #faf7f40b;
+    --card-foreground: var(--brand-paper);
+    --secondary: #798fb624;
+    --secondary-foreground: var(--brand-paper);
+    --muted: #798fb624;
+    --muted-foreground: #faf7f4ad;
+    --accent: color-mix(in oklab, var(--brand-mint) 14%, transparent);
+    --accent-foreground: var(--brand-lime);
+    --border: #faf7f41a;
+    --input: #faf7f424;
+    --eyebrow: var(--brand-slate);
+    --wash-1: transparent;
+    --wash-2: transparent;
+    --wash-3: transparent;
+    --shadow-soft: 0 22px 46px -26px rgb(0 0 0 / 0.9), inset 0 1px 0 #faf7f40d;
+    --shadow-lifted: 0 28px 56px -24px rgb(0 0 0 / 0.95), inset 0 1px 0 #faf7f414;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root:has([data-omvin-stage]) { scroll-behavior: auto; }
+  }
+
+  @property --stage-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+  }
+
+  /* ── Hintergrund ────────────────────────────────────────────────────── */
+  .stage-sky {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--brand-night);
+  }
+  /* Ersatz ohne WebGL: treibende Schleier, die beim Scrollen mitwandern. */
+  .stage-sky__scroll {
+    position: absolute;
+    inset: -20% -10%;
+  }
+  .stage-sky:has(.stage-silk[data-ready]) .stage-sky__scroll {
+    display: none;
+  }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .stage-sky__scroll {
+        animation: sky-scroll linear both;
+        animation-timeline: scroll(root);
+      }
+    }
+  }
+  @keyframes sky-scroll {
+    to { transform: translate3d(0, -14%, 0) rotate(12deg); }
+  }
+  .aurora {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.45;
+    animation: aurora-drift 24s ease-in-out infinite alternate;
+  }
+  .aurora--a { top: 6%; left: 8%; width: 46vmax; height: 30vmax; background: color-mix(in oklab, var(--brand-lime) 30%, transparent); }
+  .aurora--b { top: 2%; right: 4%; width: 44vmax; height: 34vmax; background: color-mix(in oklab, var(--brand-cyan) 28%, transparent); animation-duration: 28s; animation-delay: -9s; }
+  .aurora--c { top: 42%; left: 22%; width: 56vmax; height: 30vmax; background: color-mix(in oklab, var(--brand-petrol) 85%, transparent); opacity: 0.6; animation-duration: 32s; animation-delay: -15s; }
+  .aurora--d { bottom: 0; right: 10%; width: 40vmax; height: 28vmax; background: color-mix(in oklab, var(--brand-mint) 22%, transparent); animation-duration: 36s; animation-delay: -4s; }
+  @keyframes aurora-drift {
+    0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+    50% { transform: translate3d(6vw, 6vh, 0) scale(1.12) rotate(8deg); }
+    100% { transform: translate3d(-6vw, -2vh, 0) scale(1.04) rotate(-4deg); }
+  }
+
+  .stage-silk {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1600ms ease;
+  }
+  .stage-silk[data-ready] {
+    opacity: 1;
+  }
+  /* Ein breiter Lichtkegel von oben, wie ein Scheinwerfer auf die Bühne. */
+  .stage-beam {
+    position: absolute;
+    top: -30vh;
+    left: 50%;
+    width: 140vmax;
+    height: 120vh;
+    transform: translateX(-50%);
+    background: conic-gradient(
+      from 180deg at 50% 0%,
+      transparent 160deg,
+      rgb(250 247 244 / 0.05) 176deg,
+      rgb(250 247 244 / 0.08) 180deg,
+      rgb(250 247 244 / 0.05) 184deg,
+      transparent 200deg
+    );
+    filter: blur(24px);
+    mix-blend-mode: plus-lighter;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .stage-beam { animation: beam-sway 18s ease-in-out infinite alternate; }
+  }
+  @keyframes beam-sway {
+    from { transform: translateX(-50%) rotate(-7deg); opacity: 0.7; }
+    to { transform: translateX(-50%) rotate(7deg); opacity: 1; }
+  }
+  .stage-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(140% 100% at 50% 35%, transparent 55%, rgb(6 17 20 / 0.65));
+  }
+  /* Filmkorn: nimmt dem Verlauf das Digitale und den Farbstufen die Kanten. */
+  .stage-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.09;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Hero ───────────────────────────────────────────────────────────── */
+  .rotator {
+    display: grid;
+    justify-items: center;
+    padding-bottom: 0.08em; /* Unterlängen nicht abschneiden */
+  }
+  @media (min-width: 1024px) {
+    .rotator { justify-items: start; }
+  }
+  .rotator__word {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(0.45em);
+    filter: blur(10px);
+    transition:
+      opacity 600ms cubic-bezier(0.23, 1, 0.32, 1),
+      transform 700ms cubic-bezier(0.23, 1, 0.32, 1),
+      filter 600ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .rotator__word[data-active] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .rotator__word[data-leaving] {
+    transform: translateY(-0.45em);
+  }
+
+  .format-chip {
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    background: #faf7f408;
+    box-shadow: inset 0 0 0 1px #faf7f41a;
+    transition: color 400ms, background 400ms, box-shadow 400ms;
+  }
+  @media (min-width: 400px) {
+    .format-chip { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
+  }
+  .format-chip[data-lit] {
+    color: var(--brand-night);
+    background: var(--brand-gradient);
+    box-shadow: 0 0 22px -4px color-mix(in oklab, var(--brand-mint) 80%, transparent);
+  }
+
+  /* Das Polarlicht läuft hinter dem Text durch; ein weicher dunkler Schatten
+     hält auch den grauen Fließtext auf hellen Strahlen lesbar. */
+  .hero-copy p {
+    text-shadow: 0 1px 2px rgb(6 17 20 / 0.6), 0 0 18px rgb(6 17 20 / 0.85);
+  }
+
+  /* Der Einstieg zu den drei Schritten: Glas-Pille mit Rand im Markenverlauf,
+     der Pfeil in einem gefüllten Kreis wippt sanft nach unten. */
+  .start-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.4rem 0.4rem 0.4rem 1.35rem;
+    border-radius: 999px;
+    font-family: var(--font-ui);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--brand-mint) 10%, #081619cc);
+    box-shadow: 0 12px 34px -14px color-mix(in oklab, var(--brand-mint) 70%, transparent);
+    backdrop-filter: blur(10px);
+    transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 300ms;
+  }
+  .start-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--brand-gradient);
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    pointer-events: none;
+  }
+  .start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 44px -14px color-mix(in oklab, var(--brand-mint) 95%, transparent);
+  }
+  .start-button:focus-visible {
+    outline: 2px solid var(--brand-mint);
+    outline-offset: 3px;
+  }
+  .start-button__icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    color: var(--brand-night);
+    background: var(--brand-gradient);
+    box-shadow: 0 0 18px -4px var(--brand-mint);
+  }
+  .start-button__icon svg {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .start-button__icon svg {
+      animation: start-bob 2.2s ease-in-out infinite;
+    }
+  }
+  @keyframes start-bob {
+    0%, 100% { transform: translateY(-2px); }
+    50% { transform: translateY(3px); }
+  }
+
+  /* Im zweispaltigen Hero steht das Karussell in einer Spalte statt über der
+     ganzen Breite. Würde es dort weiter an seinem Rand abschneiden, endeten die
+     gekippten Nachbarkarten in harten senkrechten Kanten. Deshalb darf es über
+     die Spalte hinausragen (der äußere Seitencontainer verhindert horizontales
+     Scrollen). Die Nachbarn enden so an ihrer eigenen runden Kante. */
+  .hero-gallery .ex-stage {
+    overflow: visible;
+  }
+  .hero-gallery .ex-show {
+    width: min(86%, 36rem);
+  }
+  @media (min-width: 1024px) {
+    .hero-gallery .ex-show { width: 84%; }
+  }
+
+  /* ── Einblenden beim Scrollen ───────────────────────────────────────── */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      filter: blur(6px);
+      transition:
+        opacity 900ms cubic-bezier(0.23, 1, 0.32, 1) var(--delay, 0ms),
+        transform 900ms cubic-bezier(0.23, 1, 0.32, 1) var(--delay, 0ms),
+        filter 900ms cubic-bezier(0.23, 1, 0.32, 1) var(--delay, 0ms);
+    }
+    .reveal[data-visible] {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  /* ── Ideen-Laufband ─────────────────────────────────────────────────── */
+  .marquee {
+    display: grid;
+    gap: 0.65rem;
+    margin-inline: calc(50% - 50vw);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .marquee__row {
+    overflow: hidden;
+  }
+  .marquee__track {
+    display: flex;
+    gap: 0.65rem;
+    width: max-content;
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+    animation: marquee 50s linear infinite;
+  }
+  .marquee__row[data-reverse] .marquee__track {
+    animation-direction: reverse;
+    animation-duration: 58s;
+  }
+  @media (hover: hover) {
+    .marquee:hover .marquee__track { animation-play-state: paused; }
+  }
+  /* Halbe Breite minus halber Lücke: genau eine Kopie weiter, nahtlos. */
+  @keyframes marquee {
+    to { transform: translateX(calc(-50% - 0.325rem)); }
+  }
+  .idea-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    background: #0b1d21b3;
+    box-shadow: inset 0 0 0 1px #faf7f41a, inset 0 1px 0 #faf7f414;
+    backdrop-filter: blur(8px);
+    transition: background 200ms, box-shadow 200ms;
+  }
+  @media (min-width: 640px) {
+    .idea-chip { padding: 0.7rem 1.1rem; font-size: 0.95rem; }
+  }
+  .idea-chip:hover {
+    background: color-mix(in oklab, var(--brand-mint) 12%, #0b1d21);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-mint) 50%, transparent), 0 0 24px -6px var(--brand-mint);
+  }
+  .idea-chip__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    box-shadow: 0 0 8px var(--brand-mint);
+  }
+
+  /* ── Orbit ──────────────────────────────────────────────────────────── */
+  .orbit {
+    position: relative;
+    width: min(100%, 28rem);
+    aspect-ratio: 1;
+    margin-inline: auto;
+    container-type: size;
+  }
+  .orbit::before {
+    content: "";
+    position: absolute;
+    inset: 18%;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklab, var(--brand-mint) 30%, transparent), transparent 70%);
+    filter: blur(20px);
+  }
+  .orbit__ring {
+    position: absolute;
+    border-radius: 50%;
+    animation: orbit-spin 60s linear infinite;
+  }
+  .orbit__ring--outer {
+    inset: 10%;
+    border: 1px dashed #faf7f42a;
+  }
+  .orbit__ring--inner {
+    inset: 25%;
+    border: 1px solid color-mix(in oklab, var(--brand-mint) 30%, transparent);
+    animation-duration: 36s;
+    animation-direction: reverse;
+  }
+  .orbit__slot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a)));
+  }
+  .orbit__anchor {
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+  .orbit__chip {
+    display: block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-family: var(--font-ui);
+    font-size: clamp(0.68rem, 3cqw, 0.8rem);
+    font-weight: 500;
+    color: var(--foreground);
+    background: #0b1d21e6;
+    box-shadow: inset 0 0 0 1px #faf7f42a, 0 8px 20px -10px #000;
+    animation: orbit-spin 60s linear infinite reverse;
+  }
+  .orbit__ring--inner .orbit__chip {
+    animation-duration: 36s;
+    animation-direction: normal;
+  }
+  .orbit__chip--bright {
+    color: var(--brand-lime);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-lime) 45%, transparent), 0 0 18px -6px var(--brand-lime);
+  }
+  .orbit__core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 28cqw;
+    height: 28cqw;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--brand-gradient);
+    box-shadow: 0 0 60px -10px var(--brand-mint), inset 0 2px 0 #ffffff80;
+  }
+  .orbit__pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    animation: core-pulse 3.2s ease-out infinite;
+  }
+  .orbit__pulse--late {
+    animation-delay: 1.6s;
+  }
+  @keyframes orbit-spin {
+    to { rotate: 360deg; }
+  }
+  @keyframes core-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand-mint) 55%, transparent); }
+    100% { box-shadow: 0 0 0 9cqw transparent; }
+  }
+
+  /* ── Karten ─────────────────────────────────────────────────────────── */
+  .steps {
+    padding: 0;
+    list-style: none;
+  }
+  .step-card {
+    position: relative;
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    background: #0a1a1ee0;
+    box-shadow: var(--shadow-soft), inset 0 0 0 1px var(--border);
+    backdrop-filter: blur(10px);
+    transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 300ms;
+  }
+  @media (min-width: 640px) {
+    .step-card { padding: 1.75rem; }
+  }
+  @media (hover: hover) {
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lifted), inset 0 0 0 1px color-mix(in oklab, var(--brand-mint) 40%, transparent),
+        0 20px 50px -30px var(--brand-mint);
+    }
+  }
+  .step-card__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.9rem;
+    color: var(--brand-lime);
+    background: color-mix(in oklab, var(--brand-mint) 12%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-mint) 30%, transparent);
+  }
+  .step-card__icon svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  /* Beispielsatz mit umlaufendem Lichtrand. */
+  .prompt-card {
+    position: relative;
+    padding: 1px;
+    border-radius: var(--radius);
+    background: conic-gradient(
+      from var(--stage-angle),
+      #faf7f41a 0deg,
+      var(--brand-lime) 60deg,
+      var(--brand-cyan) 120deg,
+      #faf7f41a 180deg,
+      #faf7f41a 360deg
+    );
+    box-shadow: 0 24px 60px -30px var(--brand-mint);
+    animation: border-spin 6s linear infinite;
+  }
+  @keyframes border-spin {
+    to { --stage-angle: 360deg; }
+  }
+
+  .kbd {
+    border-radius: 0.375rem;
+    border: 1px solid var(--border);
+    background: var(--secondary);
+    padding: 0.1rem 0.4rem;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora,
+    .stage-beam,
+    .marquee__track,
+    .orbit__ring,
+    .orbit__chip,
+    .orbit__pulse,
+    .prompt-card {
+      animation: none;
+    }
+    .marquee__row { overflow-x: auto; }
+  }
+</style>

@@ -2,7 +2,7 @@
 import "./BeispielKarussell.css";
 import { Image } from "astro:assets";
 import cabinHero from "./bilder/cabin-hero-1200.webp";
-import kreavoHome from "./bilder/kreavo-home.webp";
+import flowOfficeHome from "./bilder/flow-office-home.webp";
 import adProduct from "./bilder/ad-product.webp";
 import adProductB from "./bilder/ad-product-b.webp";
 import adProductC from "./bilder/ad-product-c.webp";
@@ -16,8 +16,8 @@ import posterFitness from "./bilder/poster-fitness.webp";
  * Das Glasfenster-Karussell aus dem Hero von omvin.ai, verschlankt: dieselben
  * Beispiele, aber Bilder statt HTML-Nachbauten, ohne H1-Rotor, Videos und
  * Wischgesten. Prompts sind Imperative an OMVIN, deshalb spricht hier „Du“.
- * Bilder in ./bilder/, Quelle omvin.ai. Nur kreavo.de
- * ist ein echtes Projekt, alles andere ist erfunden.
+ * Bilder in ./bilder/, Quelle omvin.ai. Nur flow-office.eu (Startseite,
+ * aufgenommen im Oktober 2026) ist ein echtes Projekt, alles andere ist erfunden.
  *
  * Gehört zur Platzhalter-Startseite (`@omvin-placeholder`): Wird sie
  * überschrieben, geht dieser Ordner mit.
@@ -27,7 +27,7 @@ interface Props {
 }
 const { class: className } = Astro.props;
 
-type BeispielKey = "web" | "shop" | "ad" | "expose" | "poster";
+type BeispielKey = "web" | "firma" | "ad" | "expose" | "poster";
 interface Beispiel {
   key: BeispielKey;
   title: string;
@@ -38,7 +38,7 @@ interface Beispiel {
 }
 const beispiele: readonly Beispiel[] = [
   { key: "web", title: "Website", prompt: "Bau uns eine Website fürs Waldrefugium.", state: "Fertig · zur Freigabe", hold: 6500 },
-  { key: "shop", title: "Webshop", prompt: "Bau uns einen Shop für unsere 3D⁠-⁠Figuren.", state: "Live · kreavo.de", hold: 9000 },
+  { key: "firma", title: "Unternehmenswebsite", prompt: "Bau uns die Website für unsere Unternehmenssoftware.", state: "Live · flow⁠-⁠office.eu", hold: 9000 },
   { key: "ad", title: "Kampagne", prompt: "Plan eine Kampagne für die AURA Buds.", state: "Fertig · zur Freigabe", hold: 6500 },
   { key: "expose", title: "Exposé", prompt: "Erstell ein Exposé für die Villa am Hang.", state: "Fertig · zur Freigabe", hold: 6500 },
   { key: "poster", title: "Plakat", prompt: "Gestalte ein Plakat fürs Fitnessstudio.", state: "Fertig · zur Freigabe", hold: 6500 },
@@ -127,15 +127,15 @@ const plakatFarben = ["#c4f23a", "#151815", "#f1f0ec", "#6f7d2c"];
                   </div>
                 </div>
               )}
-              {b.key === "shop" && (
+              {b.key === "firma" && (
                 <div class="ex-browser">
                   <span class="ex-browser__bar">
                     <i class="ex-dots"><i /><i /><i /></i>
-                    <b class="ex-url">kreavo.de</b>
+                    <b class="ex-url">flow-office.eu</b>
                     <em class="ex-real">Echtes Projekt</em>
                   </span>
                   <div class="ex-browser__view bg-white">
-                    <Image class="ex-shop__img" src={kreavoHome} alt="" draggable="false" />
+                    <Image class="ex-scroll__img" src={flowOfficeHome} alt="" draggable="false" />
                   </div>
                 </div>
               )}
@@ -207,7 +207,7 @@ const plakatFarben = ["#c4f23a", "#151815", "#f1f0ec", "#6f7d2c"];
               <span class="ex-status__work" aria-hidden="true"><i class="ex-ring" />OMVIN arbeitet …</span>
               <span class="ex-status__done">{b.state}</span>
             </span>
-            <span class="ex-kind">{b.key === "shop" ? "Echtes Projekt" : "Beispiel"}</span>
+            <span class="ex-kind">{b.key === "firma" ? "Echtes Projekt" : "Beispiel"}</span>
           </figcaption>
           <span class="ex-frost" aria-hidden="true" />
         </figure>

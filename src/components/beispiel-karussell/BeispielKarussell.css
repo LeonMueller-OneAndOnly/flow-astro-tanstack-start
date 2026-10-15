@@ -36,7 +36,7 @@
     transition: --ex-amb 900ms var(--ex-ease);
   }
   .ex-stage:has([data-kind="web"][data-position="current"])::before { --ex-amb: rgb(217 164 65); }
-  .ex-stage:has([data-kind="shop"][data-position="current"])::before { --ex-amb: rgb(245 146 40); }
+  .ex-stage:has([data-kind="firma"][data-position="current"])::before { --ex-amb: rgb(60 220 140); }
   .ex-stage:has([data-kind="ad"][data-position="current"])::before { --ex-amb: rgb(232 52 64); }
   .ex-stage:has([data-kind="expose"][data-position="current"])::before { --ex-amb: rgb(70 160 255); }
   .ex-stage:has([data-kind="poster"][data-position="current"])::before { --ex-amb: rgb(200 245 40); }
@@ -84,7 +84,7 @@
       visibility 0s;
   }
   .ex-card[data-kind="web"] { --acc: 217, 164, 65; }
-  .ex-card[data-kind="shop"] { --acc: 245, 146, 40; }
+  .ex-card[data-kind="firma"] { --acc: 60, 220, 140; }
   .ex-card[data-kind="ad"] { --acc: 232, 52, 64; }
   .ex-card[data-kind="expose"] { --acc: 70, 160, 255; }
   .ex-card[data-kind="poster"] { --acc: 200, 245, 40; }
@@ -296,16 +296,16 @@
     height: 100%;
     object-fit: cover;
   }
-  .ex-shop__img {
+  .ex-scroll__img {
     display: block;
     width: 100%;
     height: auto;
   }
-  /* Vorn läuft die Website langsam heran, der Shop scrollt einmal durch. */
+  /* Vorn läuft die Website langsam heran, die echte Seite scrollt einmal durch. */
   .ex-card[data-position="current"] .ex-web__img {
     animation: ex-zoom 7s ease-out both;
   }
-  .ex-card[data-position="current"] .ex-shop__img {
+  .ex-card[data-position="current"] .ex-scroll__img {
     animation: ex-scroll 6.5s var(--ex-ease-in-out) 1.6s both;
   }
   @keyframes ex-zoom {
