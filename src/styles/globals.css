@@ -1,11 +1,9 @@
-/* Layout classes for `<ResponsiveImage>` (src/app/components/ResponsiveImage.tsx), in
-   the base layer so utilities on the image can override them. */
+/* Why the layer matters: src/app/components/ResponsiveImage.tsx */
 @import "@responsive-image/react/responsive-image.css" layer(base);
 
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Self-hosted variable fonts: Arimo for running text, Geist for controls. */
 @import "@fontsource-variable/arimo";
 @import "@fontsource-variable/geist";
 
@@ -18,46 +16,33 @@
    this to `(&:where(.dark, .dark *))` and wrap the dark block in `:root:not(.light)`. */
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
-/* ── Brand hues ─────────────────────────────────────────────────────────────
-   Fixed in both modes; the mode blocks below only assign them to roles. */
+/* Brand hues, fixed in both modes. */
 :root {
-  /* The two ends of the brand gradient. */
   --brand-lime: #a2f11c;
   --brand-cyan: #00e3f1;
-  /* Text and line variants for light backgrounds, where the bright pair fails
-     contrast. lime-deep is the lightest step that passes AA on white. */
+  /* For text on white, where the bright pair fails contrast (AA). */
   --brand-lime-deep: #3e6b0e;
   --brand-cyan-deep: #00c2cf;
-  /* Glow colour: rings, focus states, light under raised surfaces. */
   --brand-mint: #2edeaa;
   --brand-petrol: #046268;
-  /* Calm accent; base of the dark-mode greys. */
   --brand-slate: #798fb6;
-  /* Dark-mode ground and text. */
   --brand-night: #061114;
   --brand-paper: #faf7f4;
 
-  /* Carries dark text in both modes, so it needs no light variant. */
   --brand-gradient: linear-gradient(100deg, var(--brand-lime) 0%, var(--brand-cyan) 100%);
 }
 
 :root {
-  /* Cards use `--radius`, controls `--radius-lg`. */
   --radius: 1.5rem;
 
-  /* Shared by the top bar, its spacer and the sidebar inset. */
   --header-height: 4rem;
 
-  /* ── Light palette ───────────────────────────────────────────────────────
-     `--brand` is for fills (with dark text on top), `--brand-ink` for text:
-     bright lime is unreadable as text on white. */
+  /* `--brand` for fills, `--brand-ink` for text: lime is unreadable as text on white. */
   --brand: var(--brand-lime);
   --brand-soft: #eefdd0;
   --brand-ink: var(--brand-lime-deep);
-  /* For gradient text (`text-brand-gradient`); must stay legible as text. */
   --brand-gradient-ink: linear-gradient(100deg, var(--brand-lime-deep) 0%, var(--brand-petrol) 100%);
 
-  /* Neutral greys, deliberately not tinted towards the brand. */
   --background: #f9fafb;
   --foreground: #111827;
   --card: #ffffff;
@@ -65,34 +50,28 @@
   --popover: #ffffff;
   --popover-foreground: #111827;
   --primary: var(--brand);
-  /* Dark text on lime; white is unreadable. */
   --primary-foreground: var(--brand-night);
   --secondary: #f3f4f6;
   --secondary-foreground: #111827;
   --muted: #f3f4f6;
   --muted-foreground: #6b7280;
-  /* Hover surface: a mint tint instead of grey. */
   --accent: color-mix(in oklab, var(--brand-mint) 14%, transparent);
   --accent-foreground: var(--brand-lime-deep);
   --destructive: oklch(57.7% 0.245 27.325);
   --destructive-foreground: var(--brand-paper);
-  /* Not in shadcn by default. */
   --success: #34e6a0;
   --success-foreground: var(--brand-night);
   --border: #e5e7eb;
   --input: #d1d5db;
-  /* Mint, not lime: a lime ring on a lime button is invisible. */
   --ring: color-mix(in oklab, var(--brand-mint) 45%, transparent);
 
   /* Slate is only 3:1 on white, so light mode uses the secondary-text grey. */
   --eyebrow: var(--muted-foreground);
 
-  /* Background washes behind the page (see `body::before`). Kept faint on light. */
   --wash-1: color-mix(in oklab, var(--brand-mint) 10%, transparent);
   --wash-2: color-mix(in oklab, var(--brand-cyan) 8%, transparent);
   --wash-3: color-mix(in oklab, var(--brand-lime) 10%, transparent);
 
-  /* Full values rather than a shared colour: the dark palette needs a different shape. */
   --shadow-soft: 0 1px 2px rgb(6 17 20 / 0.05), 0 8px 24px -8px rgb(6 17 20 / 0.12);
   --shadow-lifted: 0 2px 4px rgb(6 17 20 / 0.06), 0 16px 36px -12px rgb(6 17 20 / 0.2);
   --chart-1: var(--brand-lime-deep);
@@ -113,10 +92,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  /* ── Dark palette ────────────────────────────────────────────────────────
-     Surfaces are translucent paper over the night ground. */
   :root {
-
     --brand-ink: var(--brand-lime);
     --brand-soft: color-mix(in oklab, var(--brand-mint) 14%, transparent);
     --brand-gradient-ink: var(--brand-gradient);
@@ -130,7 +106,6 @@
     --popover-foreground: var(--brand-paper);
     --primary: var(--brand);
     --primary-foreground: var(--brand-night);
-    /* Greys are slate at low alpha, which keeps surfaces teal rather than ash. */
     --secondary: #798fb624;
     --secondary-foreground: var(--brand-paper);
     --muted: #798fb624;
@@ -152,8 +127,6 @@
     --wash-2: color-mix(in oklab, var(--brand-mint) 9%, transparent);
     --wash-3: color-mix(in oklab, var(--brand-cyan) 7%, transparent);
 
-    /* A deep black drop plus a 1px light rim on the top edge: on glass there is
-       no surface for a soft shadow to darken. */
     --shadow-soft: 0 22px 46px -26px rgb(0 0 0 / 0.9), inset 0 1px 0 #faf7f40d;
     --shadow-lifted: 0 28px 56px -24px rgb(0 0 0 / 0.95), inset 0 1px 0 #faf7f414;
     --chart-1: var(--brand-lime);
@@ -162,7 +135,6 @@
     --chart-4: var(--brand-slate);
     --chart-5: var(--muted-foreground);
 
-    /* One step darker than the page, so the rail reads as beneath it. */
     --sidebar: #080d14;
     --sidebar-foreground: var(--brand-paper);
     --sidebar-primary: var(--brand);
@@ -228,17 +200,14 @@
   --radius-xl: var(--radius);
   --radius-2xl: calc(var(--radius) + 8px);
 
-  /* Enables `h-header` / `pt-header`. */
   --spacing-header: var(--header-height);
 }
 
-/* The call-to-action background. Pair with `shadow-brand-glow`. */
 @utility bg-brand-gradient {
   background-image: var(--brand-gradient);
 }
 
-/* Gradient text for emphasised headline words. `-webkit-text-fill-color` is
-   required on Safari, where `color: transparent` alone paints solid text. */
+/* `-webkit-text-fill-color`: Safari paints solid text with `color: transparent` alone. */
 @utility text-brand-gradient {
   background-image: var(--brand-gradient-ink);
   background-clip: text;
@@ -246,23 +215,19 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Resting shadow for raised surfaces. */
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
 }
 
-/* `shadow-soft` on hover. */
 @utility shadow-lifted {
   box-shadow: var(--shadow-lifted);
 }
 
-/* Mint glow under anything wearing the brand gradient. */
 @utility shadow-brand-glow {
   box-shadow: 0 10px 24px -12px color-mix(in oklab, var(--brand-mint) 70%, transparent);
 }
 
-/* 1px gradient border for the one featured surface on a page. Drawn as a masked
-   pseudo-element, hence `position: relative`; pair with `border-transparent`
+/* Masked pseudo-element, hence `position: relative`. Pair with `border-transparent`
    if the element has a border of its own. */
 @utility border-brand-gradient {
   position: relative;
@@ -281,7 +246,6 @@
   }
 }
 
-/* Small uppercase label above a heading, led by a short gradient line. */
 @utility eyebrow {
   /* `flex`, not `inline-flex`, so it never joins a neighbouring inline box.
      Centre it with `justify-center`. */
@@ -317,7 +281,6 @@
     /* Removes the tap delay at every zoom level; pinch zoom still works.
        https://webkit.org/blog/5610/more-responsive-tapping-on-ios/ */
     touch-action: manipulation;
-    /* Form controls and scrollbars follow the OS setting too. */
     color-scheme: light dark;
   }
 
