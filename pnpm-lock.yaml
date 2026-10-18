@@ -10,7 +10,7 @@ overrides:
 
 patchedDependencies:
   '@responsive-image/vite-plugin@3.0.1':
-    hash: 2bdcfea30f45ff4e9350bd9e8c19066807b96dc9246719defc638944f3d74438
+    hash: f98819e29b4933794fb3c2d241fd19e1d230e54ed705d0517dca163ad6831dc4
     path: patches/@responsive-image__vite-plugin@3.0.1.patch
   astro-grab@0.3.0:
     hash: 63913e4aee9fc0f07770083bb66df85c46f4f14f101f6ed30eedb752b1fee995
@@ -146,7 +146,7 @@ importers:
         version: 3.7.3
       '@responsive-image/vite-plugin':
         specifier: ^3.0.1
-        version: 3.0.1(patch_hash=2bdcfea30f45ff4e9350bd9e8c19066807b96dc9246719defc638944f3d74438)(rollup@4.62.2)(vite@8.3.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4)(yaml@2.9.1))
+        version: 3.0.1(patch_hash=f98819e29b4933794fb3c2d241fd19e1d230e54ed705d0517dca163ad6831dc4)(rollup@4.62.2)(vite@8.3.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4)(yaml@2.9.1))
       '@tanstack/devtools-event-client':
         specifier: 0.5.0
         version: 0.5.0
@@ -7207,7 +7207,7 @@ snapshots:
       - blurhash
       - thumbhash
 
-  '@responsive-image/vite-plugin@3.0.1(patch_hash=2bdcfea30f45ff4e9350bd9e8c19066807b96dc9246719defc638944f3d74438)(rollup@4.62.2)(vite@8.3.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4)(yaml@2.9.1))':
+  '@responsive-image/vite-plugin@3.0.1(patch_hash=f98819e29b4933794fb3c2d241fd19e1d230e54ed705d0517dca163ad6831dc4)(rollup@4.62.2)(vite@8.3.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4)(yaml@2.9.1))':
     dependencies:
       '@responsive-image/build-utils': 3.0.1(blurhash@2.0.5)(rollup@4.62.2)(thumbhash@0.1.1)
       '@responsive-image/core': 2.1.0(blurhash@2.0.5)(thumbhash@0.1.1)

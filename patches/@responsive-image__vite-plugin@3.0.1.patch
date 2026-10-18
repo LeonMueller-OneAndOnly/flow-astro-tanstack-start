@@ -1,5 +1,5 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 68ec7ec56673bce3802e6fcea6cca7a844bb426c..f03b9e0f25a82feb793894cb012313a4c242a386 100644
+index 68ec7ec56673bce3802e6fcea6cca7a844bb426c..4f522e52d41073b56c768edb96642ced4c81d5a1 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
 @@ -44,6 +44,16 @@ function configPlugin() {
@@ -28,7 +28,24 @@ index 68ec7ec56673bce3802e6fcea6cca7a844bb426c..f03b9e0f25a82feb793894cb012313a4
  }
  function getViteBasePath(viteConfig) {
    return `${viteConfig.base.endsWith("/") ? viteConfig.base.slice(0, -1) : viteConfig.base}/@responsive-image/vite-plugin/`;
-@@ -175,6 +185,7 @@ function loaderPlugin(userOptions = {}) {
+@@ -105,7 +115,15 @@ function exportPlugin(userOptions = {}) {
+         let imageUrl;
+         if (viteConfig.command === "serve") {
+           const moduleId = id.startsWith(viteConfig.root) ? id.substring(viteConfig.root.length) : id;
+-          const imagePath = `${format}/${width}${moduleId}`;
++          /**
++           * The served path is what the browser sends back, so it has to survive a
++           * proxy that sits between browser and dev server. The module id carries the
++           * import query (`…jpg?w=640;828;1120&responsive`); re-serialising `;` as `&`
++           * changes the id and the lookup below misses. Digested, the served URL has
++           * no query at all - format and width stay as readable segments, the id is
++           * opaque. `servedImages` and the middleware use this same string.
++           */
++          const imagePath = `${format}/${width}/${buildUtils.hash([moduleId])}`;
+           imageUrl = `${viteConfig.server.origin ?? ""}${basePath}${imagePath}`;
+           servedImages.set(imagePath, { data, format });
+         } else {
+@@ -175,6 +193,7 @@ function loaderPlugin(userOptions = {}) {
          }
          const options2 = getViteOptions(id, userOptions);
          const data = buildUtils.normalizeInput(id, { generateHash: options2.cache });
@@ -37,9 +54,16 @@ index 68ec7ec56673bce3802e6fcea6cca7a844bb426c..f03b9e0f25a82feb793894cb012313a4
            // Only the export plugin will actually return ESM code
            code: "",
 diff --git a/dist/index.mjs b/dist/index.mjs
-index b3dc42bf31f204fad00d33f2f58f52c9195b8dec..2f2f686179d4a67f7a91ada33dce3baa80ff4df5 100644
+index b3dc42bf31f204fad00d33f2f58f52c9195b8dec..eaaa2810ea7a5b1ce72dd091288073bb6ae3218b 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
+@@ -1,5 +1,5 @@
+ import * as path from 'path';
+-import { getOptions, parseURL, onlyUnique, getAspectRatio, serialize, safeString, normalizeInput, parseQuery, getPathname, generateLqipClassName, dataUri, blurrySvg, effectiveImageFormats, getImagetoolsConfigs, generateResizedImage } from '@responsive-image/build-utils';
++import { getOptions, parseURL, onlyUnique, getAspectRatio, serialize, safeString, normalizeInput, parseQuery, getPathname, generateLqipClassName, dataUri, blurrySvg, effectiveImageFormats, getImagetoolsConfigs, generateResizedImage, hash } from '@responsive-image/build-utils';
+ import { createFilter } from 'vite';
+ import { encode } from 'blurhash';
+ import sharp from 'sharp';
 @@ -23,6 +23,16 @@ function configPlugin() {
  }
  
@@ -66,7 +90,24 @@ index b3dc42bf31f204fad00d33f2f58f52c9195b8dec..2f2f686179d4a67f7a91ada33dce3baa
  }
  function getViteBasePath(viteConfig) {
    return `${viteConfig.base.endsWith("/") ? viteConfig.base.slice(0, -1) : viteConfig.base}/@responsive-image/vite-plugin/`;
-@@ -154,6 +164,7 @@ function loaderPlugin(userOptions = {}) {
+@@ -84,7 +94,15 @@ function exportPlugin(userOptions = {}) {
+         let imageUrl;
+         if (viteConfig.command === "serve") {
+           const moduleId = id.startsWith(viteConfig.root) ? id.substring(viteConfig.root.length) : id;
+-          const imagePath = `${format}/${width}${moduleId}`;
++          /**
++           * The served path is what the browser sends back, so it has to survive a
++           * proxy that sits between browser and dev server. The module id carries the
++           * import query (`…jpg?w=640;828;1120&responsive`); re-serialising `;` as `&`
++           * changes the id and the lookup below misses. Digested, the served URL has
++           * no query at all - format and width stay as readable segments, the id is
++           * opaque. `servedImages` and the middleware use this same string.
++           */
++          const imagePath = `${format}/${width}/${hash([moduleId])}`;
+           imageUrl = `${viteConfig.server.origin ?? ""}${basePath}${imagePath}`;
+           servedImages.set(imagePath, { data, format });
+         } else {
+@@ -154,6 +172,7 @@ function loaderPlugin(userOptions = {}) {
          }
          const options2 = getViteOptions(id, userOptions);
          const data = normalizeInput(id, { generateHash: options2.cache });
