@@ -1,0 +1,76 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 68ec7ec56673bce3802e6fcea6cca7a844bb426c..f03b9e0f25a82feb793894cb012313a4c242a386 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -44,6 +44,16 @@ function configPlugin() {
+ }
+ 
+ const META_KEY = "responsive-image";
++/**
++ * Vite >= 8 creates the module entry only after the `load` hook ran, so the `meta`
++ * this plugin returns from `load` never reaches ModuleInfo in the client dev path
++ * again (`_updateModuleInfo` only writes into entries that already exist). Every
++ * later hook here reads its input from exactly that meta, so without a fallback the
++ * image module stays empty and importing it fails with "doesn't provide an export
++ * named: 'default'". The loader records its input under the id Vite handed to it.
++ * Remove once load meta survives the client dev pipeline again.
++ */
++const inputsById = new Map();
+ const defaultViteOptions = {
+   include: /^[^?]+\.(avif|gif|heif|jpeg|jpg|png|tiff|webp)\?.*responsive.*$/,
+   name: "[name]-[width]w.[ext]",
+@@ -62,7 +72,7 @@ function getViteOptions(id, loaderOptions) {
+ }
+ function getInput(context, id) {
+   const info = context.getModuleInfo(id);
+-  return info?.meta[META_KEY];
++  return info?.meta[META_KEY] ?? inputsById.get(id);
+ }
+ function getViteBasePath(viteConfig) {
+   return `${viteConfig.base.endsWith("/") ? viteConfig.base.slice(0, -1) : viteConfig.base}/@responsive-image/vite-plugin/`;
+@@ -175,6 +185,7 @@ function loaderPlugin(userOptions = {}) {
+         }
+         const options2 = getViteOptions(id, userOptions);
+         const data = buildUtils.normalizeInput(id, { generateHash: options2.cache });
++        inputsById.set(id, data);
+         return {
+           // Only the export plugin will actually return ESM code
+           code: "",
+diff --git a/dist/index.mjs b/dist/index.mjs
+index b3dc42bf31f204fad00d33f2f58f52c9195b8dec..2f2f686179d4a67f7a91ada33dce3baa80ff4df5 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -23,6 +23,16 @@ function configPlugin() {
+ }
+ 
+ const META_KEY = "responsive-image";
++/**
++ * Vite >= 8 creates the module entry only after the `load` hook ran, so the `meta`
++ * this plugin returns from `load` never reaches ModuleInfo in the client dev path
++ * again (`_updateModuleInfo` only writes into entries that already exist). Every
++ * later hook here reads its input from exactly that meta, so without a fallback the
++ * image module stays empty and importing it fails with "doesn't provide an export
++ * named: 'default'". The loader records its input under the id Vite handed to it.
++ * Remove once load meta survives the client dev pipeline again.
++ */
++const inputsById = new Map();
+ const defaultViteOptions = {
+   include: /^[^?]+\.(avif|gif|heif|jpeg|jpg|png|tiff|webp)\?.*responsive.*$/,
+   name: "[name]-[width]w.[ext]",
+@@ -41,7 +51,7 @@ function getViteOptions(id, loaderOptions) {
+ }
+ function getInput(context, id) {
+   const info = context.getModuleInfo(id);
+-  return info?.meta[META_KEY];
++  return info?.meta[META_KEY] ?? inputsById.get(id);
+ }
+ function getViteBasePath(viteConfig) {
+   return `${viteConfig.base.endsWith("/") ? viteConfig.base.slice(0, -1) : viteConfig.base}/@responsive-image/vite-plugin/`;
+@@ -154,6 +164,7 @@ function loaderPlugin(userOptions = {}) {
+         }
+         const options2 = getViteOptions(id, userOptions);
+         const data = normalizeInput(id, { generateHash: options2.cache });
++        inputsById.set(id, data);
+         return {
+           // Only the export plugin will actually return ESM code
+           code: "",
