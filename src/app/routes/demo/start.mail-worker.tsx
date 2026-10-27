@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DEV_SERVER_ONLY_MESSAGE, DevServerOnlyNotice } from "@/lib/demo/dev-server-only";
 import { Result } from "@/lib/framework/result";
 import { sendMail } from "src/integrations/mailer";
 
@@ -29,6 +30,10 @@ type QueueMailResult =
 const queueMail = createServerFn({ method: "POST" })
   .validator((data: MailWorkerInput) => data)
   .handler(async ({ data }): Promise<QueueMailResult> => {
+    if (!import.meta.env.DEV) {
+      return { success: false, error: DEV_SERVER_ONLY_MESSAGE };
+    }
+
     const parsedInput = ZMailWorkerInput.safeParse(data);
 
     if (!parsedInput.success) {
@@ -103,51 +108,55 @@ function MailWorkerTestPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-5" onSubmit={submitMail}>
-            <div className="space-y-2">
-              <Label htmlFor="mail-to">Recipient</Label>
-              <Input
-                id="mail-to"
-                type="email"
-                value={form.to}
-                onChange={(event) => setForm({ ...form, to: event.target.value })}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="mail-subject">Subject</Label>
-              <Input
-                id="mail-subject"
-                value={form.subject}
-                onChange={(event) => setForm({ ...form, subject: event.target.value })}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="mail-message">Message</Label>
-              <Textarea
-                id="mail-message"
-                value={form.message}
-                onChange={(event) => setForm({ ...form, message: event.target.value })}
-                className="min-h-36"
-                required
-              />
-            </div>
+          {import.meta.env.DEV ? (
+            <form className="space-y-5" onSubmit={submitMail}>
+              <div className="space-y-2">
+                <Label htmlFor="mail-to">Recipient</Label>
+                <Input
+                  id="mail-to"
+                  type="email"
+                  value={form.to}
+                  onChange={(event) => setForm({ ...form, to: event.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="mail-subject">Subject</Label>
+                <Input
+                  id="mail-subject"
+                  value={form.subject}
+                  onChange={(event) => setForm({ ...form, subject: event.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="mail-message">Message</Label>
+                <Textarea
+                  id="mail-message"
+                  value={form.message}
+                  onChange={(event) => setForm({ ...form, message: event.target.value })}
+                  className="min-h-36"
+                  required
+                />
+              </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Queueing..." : "Queue mail job"}
-              </Button>
-              {status?.success ? (
-                <p className="text-sm font-medium text-success">
-                  Queued job #{status.jobId} for {status.to}. Watch for the preview window.
-                </p>
-              ) : null}
-              {status && !status.success ? (
-                <p className="text-sm text-destructive">{status.error}</p>
-              ) : null}
-            </div>
-          </form>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Queueing..." : "Queue mail job"}
+                </Button>
+                {status?.success ? (
+                  <p className="text-sm font-medium text-success">
+                    Queued job #{status.jobId} for {status.to}. Watch for the preview window.
+                  </p>
+                ) : null}
+                {status && !status.success ? (
+                  <p className="text-sm text-destructive">{status.error}</p>
+                ) : null}
+              </div>
+            </form>
+          ) : (
+            <DevServerOnlyNotice />
+          )}
         </CardContent>
       </Card>
     </main>

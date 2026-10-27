@@ -6,6 +6,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { db } from "../../../db/client";
 import { demoUserUploads } from "../../../db/schema";
 import { UploadDisk, getLocalFilesystemDisk, getUploadDir } from "../../../integrations/storage";
+import { DEV_SERVER_ONLY_MESSAGE } from "../../lib/demo/dev-server-only";
 import { $appPath } from "../../lib/framework/typesafe-paths";
 
 export const MAX_DEMO_UPLOAD_BYTES = 5 * 1024 * 1024;
@@ -35,6 +36,10 @@ export const Route = createFileRoute("/demo/api/uploads")({
         });
       },
       POST: async ({ request }) => {
+        if (!import.meta.env.DEV) {
+          return Response.json({ error: DEV_SERVER_ONLY_MESSAGE }, { status: 403 });
+        }
+
         const formData = await request.formData();
         const file = formData.get("file");
 

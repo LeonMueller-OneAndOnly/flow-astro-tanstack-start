@@ -7,6 +7,7 @@ import { db } from "../../../db/client";
 import { demoTodos } from "../../../db/schema";
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
+import { DEV_SERVER_ONLY_MESSAGE, DevServerOnlyNotice } from "@/lib/demo/dev-server-only";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,8 @@ type Todo = {
   id: number;
   name: string;
 };
+
+type AddTodoResult = { success: true; todos: Array<Todo> } | { success: false; error: string };
 
 async function readTodos(): Promise<Array<Todo>> {
   const todos = await listTodos();
@@ -51,21 +54,26 @@ async function listTodos(): Promise<Array<Todo>> {
     .orderBy(asc(demoTodos.id));
 }
 
+// Seeding writes too, so production only lists what is already there.
 const getTodos = createServerFn({
   method: "GET",
-}).handler(async () => await readTodos());
+}).handler(async () => (import.meta.env.DEV ? await readTodos() : await listTodos()));
 
 const addTodo = createServerFn({ method: "POST" })
   .validator((d: string) => d.trim())
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<AddTodoResult> => {
+    if (!import.meta.env.DEV) {
+      return { success: false, error: DEV_SERVER_ONLY_MESSAGE };
+    }
+
     if (data.length === 0) {
-      return await readTodos();
+      return { success: true, todos: await readTodos() };
     }
 
     await readTodos();
     await db.insert(demoTodos).values({ name: data, createdAt: new Date() });
 
-    return await listTodos();
+    return { success: true, todos: await listTodos() };
   });
 
 /** Served at `/app/demo/start/server-funcs`; TanStack route paths are mounted under Astro's `/app` catch-all. */
@@ -76,13 +84,21 @@ export const Route = createFileRoute("/demo/start/server-funcs")({
 
 function Home() {
   const router = useRouter();
-  let todos = Route.useLoaderData();
+  const todos = Route.useLoaderData();
 
   const [todo, setTodo] = useState("");
+  const [error, setError] = useState<string | undefined>();
 
   const submitTodo = async () => {
-    todos = await addTodo({ data: todo });
+    const result = await addTodo({ data: todo });
+
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+
     setTodo("");
+    setError(undefined);
     router.invalidate();
   };
 
@@ -113,26 +129,31 @@ function Home() {
         </p>
       )}
 
-      <div className="mt-6 space-y-2">
-        <Label htmlFor="new-todo">New todo</Label>
-        <div className="flex gap-2">
-          <Input
-            id="new-todo"
-            type="text"
-            value={todo}
-            onChange={(e) => setTodo(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                submitTodo();
-              }
-            }}
-            placeholder="Enter a new todo..."
-          />
-          <Button disabled={todo.trim().length === 0} onClick={submitTodo}>
-            Add
-          </Button>
+      {import.meta.env.DEV ? (
+        <div className="mt-6 space-y-2">
+          <Label htmlFor="new-todo">New todo</Label>
+          <div className="flex gap-2">
+            <Input
+              id="new-todo"
+              type="text"
+              value={todo}
+              onChange={(e) => setTodo(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  submitTodo();
+                }
+              }}
+              placeholder="Enter a new todo..."
+            />
+            <Button disabled={todo.trim().length === 0} onClick={submitTodo}>
+              Add
+            </Button>
+          </div>
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
         </div>
-      </div>
+      ) : (
+        <DevServerOnlyNotice className="mt-6" />
+      )}
     </main>
   );
 }

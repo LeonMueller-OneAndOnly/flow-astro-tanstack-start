@@ -5,6 +5,7 @@ import { FileDown, RefreshCw } from "lucide-react";
 import { BackLink } from "@/components/BackLink";
 import { DemoExplainer } from "@/components/DemoExplainer";
 import { Button } from "@/components/ui/button";
+import { DevServerOnlyNotice } from "@/lib/demo/dev-server-only";
 import { $appPath } from "../../lib/framework/typesafe-paths";
 
 type DemoUpload = {
@@ -100,18 +101,29 @@ function UploadsDemo() {
           <h2 className="font-semibold tracking-tight">Upload</h2>
           <p className="mt-1 text-sm text-muted-foreground">Max 5 MB in this example.</p>
 
-          <input
-            aria-label="File to upload"
-            type="file"
-            onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-            className="mt-5 block w-full rounded-md border border-input bg-transparent p-2 text-sm file:mr-3 file:rounded-sm file:border-0 file:bg-secondary file:px-3 file:py-1 file:text-sm file:font-medium file:text-secondary-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-          />
+          {import.meta.env.DEV ? (
+            <>
+              <input
+                aria-label="File to upload"
+                type="file"
+                onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+                className="mt-5 block w-full rounded-md border border-input bg-transparent p-2 text-sm file:mr-3 file:rounded-sm file:border-0 file:bg-secondary file:px-3 file:py-1 file:text-sm file:font-medium file:text-secondary-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+              />
 
-          <Button type="button" onClick={uploadFile} disabled={isPending} className="mt-4 w-full">
-            {isPending ? "Uploading" : "Upload file"}
-          </Button>
+              <Button
+                type="button"
+                onClick={uploadFile}
+                disabled={isPending}
+                className="mt-4 w-full"
+              >
+                {isPending ? "Uploading" : "Upload file"}
+              </Button>
 
-          <p className="mt-4 text-sm text-muted-foreground">{message}</p>
+              <p className="mt-4 text-sm text-muted-foreground">{message}</p>
+            </>
+          ) : (
+            <DevServerOnlyNotice className="mt-5" />
+          )}
 
           <div className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
             <p className="font-medium text-foreground">Local root</p>
