@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node ./scripts/check-dev-port.ts && astro dev",
+    "install+migrate": "pnpm i && node --run db:migrate",
     "build": "astro build",
     "start": "node --import ./src/app/lib/framework/register-config-env.ts ./server/prod.ts",
     "db:generate": "drizzle-kit generate",
