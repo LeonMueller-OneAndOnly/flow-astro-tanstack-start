@@ -50,7 +50,7 @@ async function sendMagicLink(input: { email: string; url: string }) {
   await sendMail({
     mail: {
       to: input.email,
-      subject: "Sign in to Omvin Start",
+      subject: "Sign in to my app",
       text: `Open this link to sign in: ${input.url}`,
       html: `<p>Open this link to sign in:</p><p><a href="${input.url}">${input.url}</a></p>`,
     },
