@@ -1,0 +1,51 @@
+---
+/**
+ * Backlink auf omvin.ai für den Footer: der Omvin-Ring (dasselbe Zeichen wie
+ * `public/favicon.svg`) plus Wortmarke. Erbt Schriftgröße und Farbe vom
+ * Footer, damit er nicht lauter ist als die Einträge daneben. Der Text im Slot
+ * folgt der Sprache der Seite, z.B. `<OmvinBacklink>Built with</OmvinBacklink>`.
+ */
+---
+
+<a href="https://omvin.ai" class="omvin-backlink group inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
+  <span><slot>Erstellt mit</slot></span>
+  <svg viewBox="0 0 116.46 116.46" fill="none" aria-hidden="true" class="size-[1.1em] shrink-0">
+    <defs>
+      <linearGradient id="omvin-backlink-ring" gradientUnits="userSpaceOnUse" x1="20.94" y1="20.94" x2="95.52" y2="95.52">
+        <stop offset="0" class="omvin-backlink__from" />
+        <stop offset="1" class="omvin-backlink__to" />
+      </linearGradient>
+    </defs>
+    <path
+      d="M73.12 108.81A52.73 52.73 0 1 1 102.80 86.41"
+      stroke="url(#omvin-backlink-ring)"
+      stroke-width="11"
+      stroke-linecap="round"
+      class="omvin-backlink__ring"
+    />
+  </svg>
+  <span class="font-ui font-semibold tracking-[0.04em] text-foreground/80 transition-colors group-hover:text-foreground">Omvin</span>
+</a>
+
+<style>
+  /* Hell die tiefen Töne, sonst verschwindet die Lime-Hälfte auf Weiß. */
+  .omvin-backlink__from { stop-color: var(--brand-lime-deep); }
+  .omvin-backlink__to { stop-color: var(--brand-petrol); }
+  @media (prefers-color-scheme: dark) {
+    .omvin-backlink__from { stop-color: var(--brand-lime); }
+    .omvin-backlink__to { stop-color: var(--brand-cyan); }
+  }
+
+  /* Der Ring ist ein Ladekreis; beim Hover dreht er eine Runde. */
+  .omvin-backlink__ring {
+    transform-origin: 58.23px 58.23px;
+    transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .omvin-backlink:hover .omvin-backlink__ring,
+  .omvin-backlink:focus-visible .omvin-backlink__ring {
+    transform: rotate(360deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .omvin-backlink__ring { transition: none; }
+  }
+</style>
