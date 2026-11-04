@@ -16,25 +16,22 @@ export const auth = betterAuth({
   secret: SESSION_SECRET_KEY,
   database: drizzleAdapter(db, {
     provider: "sqlite",
-    schema: {
-      ...schema,
-      user: schema.authUsers,
-      session: schema.authSessions,
-      account: schema.authAccounts,
-      verification: schema.authVerifications,
-    },
+    schema,
   }),
+  // The drizzle adapter looks tables up by their key in `schema`, so modelName is the
+  // export name, not the SQL table name (that comes from `sqliteTable("auth_users")`).
+  // Since 1.7 a mismatch fails Better Auth's startup schema check.
   user: {
-    modelName: "auth_users",
+    modelName: "authUsers",
   },
   session: {
-    modelName: "auth_sessions",
+    modelName: "authSessions",
   },
   account: {
-    modelName: "auth_accounts",
+    modelName: "authAccounts",
   },
   verification: {
-    modelName: "auth_verifications",
+    modelName: "authVerifications",
   },
   emailAndPassword: {
     enabled: true,

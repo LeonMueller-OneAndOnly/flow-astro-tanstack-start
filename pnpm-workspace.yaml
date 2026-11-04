@@ -34,6 +34,18 @@ minimumReleaseAgeExclude:
   - "@tanstack/router-plugin@1.168.45"
   - "@tanstack/router-generator@1.167.43"
   - "@tanstack/history@1.162.5"
+  # Better Auth November 2026 security release (12 advisories, fixed in 1.7.16). Same
+  # rules: exact versions, direct and transitive. Published 2026-11-03, matures on
+  # 2026-11-10 — after that these entries can go.
+  - better-auth@1.7.16
+  - "@better-auth/core@1.7.16"
+  - "@better-auth/drizzle-adapter@1.7.16"
+  - "@better-auth/kysely-adapter@1.7.16"
+  - "@better-auth/memory-adapter@1.7.16"
+  - "@better-auth/mongo-adapter@1.7.16"
+  - "@better-auth/prisma-adapter@1.7.16"
+  - "@better-auth/telemetry@1.7.16"
+  - better-call@1.4.5
 
 allowBuilds:
   "@parcel/watcher": true
