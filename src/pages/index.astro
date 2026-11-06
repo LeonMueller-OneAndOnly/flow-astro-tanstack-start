@@ -703,13 +703,20 @@ const tryPrompt =
     --stage-glass-solid: #ffffffeb;
     --stage-halo: 0 0 14px rgb(255 255 255 / 0.9), 0 0 2px rgb(255 255 255 / 0.8);
     --stage-vignette: rgb(4 98 104 / 0.06);
+    --stage-chip: var(--card);
+    --stage-chip-edge: var(--border);
   }
   @media (prefers-color-scheme: dark) {
     :root:has([data-omvin-stage]) {
-      --stage-glass: #0b1d21b3;
+      --stage-glass: #0b1d21e6;
       --stage-glass-solid: #0a1a1ee6;
       --stage-halo: 0 1px 2px rgb(6 17 20 / 0.6), 0 0 18px rgb(6 17 20 / 0.85);
       --stage-vignette: rgb(6 17 20 / 0.65);
+      /* Dunkles Glas muss fast deckend sein: halb durchsichtig wird es über dem
+         hellen Polarlicht zu einem trüben Fleck. Aus demselben Grund taugen
+         `--card` und `--border` (dunkel nur Hauch-Weiß) hier nicht für Pillen. */
+      --stage-chip: var(--stage-glass-solid);
+      --stage-chip-edge: rgb(250 247 244 / 0.16);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -860,8 +867,8 @@ const tryPrompt =
     font-size: 0.72rem;
     font-weight: 500;
     color: var(--muted-foreground);
-    background: var(--card);
-    box-shadow: inset 0 0 0 1px var(--border);
+    background: var(--stage-chip);
+    box-shadow: inset 0 0 0 1px var(--stage-chip-edge);
     transition: color 400ms, background 400ms, box-shadow 400ms;
   }
   @media (min-width: 400px) {
@@ -1014,7 +1021,7 @@ const tryPrompt =
     font-size: 0.875rem;
     color: var(--foreground);
     background: var(--stage-glass);
-    box-shadow: inset 0 0 0 1px var(--border), var(--shadow-soft);
+    box-shadow: inset 0 0 0 1px var(--stage-chip-edge), var(--shadow-soft);
     backdrop-filter: blur(8px);
     transition: background 200ms, box-shadow 200ms;
   }
